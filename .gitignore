@@ -27,3 +27,6 @@ reports/ui-verification/*/
 
 # Generated map staleness scratch
 node_modules/.tmp/
+
+# Browser automation artifacts
+.playwright-mcp/
