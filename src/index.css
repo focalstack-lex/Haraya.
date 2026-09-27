@@ -1,0 +1,299 @@
+@import "tailwindcss";
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    background-color: #FBF4E4;
+    color: #1A2225;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: #FBF4E4;
+    color: #1A2225;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
+  }
+}
+
+/* Haraya Cream-Obsidian-Coffee design tokens. The page is warm cream linen, cards are
+   soft warm canvas, inputs and chips are light latte, headings are deep obsidian slate,
+   hairlines are taupe, secondary text is muted sage, and limited roasts carry the warm
+   roast accent. Tailwind v4 utilities reference theme variables, so remapping the zinc
+   scale (and white) lets stock utilities like bg-zinc-950 render as obsidian while
+   keeping every component free of hardcoded hex values. */
+:root {
+  --color-white: #FFF9E9;
+  --color-zinc-50: #FBF4E4;
+  --color-zinc-100: #F3ECD8;
+  --color-zinc-200: #E6DCC0;
+  --color-zinc-300: #D6C9A8;
+  --color-zinc-400: #A89F8C;
+  --color-zinc-500: #55615D;
+  --color-zinc-600: #45514D;
+  --color-zinc-700: #333F3D;
+  --color-zinc-800: #26302F;
+  --color-zinc-900: #1E2726;
+  --color-zinc-950: #1A2225;
+  --color-amber-50: #FBF4E4;
+  --color-amber-100: #F3ECD8;
+  --color-amber-200: #E6DCC0;
+  --color-amber-800: #C86428;
+  --color-amber-900: #A34F1E;
+  --color-emerald-800: #3E5C48;
+  --color-red-800: #8C3A2E;
+
+  --color-brand-canvas: #FBF4E4;
+  --color-brand-light: #FFF9E9;
+  --color-brand-surface: #F3ECD8;
+  --color-brand-dark: #1A2225;
+  --color-brand-hairline: #E6DCC0;
+  --color-brand-muted: #55615D;
+  --color-brand-roast: #C86428;
+  --color-brand-leaf: #3E5C48;
+}
+
+/* Typography: Cooper Black is the sibling brand face; Fraunces is the loaded web
+   fallback so the display serif renders on machines without Cooper. */
+.font-cooper {
+  font-family: 'Cooper BT', 'Cooper Black', 'Fraunces', 'Young Serif', serif;
+}
+
+.font-outfit {
+  font-family: 'Cooper BT', 'Cooper Black', 'Fraunces', 'Young Serif', serif;
+}
+
+/* Micro copy (chips, tabs, meta rows) uses the body sans; a tracked display face
+   rendered too thin below 12px on phones in the sibling platform. */
+.font-avantgarde {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+.font-sans {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+.font-mono {
+  font-family: 'Space Mono', monospace;
+}
+
+.text-display {
+  font-family: 'Cooper BT', 'Cooper Black', 'Fraunces', 'Young Serif', serif;
+  font-size: 38px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+
+.text-headline {
+  font-family: 'Cooper BT', 'Cooper Black', 'Fraunces', 'Young Serif', serif;
+  font-size: 26px;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  font-weight: 700;
+}
+
+.text-title {
+  font-family: 'Cooper BT', 'Cooper Black', 'Fraunces', 'Young Serif', serif;
+  font-size: 19px;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  font-weight: 600;
+}
+
+.text-body {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  letter-spacing: 0;
+}
+
+.text-meta {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 12px;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+}
+
+.text-micro {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 10px;
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+}
+
+/* Warm Roast Accent helpers for limited single-origin badges and drop timers */
+.text-roast {
+  color: #C86428;
+}
+
+.bg-roast {
+  background-color: #C86428;
+}
+
+.border-roast {
+  border-color: #C86428;
+}
+
+.bg-roast-soft {
+  background-color: rgba(200, 100, 40, 0.12);
+}
+
+/* Brand palette utility helpers (used by map pins, editorial banners, footer) */
+.bg-brand-dark {
+  background-color: #1A2225;
+}
+
+.bg-brand-light {
+  background-color: #FFF9E9;
+}
+
+.bg-brand-canvas {
+  background-color: #FBF4E4;
+}
+
+.bg-brand-surface {
+  background-color: #F3ECD8;
+}
+
+.border-brand-hairline {
+  border-color: #E6DCC0;
+}
+
+.text-brand-dark {
+  color: #141A1C;
+}
+
+.text-brand-muted {
+  color: #55615D;
+}
+
+/* Density scale. Tailwind v4 sizes type, spacing, icons, and radii in rem, so the
+   root font size shrinks every container, gap, and font together. Breakpoints use
+   the browser default (16px) and are not affected. Targets the same Instagram-like
+   density as the sibling platform: 14px body text, 13px secondary, ~11.5px meta on
+   phones. Declared outside any layer so the type tokens win over Tailwind's theme. */
+html {
+  font-size: 15px;
+}
+
+:root {
+  --text-xs: 0.8rem; /* 12px */
+}
+
+@media (max-width: 639px) {
+  html {
+    font-size: 14px;
+  }
+
+  :root {
+    --spacing: 0.225rem; /* 3.15px step: paddings, gaps, and boxes ~10% tighter than stock */
+    --text-xs: 0.8125rem; /* 11.4px */
+    --text-sm: 0.9286rem; /* 13px */
+    --text-base: 1rem; /* 14px */
+    --text-lg: 1.0714rem; /* 15px */
+    --text-xl: 1.2143rem; /* 17px */
+    --text-2xl: 1.3571rem; /* 19px */
+    --text-3xl: 1.5714rem; /* 22px */
+    --text-4xl: 1.7857rem; /* 25px */
+    --text-5xl: 2rem; /* 28px */
+    --text-6xl: 2.2857rem; /* 32px */
+  }
+
+  /* Text fields: 13px, compact like the rest of the body text; selects keep their own size */
+  input:not([type='checkbox']):not([type='radio']):not([type='file']),
+  textarea {
+    font-size: 13px;
+  }
+}
+
+/* iOS Safari zooms the page when a focused field is under 16px, so iOS alone keeps 16px */
+@supports (-webkit-touch-callout: none) {
+  @media (max-width: 639px) {
+    input:not([type='checkbox']):not([type='radio']):not([type='file']),
+    select,
+    textarea {
+      font-size: 16px;
+    }
+  }
+}
+
+/* Safe-area padding for fixed surfaces. Uses max() so the value never collapses to zero
+   on devices without an inset, and does not collide with Tailwind padding utilities. */
+.tabbar-safe {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
+}
+
+.sheet-safe {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+}
+
+/* Hide scrollbar for clean chip rails */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Custom Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FBF4E4;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #E6DCC0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #D6C9A8;
+}
+
+/* Editorial hero: 6-second auto-advance progress rail segments */
+.hero-progress-segment {
+  overflow: hidden;
+  border-radius: 9999px;
+  background: rgba(255, 249, 233, 0.28);
+}
+
+.hero-progress-segment > span {
+  display: block;
+  height: 100%;
+  background: #FFF9E9;
+  border-radius: 9999px;
+}
+
+/* Bean drop countdown uses tabular numerals so ticking digits do not jitter */
+.tabular-countdown {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Leaflet: transparent pin containers so custom Haraya markers render cleanly */
+.haraya-map-pin-container {
+  background: transparent;
+  border: none;
+}
+
+/* Map pin labels hide at region zoom so nearby pins do not pile up */
+.haraya-map-far .haraya-pin-label {
+  display: none !important;
+}
+
+/* Cup Check flavor pins float over post photos */
+.flavor-pin {
+  filter: drop-shadow(0 2px 6px rgba(26, 34, 37, 0.45));
+}
+
+::selection {
+  background: #1A2225;
+  color: #FFF9E9;
+}

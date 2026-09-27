@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+dist-ssr/
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+
+# Logs and local state
+*.log
+npm-debug.log*
+
+# Editor and OS noise
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# Verification run artifacts (screenshots are regenerated per run)
+reports/ui-verification/*/
+!reports/ui-verification/.gitkeep
+
+# Generated map staleness scratch
+node_modules/.tmp/
