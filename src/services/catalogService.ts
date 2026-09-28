@@ -6,11 +6,12 @@ import type {
   DropStatus,
   BeanReservation,
 } from '../types/coffee';
+import { CURATED_CAFES } from '../data/spots';
 
 /**
  * Catalog layer over roaster-created and admin-moderated records kept in
- * localStorage. There is no bundled dataset: the catalog holds only real
- * listings added through the Roaster Suite. Components read through
+ * localStorage, led by the team's curated spots (src/data/spots.ts). There is
+ * no invented dataset: every listing is a real, source-checked place. Components read through
  * catalogService; writers call the mutators here, which notify subscribers so
  * the view re-queries.
  */
@@ -93,7 +94,7 @@ export const catalogService = {
 
   getCafes(): Cafe[] {
     const verifications = readJson<Record<string, boolean>>(KEYS.VERIFICATIONS, {});
-    const custom = [...this.getCustomCafes(), ...communitySpots];
+    const custom = [...CURATED_CAFES, ...this.getCustomCafes(), ...communitySpots];
     const all = custom.map((cafe) =>
       cafe.id in verifications ? { ...cafe, verified: verifications[cafe.id] } : cafe
     );

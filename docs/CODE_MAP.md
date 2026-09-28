@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-28 : commit b8c69bb : fingerprint c842d2283b124e67
+Generated 2026-09-28 : commit 78355cf : fingerprint 61ce966a04180c0a
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -135,6 +135,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/data/
 
+- `src/data/spots.ts` (61 lines) : Curated spots listed by the Haraya team, shown ahead of roaster and community listings. Every field comes
 - `src/data/trails.ts` (8 lines) : Curated coffee trails. Empty until real trails are set up: each entry lists at least two cafe ids that
 
 ## src/hooks/
@@ -157,15 +158,15 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L96 : makeAccountId
   - L105 : ensureSeedAdmin
   - L126 : authService
-- `src/services/catalogService.ts` (347 lines) : Catalog layer over roaster-created and admin-moderated records kept in
-  - L28 : CafeMetrics
-  - L35 : MetricsStore
-  - L47 : readJson
-  - L56 : writeJson
-  - L60 : notify
-  - L65 : makeCatalogId
-  - L73 : deriveStatus
-  - L78 : catalogService
+- `src/services/catalogService.ts` (348 lines) : Catalog layer over roaster-created and admin-moderated records kept in
+  - L29 : CafeMetrics
+  - L36 : MetricsStore
+  - L48 : readJson
+  - L57 : writeJson
+  - L61 : notify
+  - L66 : makeCatalogId
+  - L74 : deriveStatus
+  - L79 : catalogService
 - `src/services/communityService.ts` (149 lines) : Cup Check community layer: browser-created posts, likes, and comments. Likes are stored per browser (no accounts needed to
 - `src/services/roasterService.ts` (115 lines) : Roaster-facing facade over the catalog: everything an approved roaster or
 - `src/services/spotMapping.test.ts` (116 lines) : src/services module: spotMapping.test
