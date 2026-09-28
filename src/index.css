@@ -284,32 +284,31 @@ html {
   padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
 }
 
-/* Tab dock: a floating surface bar; the active tab sits on a tint arch (semicircular top, straight
-   sides, resting on the bar's bottom edge) that rises above the bar's top edge and slides between tabs. --dock-i is the active index, --dock-n the tab count; cqw keeps
-   the pill and the tab centers on one axis. */
+/* Tab dock: a flush, minimalist floating navigation bar.
+   --dock-i is the active index, --dock-n the tab count; cqw keeps
+   the micro-indicator and tab centers on one axis. */
 .dock {
   container-type: inline-size;
-  --dock-pad: 10px;
+  --dock-pad: 8px;
   --dock-cell: calc((100cqw - 2 * var(--dock-pad)) / var(--dock-n));
   --dock-x: calc(var(--dock-pad) + (var(--dock-i) + 0.5) * var(--dock-cell));
 }
 
 .dock-bar {
-  background-color: var(--ios-surface);
-  box-shadow: 0 0.5px 1px rgba(19, 25, 31, 0.06), 0 10px 28px -8px rgba(19, 25, 31, 0.22);
+  background-color: rgba(255, 253, 249, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(89, 76, 61, 0.12);
+  box-shadow: 0 4px 24px -4px rgba(19, 25, 31, 0.12), 0 1px 3px rgba(19, 25, 31, 0.04);
 }
 
-.dock-pill {
-  width: min(68px, calc(var(--dock-cell) - 6px));
+.dock-indicator {
+  width: 16px;
+  height: 2.5px;
   background-color: var(--ios-tint);
-  border-radius: 999px 999px 8px 8px;
-  box-shadow: 0 -4px 12px -6px rgba(144, 109, 75, 0.45);
+  border-radius: 9999px;
   transform: translateX(calc(var(--dock-x) - 50%));
-  transition: transform 0.5s var(--ios-ease);
-}
-
-.dock-item {
-  transition: translate 0.5s var(--ios-ease), color 0.3s var(--ios-ease);
+  transition: transform 0.4s var(--ios-ease);
 }
 
 /* Hide scrollbar for clean chip rails */
