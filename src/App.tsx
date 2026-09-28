@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { NavigationHeader, PORTAL_TAB_ID, SUBMIT_TAB_ID } from './components/layout/NavigationHeader';
+import { NavigationHeader, ADMIN_TAB_ID, LOGIN_TAB_ID, PORTAL_TAB_ID, SUBMIT_TAB_ID } from './components/layout/NavigationHeader';
 import { NavigationDrawer } from './components/layout/NavigationDrawer';
 import { BottomTabBar } from './components/layout/BottomTabBar';
 import { FooterSection } from './components/layout/FooterSection';
@@ -16,12 +16,11 @@ import { CafeDetailModal } from './components/cafe/CafeDetailModal';
 import { DavaoCoffeeMap } from './components/map/DavaoCoffeeMap';
 import { DirectionsActionSheet } from './components/map/DirectionsActionSheet';
 
-import { AuthView, type AuthMode } from './components/auth/AuthView';
-import { ApplicationStatusView } from './components/auth/ApplicationStatusView';
-import { RoasterDashboard } from './components/roaster/RoasterDashboard';
 import { AdminDashboard } from './components/admin/AdminDashboard';
 
 import { AddSpotView } from './views/AddSpotView';
+import { LoginView, type LoginMode } from './views/LoginView';
+import { PlacePortalView } from './views/PlacePortalView';
 import { ProfileView } from './views/ProfileView';
 import { SharedListView } from './views/SharedListView';
 import { LegalView } from './views/LegalView';
@@ -36,19 +35,20 @@ import type { MoodId } from './components/moodFinder/moods';
 
 import { catalogService } from './services/catalogService';
 import { userPrefsService } from './services/userPrefsService';
-import { authService } from './services/authService';
 import { communityService } from './services/communityService';
+import { sessionService, RESET_RETURN_TAB } from './services/sessionService';
 import { spotService } from './services/spotService';
-import { useCatalogVersion, usePrefsVersion, useCommunityVersion, useAuthVersion, useSpotVersion } from './hooks/useServiceVersions';
+import { placeService } from './services/placeService';
+import { useCatalogVersion, usePrefsVersion, useCommunityVersion, useSessionVersion, useSpotVersion, usePlaceVersion } from './hooks/useServiceVersions';
 import { buildHash, parseHash, setHash } from './utils/router';
 import { distanceKm } from './utils/geo';
 import { PRICE_RANGES } from './types/coffee';
-import type { Account } from './types/auth';
 import type { Cafe } from './types/coffee';
 
-// Drops, beans and Cup Check are hidden since the discovery pivot (their code is kept); the roaster portal
-// stays reachable only by its hash route.
-const TAB_IDS = new Set(['feed', 'map', SUBMIT_TAB_ID, 'profile', 'saved', 'privacy', 'terms', PORTAL_TAB_ID]);
+// Drops, beans and Cup Check are hidden since the discovery pivot (their code is kept).
+const TAB_IDS = new Set(['feed', 'map', SUBMIT_TAB_ID, 'profile', 'saved', 'privacy', 'terms', LOGIN_TAB_ID, PORTAL_TAB_ID, ADMIN_TAB_ID]);
+/** Older links: the roaster portal is now the Place Portal. */
+const TAB_ALIASES: Record<string, string> = { roaster: PORTAL_TAB_ID };
 
 interface SharedList {
   name: string;
@@ -80,8 +80,9 @@ export const App: React.FC = () => {
   const catalogVersion = useCatalogVersion();
   usePrefsVersion();
   useCommunityVersion();
-  useAuthVersion();
+  useSessionVersion();
   useSpotVersion();
+  usePlaceVersion();
 
   // Navigation state
   const [activeTab, setActiveTabState] = useState('feed');
@@ -111,14 +112,23 @@ export const App: React.FC = () => {
   const [directionsFor, setDirectionsFor] = useState<Cafe | null>(null);
   const [navTarget, setNavTarget] = useState<Cafe | null>(null);
 
-  // Auth state
-  const [account, setAccount] = useState<Account | null>(() => authService.getCurrentAccount());
-  const [authMode, setAuthMode] = useState<AuthMode>('signin');
+  // Sign-in page: how it opens and where it returns to afterwards
+  const [loginIntent, setLoginIntent] = useState<{ mode: LoginMode; returnTab: string }>({ mode: 'signin', returnTab: 'profile' });
 
   const baseHashRef = useRef(buildHash('/tab/feed'));
 
-  // Once per load: forget saves, ratings, reminders and likes that point at records no longer in the
-  // catalog (the retired demo dataset included), so badges and counts only reflect real listings
+  const setActiveTab = useCallback((tab: string) => {
+    const resolved = TAB_ALIASES[tab] ?? tab;
+    setActiveTabState(resolved);
+    if (TAB_IDS.has(resolved)) {
+      baseHashRef.current = buildHash(`/tab/${resolved}`);
+      setHash(baseHashRef.current);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  // Once per load: restore the session, load listings and community spots, then forget saves, ratings,
+  // reminders and likes that point at records no longer in the catalog (the retired demo dataset included)
   useEffect(() => {
     const prune = () => {
       try {
@@ -132,31 +142,23 @@ export const App: React.FC = () => {
         console.warn('Haraya: could not clean up stale saved records', error);
       }
     };
-    // Load community spots before pruning, so saves of community spots are not mistaken for stale ones.
-    // A failed load skips pruning rather than deleting saves on a flaky connection.
-    spotService
+    sessionService
       .start()
+      .then(() => Promise.all([spotService.start(), placeService.start()]))
       .then(() => {
-        if (!spotService.getLoadError()) prune();
-        const returnTab = spotService.takeReturnTab();
-        if (returnTab && spotService.getUser()) setActiveTabState(returnTab);
+        // A failed load skips pruning rather than deleting saves on a flaky connection
+        if (!spotService.getLoadError() && !placeService.getLoadError()) prune();
+        // Back from an email link: a reset link opens the new-password form, a sign-in link its origin tab
+        const returnTab = sessionService.takeReturnTab();
+        if (returnTab === RESET_RETURN_TAB) {
+          setLoginIntent({ mode: 'reset', returnTab: 'profile' });
+          setActiveTab(LOGIN_TAB_ID);
+        } else if (returnTab && sessionService.getUser()) {
+          setActiveTab(returnTab);
+        }
       })
-      .catch((error) => console.warn('Haraya: could not start community spots', error));
-    // Remove identity photos, the old seeded admin and any plain-text password earlier builds stored
-    authService.purgeSensitiveStorage().catch((error) => {
-      console.warn('Haraya: could not clean up sensitive browser storage', error);
-    });
-  }, []);
-
-  useEffect(() => {
-    const refresh = () => setAccount(authService.getCurrentAccount());
-    const unsubscribe = authService.subscribe(refresh);
-    window.addEventListener('storage', refresh);
-    return () => {
-      unsubscribe();
-      window.removeEventListener('storage', refresh);
-    };
-  }, []);
+      .catch((error) => console.warn('Haraya: could not start the session', error));
+  }, [setActiveTab]);
 
   // Hash routes: deep links on load, back and forward navigation
   useEffect(() => {
@@ -164,9 +166,10 @@ export const App: React.FC = () => {
       const route = parseHash();
       switch (route.kind) {
         case 'tab': {
-          if (TAB_IDS.has(route.id)) {
-            setActiveTabState(route.id);
-            baseHashRef.current = buildHash(`/tab/${route.id}`);
+          const id = TAB_ALIASES[route.id] ?? route.id;
+          if (TAB_IDS.has(id)) {
+            setActiveTabState(id);
+            baseHashRef.current = buildHash(`/tab/${id}`);
           }
           setSelectedCafeId(null);
           break;
@@ -216,15 +219,6 @@ export const App: React.FC = () => {
     return () => window.removeEventListener('hashchange', apply);
   }, []);
 
-  const setActiveTab = useCallback((tab: string) => {
-    setActiveTabState(tab);
-    if (TAB_IDS.has(tab)) {
-      baseHashRef.current = buildHash(`/tab/${tab}`);
-      setHash(baseHashRef.current);
-    }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
-
   const openCafe = useCallback((cafeId: string) => {
     const cafe = catalogService.getCafeById(cafeId);
     if (!cafe) return;
@@ -253,22 +247,32 @@ export const App: React.FC = () => {
     });
   };
 
-  const handleAuthenticated = (nextAccount: Account) => {
-    setAccount(nextAccount);
+  // Accounts ------------------------------------------------------------------
+
+  /** Opens the sign-in page; after sign-in the app returns to `returnTab`. */
+  const openLogin = (returnTab: string = 'profile') => {
+    setLoginIntent({ mode: 'signin', returnTab });
+    setActiveTab(LOGIN_TAB_ID);
+  };
+
+  const handleSignedIn = () => {
+    const target = loginIntent.returnTab;
+    setLoginIntent({ mode: 'signin', returnTab: 'profile' });
     // First sign-in on this device: Aya walks them through Discover once, same as Get started
     if (!isTourDone()) {
       startTour();
       return;
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setActiveTab(target);
   };
 
   const handleSignOut = () => {
-    authService.signOut();
-    setAccount(null);
-    setAuthMode('signin');
+    void sessionService.signOut();
     setActiveTab('feed');
   };
+
+  const openPortal = () => setActiveTab(PORTAL_TAB_ID);
+  const openAdmin = () => setActiveTab(ADMIN_TAB_ID);
 
   // Guided tour runs on Discover's cafe catalog; wait for the tab switch and scroll-to-top to settle
   const startTour = () => {
@@ -397,42 +401,8 @@ export const App: React.FC = () => {
   };
 
   const savedCount = savedCafeIds.length;
-  const portalRole: 'guest' | Account['role'] = !account ? 'guest' : account.role;
-  const accountName = account ? (account.role === 'admin' ? account.name : account.businessName) : null;
-
-  const renderPortal = () => {
-    if (!account) {
-      return (
-        <AuthView
-          mode={authMode}
-          onModeChange={setAuthMode}
-          onAuthenticated={handleAuthenticated}
-          onBrowseFeed={() => setActiveTab('feed')}
-        />
-      );
-    }
-    if (account.role === 'admin') {
-      return <AdminDashboard admin={account} onSignOut={handleSignOut} onViewCafe={openCafe} />;
-    }
-    if (account.status !== 'approved') {
-      return <ApplicationStatusView account={account} onSignOut={handleSignOut} onBrowseFeed={() => setActiveTab('feed')} />;
-    }
-    try {
-      return <RoasterDashboard key={account.id} account={account} onSignOut={handleSignOut} onViewStorefront={openCafe} />;
-    } catch {
-      return (
-        <div className="max-w-xl mx-auto px-4 py-12 text-center space-y-3">
-          <h2 className="font-cooper text-xl font-bold text-[#13191F]">Roastery profile missing</h2>
-          <p className="text-sm font-sans text-[#594C3D]">
-            The approved account has no cafe record in this browser. Ask an admin to re-approve the application.
-          </p>
-          <button onClick={handleSignOut} className="h-10 px-5 rounded-full bg-[#13191F] text-[#FFFDF9] text-xs font-bold font-sans">
-            Sign Out
-          </button>
-        </div>
-      );
-    }
-  };
+  const portalRole = sessionService.getPortalRole();
+  const accountName = sessionService.getUser() ? sessionService.getDisplayName() : null;
 
   const renderFeed = () => {
     if (sharedList) {
@@ -532,7 +502,9 @@ export const App: React.FC = () => {
         isDrawerOpen={isDrawerOpen}
         setIsDrawerOpen={setIsDrawerOpen}
         portalRole={portalRole}
+        accountName={accountName}
         onOpenWelcome={() => setIsWelcomeOpen(true)}
+        onOpenLogin={() => openLogin('profile')}
       />
 
       <NavigationDrawer
@@ -546,6 +518,7 @@ export const App: React.FC = () => {
         portalRole={portalRole}
         accountName={accountName}
         onSignOut={handleSignOut}
+        onOpenLogin={() => openLogin('profile')}
       />
 
       <main className="flex-1 pb-28 sm:pb-32">
@@ -568,13 +541,25 @@ export const App: React.FC = () => {
             onExploreFeed={() => setActiveTab('feed')}
             onOpenMap={() => setActiveTab('map')}
             onOpenAuth={openAddSpot}
+            onOpenLogin={() => openLogin('profile')}
+            onOpenPortal={openPortal}
+            onOpenAdmin={openAdmin}
+            onSignOut={handleSignOut}
             onStartTour={startTour}
           />
         )}
 
-        {activeTab === SUBMIT_TAB_ID && <AddSpotView onViewSpot={openCafe} />}
+        {activeTab === SUBMIT_TAB_ID && <AddSpotView onViewSpot={openCafe} onOpenLogin={() => openLogin(SUBMIT_TAB_ID)} onOpenAdmin={openAdmin} />}
 
-        {activeTab === PORTAL_TAB_ID && renderPortal()}
+        {activeTab === LOGIN_TAB_ID && (
+          <LoginView initialMode={loginIntent.mode} onSignedIn={handleSignedIn} onBrowse={() => setActiveTab('feed')} />
+        )}
+
+        {activeTab === PORTAL_TAB_ID && (
+          <PlacePortalView onOpenLogin={() => openLogin(PORTAL_TAB_ID)} onViewPlace={openCafe} onBrowse={() => setActiveTab('feed')} />
+        )}
+
+        {activeTab === ADMIN_TAB_ID && <AdminDashboard onViewCafe={openCafe} onOpenLogin={() => openLogin(ADMIN_TAB_ID)} />}
 
         {(activeTab === 'privacy' || activeTab === 'terms') && <LegalView page={activeTab} />}
       </main>
@@ -625,7 +610,7 @@ export const App: React.FC = () => {
         onLogIn={() => {
           setIsWelcomeOpen(false);
           markWelcomed();
-          openAddSpot();
+          openLogin('profile');
         }}
       />
 

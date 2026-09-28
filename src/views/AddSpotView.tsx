@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Check, Clock, LogOut, Mail, MapPin, X } from 'lucide-react';
+import { KeyRound, LogOut, Mail, MapPin, ShieldCheck } from 'lucide-react';
 import { LargeTitle } from '../components/common/LargeTitle';
 import { AyaMascot } from '../components/common/AyaMascot';
-import { Chip, ErrorNote, Field, PrimaryButton, SelectInput, TextArea, TextInput } from '../components/common/FormControls';
+import { Chip, ErrorNote, Field, PrimaryButton, SecondaryButton, SelectInput, TextArea, TextInput } from '../components/common/FormControls';
 import { LocationPicker } from '../components/community/LocationPicker';
 import { spotService } from '../services/spotService';
 import { useSpotVersion } from '../hooks/useServiceVersions';
@@ -20,6 +20,10 @@ import {
 
 interface AddSpotViewProps {
   onViewSpot: (cafeId: string) => void;
+  /** Opens the sign-in page (email and password); Add a Spot also offers a one-time link here. */
+  onOpenLogin: () => void;
+  /** Admins review spots in the Control Room. */
+  onOpenAdmin: () => void;
 }
 
 const EMPTY: SpotInput = {
@@ -56,7 +60,7 @@ const statusText: Record<SpotRow['status'], { label: string; tone: string }> = {
 const toggle = <T,>(list: T[], item: T): T[] => (list.includes(item) ? list.filter((entry) => entry !== item) : [...list, item]);
 
 /** Email sign-in with a one-time link; Supabase creates the account on first use. */
-const SignInCard: React.FC = () => {
+const SignInCard: React.FC<{ onOpenLogin: () => void }> = ({ onOpenLogin }) => {
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -100,9 +104,17 @@ const SignInCard: React.FC = () => {
         <TextInput value={email} onChange={setEmail} type="email" placeholder="you@email.com" />
       </Field>
       {error && <ErrorNote message={error} />}
-      <PrimaryButton onClick={() => void send()} disabled={busy || !email.trim()} className="w-full sm:w-auto">
-        {busy ? 'Sending' : 'Email me a sign-in link'}
-      </PrimaryButton>
+      <div className="flex flex-col sm:flex-row gap-2">
+        <PrimaryButton onClick={() => void send()} disabled={busy || !email.trim()} className="w-full sm:w-auto">
+          {busy ? 'Sending' : 'Email me a sign-in link'}
+        </PrimaryButton>
+        <SecondaryButton onClick={onOpenLogin} className="w-full sm:w-auto">
+          <span className="inline-flex items-center gap-1.5">
+            <KeyRound className="w-4 h-4" />
+            Use a password
+          </span>
+        </SecondaryButton>
+      </div>
       <p className="ios-footnote text-[#594C3D]">
         By signing in you agree to the{' '}
         <a href="#/tab/terms" className="font-semibold text-[#7D5C3D] underline underline-offset-2">Terms</a> and{' '}
@@ -289,85 +301,8 @@ const MySpots: React.FC<{ rows: SpotRow[]; onViewSpot: (cafeId: string) => void 
   );
 };
 
-const ReviewQueue: React.FC<{ rows: SpotRow[]; onViewSpot: (cafeId: string) => void }> = ({ rows, onViewSpot }) => {
-  const [notes, setNotes] = useState<Record<string, string>>({});
-  const [busyId, setBusyId] = useState<string | null>(null);
-  const [error, setError] = useState('');
-
-  const review = async (id: string, status: 'approved' | 'rejected') => {
-    setBusyId(id);
-    setError('');
-    try {
-      await spotService.review(id, status, notes[id] ?? '');
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Could not save the review.');
-    } finally {
-      setBusyId(null);
-    }
-  };
-
-  return (
-    <section className="space-y-2" aria-labelledby="review-title">
-      <h2 id="review-title" className="ios-title px-1">
-        Review queue <span className="font-mono text-[#594C3D]">({rows.length})</span>
-      </h2>
-      {error && <ErrorNote message={error} />}
-      {rows.length === 0 ? (
-        <p className="px-1 text-[14px] text-[#594C3D]">Nothing waiting for review.</p>
-      ) : (
-        rows.map((row) => (
-          <article key={row.id} className={`${CARD} space-y-2.5`}>
-            <div>
-              <h3 className="ios-headline text-[#13191F]">{row.name}</h3>
-              <p className="ios-footnote text-[#594C3D]">
-                {row.address}, {row.district}, {row.city}
-              </p>
-              {row.tip && <p className="text-[14px] text-[#13191F]/85 mt-1">"{row.tip}"</p>}
-              <p className="ios-footnote text-[#594C3D] mt-1">
-                <span className="font-mono">{row.lat.toFixed(5)}, {row.lng.toFixed(5)}</span>
-                {row.opens_at && row.closes_at && (
-                  <span className="inline-flex items-center gap-1 ml-2">
-                    <Clock className="w-3.5 h-3.5" /> {row.opens_at.slice(0, 5)} to {row.closes_at.slice(0, 5)}
-                  </span>
-                )}
-              </p>
-            </div>
-            <button onClick={() => onViewSpot(`spot-${row.id}`)} className="ios-footnote font-semibold text-[#7D5C3D] ios-press min-h-9">
-              See it on the map
-            </button>
-            <input
-              value={notes[row.id] ?? ''}
-              onChange={(event) => setNotes((current) => ({ ...current, [row.id]: event.target.value }))}
-              maxLength={280}
-              placeholder="Note to the contributor (shown if rejected)"
-              aria-label={`Review note for ${row.name}`}
-              className="w-full h-11 ios-fill rounded-[12px] px-3.5 text-[14px] text-[#13191F] placeholder:text-[#6E6150] focus:outline-none focus:shadow-[0_0_0_2px_#906D4B]"
-            />
-            <div className="flex gap-2">
-              <button
-                onClick={() => void review(row.id, 'approved')}
-                disabled={busyId === row.id}
-                className="h-11 flex-1 rounded-full bg-[#3E5C48] text-[#FFFDF9] text-[15px] font-semibold inline-flex items-center justify-center gap-1.5 disabled:opacity-50 ios-press"
-              >
-                <Check className="w-4 h-4" /> Approve
-              </button>
-              <button
-                onClick={() => void review(row.id, 'rejected')}
-                disabled={busyId === row.id}
-                className="h-11 flex-1 rounded-full ios-fill text-[#8C3A2E] text-[15px] font-semibold inline-flex items-center justify-center gap-1.5 disabled:opacity-50 ios-press"
-              >
-                <X className="w-4 h-4" /> Reject
-              </button>
-            </div>
-          </article>
-        ))
-      )}
-    </section>
-  );
-};
-
 /** Add a Spot: community submissions of cafes and study spots, reviewed before they go public. */
-export const AddSpotView: React.FC<AddSpotViewProps> = ({ onViewSpot }) => {
+export const AddSpotView: React.FC<AddSpotViewProps> = ({ onViewSpot, onOpenLogin, onOpenAdmin }) => {
   useSpotVersion();
   const [justSent, setJustSent] = useState(false);
   const user = spotService.getUser();
@@ -385,7 +320,7 @@ export const AddSpotView: React.FC<AddSpotViewProps> = ({ onViewSpot }) => {
           <p className="text-[15px] text-[#594C3D]">Adding spots is not available right now. Please check back soon.</p>
         </div>
       ) : !user ? (
-        <SignInCard />
+        <SignInCard onOpenLogin={onOpenLogin} />
       ) : (
         <>
           <div className="flex items-center justify-between gap-3 px-1">
@@ -413,7 +348,19 @@ export const AddSpotView: React.FC<AddSpotViewProps> = ({ onViewSpot }) => {
 
           <SpotForm onSubmitted={() => setJustSent(true)} />
           <MySpots rows={spotService.getMySubmissions()} onViewSpot={onViewSpot} />
-          {spotService.isAdmin() && <ReviewQueue rows={spotService.getReviewQueue()} onViewSpot={onViewSpot} />}
+          {spotService.isAdmin() && (
+            <button onClick={onOpenAdmin} className="ios-group ios-card-shadow w-full text-left">
+              <span className="ios-group-row ios-press">
+                <ShieldCheck className="w-4.5 h-4.5 shrink-0 text-[#906D4B]" />
+                <span className="flex-1 min-w-0">
+                  <span className="block ios-headline text-[#13191F]">Review spots in the Control Room</span>
+                  <span className="block ios-footnote text-[#594C3D]">
+                    <span className="font-mono">{spotService.getReviewQueue().length}</span> waiting for review
+                  </span>
+                </span>
+              </span>
+            </button>
+          )}
         </>
       )}
     </div>

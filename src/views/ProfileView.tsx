@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Star, Navigation, Edit3, ChevronRight, LogOut, Compass } from 'lucide-react';
+import { Star, Navigation, Edit3, ChevronRight, LogOut, LogIn, Compass, Store, ShieldCheck } from 'lucide-react';
 import {
   WaxStampSealIcon,
   CuppingSpoonIcon,
@@ -11,8 +11,8 @@ import {
 import type { Cafe } from '../types/coffee';
 import { userPrefsService } from '../services/userPrefsService';
 import { catalogService } from '../services/catalogService';
-import { authService } from '../services/authService';
-import { useCatalogVersion, usePrefsVersion, useAuthVersion } from '../hooks/useServiceVersions';
+import { sessionService } from '../services/sessionService';
+import { useCatalogVersion, usePrefsVersion, useSessionVersion } from '../hooks/useServiceVersions';
 import { directionsUrl } from '../utils/geo';
 import { isOpenNow, hoursTodayLabel, hasListedHours } from '../utils/calendar';
 import { RateCafeModal } from '../components/cafe/RateCafeModal';
@@ -28,6 +28,10 @@ interface ProfileViewProps {
   onExploreFeed: () => void;
   onOpenMap?: () => void;
   onOpenAuth?: () => void;
+  onOpenLogin: () => void;
+  onOpenPortal: () => void;
+  onOpenAdmin: () => void;
+  onSignOut: () => void;
   /** Replays the first-visit guided tour on Discover. */
   onStartTour?: () => void;
 }
@@ -69,16 +73,21 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   onExploreFeed,
   onOpenMap,
   onOpenAuth,
+  onOpenLogin,
+  onOpenPortal,
+  onOpenAdmin,
+  onSignOut,
   onStartTour,
 }) => {
   useCatalogVersion();
   usePrefsVersion();
-  useAuthVersion();
+  useSessionVersion();
 
   const [section, setSection] = useState<ProfileSection>('overview');
   const [ratingCafe, setRatingCafe] = useState<Cafe | null>(null);
 
-  const account = authService.getCurrentAccount();
+  const user = sessionService.getUser();
+  const portalRole = sessionService.getPortalRole();
   const ratings = userPrefsService.getRatings();
   const savedCafeIds = userPrefsService.getSavedCafes();
 
@@ -104,8 +113,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   const exploredPercent = Math.round((ratedCafes.length / Math.max(allCafesCount, 1)) * 100);
   const points = ratedCafes.length * 50 + savedCafes.length * 10;
 
-  const displayName = account ? (account.role === 'admin' ? 'Haraya Admin' : account.name) : 'Guest';
-  const displayEmail = account ? account.email : 'Saves and ratings stay on this device';
+  const displayName = user ? sessionService.getDisplayName() || 'Signed in' : 'Guest';
+  const displayEmail = user ? user.email ?? '' : 'Saves and ratings stay on this device';
   const initials =
     displayName
       .split(/\s+/)
@@ -136,15 +145,33 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <h2 className="text-[19px] font-semibold leading-tight text-[#13191F] truncate">{displayName}</h2>
-              {account?.role === 'admin' && (
+              {portalRole === 'admin' && (
                 <span className="shrink-0 px-2 py-0.5 rounded-full bg-[#906D4B]/15 text-[#7D5C3D] text-[11px] font-semibold">
                   Admin
+                </span>
+              )}
+              {portalRole === 'roaster' && (
+                <span className="shrink-0 px-2 py-0.5 rounded-full bg-[#3E5C48]/12 text-[#3E5C48] text-[11px] font-semibold">
+                  Place owner
                 </span>
               )}
             </div>
             <p className="ios-footnote text-[#594C3D] truncate mt-0.5">{displayEmail}</p>
           </div>
         </div>
+
+        {!user && (
+          <button onClick={onOpenLogin} className="ios-group-row ios-press">
+            <RowIcon>
+              <LogIn className="w-4 h-4" strokeWidth={2.2} />
+            </RowIcon>
+            <span className="flex-1 min-w-0">
+              <span className="block text-[15px] text-[#13191F]">Sign in or create an account</span>
+              <span className="block ios-footnote text-[#594C3D] truncate">Add spots and list your own place</span>
+            </span>
+            <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]/60" strokeWidth={2.5} />
+          </button>
+        )}
 
         <div className="ios-group-row">
           <RowIcon>
@@ -265,9 +292,42 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             </div>
           </section>
 
-          {account && (
+          <section className="space-y-1.5">
+            <h3 className="px-4 text-[13px] text-[#594C3D]">Your place</h3>
             <div className="ios-group">
-              <button onClick={() => authService.signOut()} className="ios-group-row ios-press">
+              <button onClick={onOpenPortal} className="ios-group-row ios-press">
+                <RowIcon>
+                  <Store className="w-4 h-4" strokeWidth={2.2} />
+                </RowIcon>
+                <span className="flex-1 min-w-0">
+                  <span className="block text-[15px] text-[#13191F]">
+                    {portalRole === 'roaster' ? 'Manage your listing' : 'List your cafe or study spot'}
+                  </span>
+                  <span className="block ios-footnote text-[#594C3D] truncate">
+                    {portalRole === 'roaster' ? 'Hours, amenities, menu and more' : 'Own a place? Get a verified listing'}
+                  </span>
+                </span>
+                <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]/60" strokeWidth={2.5} />
+              </button>
+
+              {portalRole === 'admin' && (
+                <button onClick={onOpenAdmin} className="ios-group-row ios-press">
+                  <RowIcon>
+                    <ShieldCheck className="w-4 h-4" strokeWidth={2.2} />
+                  </RowIcon>
+                  <span className="flex-1 min-w-0">
+                    <span className="block text-[15px] text-[#13191F]">Control Room</span>
+                    <span className="block ios-footnote text-[#594C3D] truncate">Review spots, applications and accounts</span>
+                  </span>
+                  <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]/60" strokeWidth={2.5} />
+                </button>
+              )}
+            </div>
+          </section>
+
+          {user && (
+            <div className="ios-group">
+              <button onClick={onSignOut} className="ios-group-row ios-press">
                 <RowIcon tone="red">
                   <LogOut className="w-4 h-4" strokeWidth={2.2} />
                 </RowIcon>

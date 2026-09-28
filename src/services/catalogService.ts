@@ -44,6 +44,8 @@ const listeners = new Set<() => void>();
 let version = 0;
 /** Community-added spots supplied by spotService (approved ones, plus the visitor's own pending ones). */
 let communitySpots: Cafe[] = [];
+/** Public listings from the cafes table, supplied by placeService (owner-managed, admin-verified). */
+let listedCafes: Cafe[] = [];
 
 function readJson<T>(key: string, fallback: T): T {
   try {
@@ -94,7 +96,7 @@ export const catalogService = {
 
   getCafes(): Cafe[] {
     const verifications = readJson<Record<string, boolean>>(KEYS.VERIFICATIONS, {});
-    const custom = [...CURATED_CAFES, ...this.getCustomCafes(), ...communitySpots];
+    const custom = [...CURATED_CAFES, ...this.getCustomCafes(), ...listedCafes, ...communitySpots];
     const all = custom.map((cafe) =>
       cafe.id in verifications ? { ...cafe, verified: verifications[cafe.id] } : cafe
     );
@@ -104,6 +106,12 @@ export const catalogService = {
   /** Replaces the community spots shown on the map and feed; called by spotService after each load. */
   setCommunitySpots(spots: Cafe[]): void {
     communitySpots = spots;
+    notify();
+  },
+
+  /** Replaces the public listings shown on the map and feed; called by placeService after each load. */
+  setListedCafes(cafes: Cafe[]): void {
+    listedCafes = cafes;
     notify();
   },
 

@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-28 : commit 78355cf : fingerprint 61ce966a04180c0a
+Generated 2026-09-28 : commit 2999b56 : fingerprint 12530f4bfb29df07
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -11,7 +11,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 - `index.html` (30 lines) : . module: index.html
 - `scripts/generate-code-map.mjs` (212 lines) : One-line purpose per file, inferred from its path and leading doc comment.
-- `src/App.tsx` (649 lines) : Storage can throw in private windows or with blocked site data; the welcome sheet is a convenience.
+- `src/App.tsx` (634 lines) : Older links: the roaster portal is now the Place Portal.
   - L53 : SharedList
   - L79 : App
 - `src/index.css` (737 lines) : src entry point
@@ -20,15 +20,11 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/admin/
 
-- `src/components/admin/AdminDashboard.tsx` (243 lines) : Control Room: verification queue, venue verification toggles, catalog pulse.
-
-## src/components/auth/
-
-- `src/components/auth/ApplicationStatusView.tsx` (85 lines) : One label and value row inside the grouped application list.
-- `src/components/auth/AuthView.tsx` (335 lines) : Roaster Suite entry: sign in, or a three-step verified roaster registration.
-  - L12 : AuthMode
-  - L14 : AuthViewProps
-  - L24 : AuthView
+- `src/components/admin/AdminDashboard.tsx` (465 lines) : A public listing from the cafes table (not a curated, community or legacy browser-only cafe).
+  - L16 : AdminDashboardProps
+  - L21 : AdminTab
+  - L325 : AdminDashboard
+- `src/components/admin/SpotReviewQueue.tsx` (86 lines) : Admin review of community spot submissions: approve to publish, reject with a note to the contributor.
 
 ## src/components/cafe/
 
@@ -83,8 +79,8 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 - `src/components/layout/BottomTabBar.tsx` (67 lines) : Persistent mobile bottom navigation (hidden while a detail modal is open). A floating dock: the
 - `src/components/layout/FooterSection.tsx` (97 lines) : Global footer: light canvas with a hairline top, the city directory and roaster links.
-- `src/components/layout/NavigationDrawer.tsx` (183 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
-- `src/components/layout/NavigationHeader.tsx` (204 lines) : The legacy roaster portal (sign-in, roaster dashboard, admin panel). Hidden from navigation since the
+- `src/components/layout/NavigationDrawer.tsx` (213 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
+- `src/components/layout/NavigationHeader.tsx` (217 lines) : Tab ids reachable by hash route but not shown in the primary navigation.
 
 ## src/components/map/
 
@@ -140,38 +136,51 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/hooks/
 
-- `src/hooks/useServiceVersions.ts` (33 lines) : Subscriber-version hooks: each service exposes a monotonically increasing
+- `src/hooks/useServiceVersions.ts` (43 lines) : Subscriber-version hooks: each service exposes a monotonically increasing
 
 ## src/services/
 
-- `src/services/authService.ts` (345 lines) : Browser account layer for the Roaster Suite. Accounts, applications, and the
-  - L25 : StoredApplication
-  - L32 : SignUpInput
-  - L40 : StoredCredential
-  - L45 : CredentialStore
-  - L54 : derive
-  - L60 : hashPassword
-  - L65 : verifyPassword
-  - L78 : readJson
-  - L87 : writeJson
-  - L91 : notify
-  - L96 : makeAccountId
-  - L105 : ensureSeedAdmin
-  - L126 : authService
-- `src/services/catalogService.ts` (348 lines) : Catalog layer over roaster-created and admin-moderated records kept in
+- `src/services/adminService.ts` (66 lines) : Control Room account management: the list of profiles (readable by admins only, per Row Level
+- `src/services/catalogService.ts` (356 lines) : Catalog layer over roaster-created and admin-moderated records kept in
   - L29 : CafeMetrics
   - L36 : MetricsStore
-  - L48 : readJson
-  - L57 : writeJson
-  - L61 : notify
-  - L66 : makeCatalogId
-  - L74 : deriveStatus
-  - L79 : catalogService
+  - L50 : readJson
+  - L59 : writeJson
+  - L63 : notify
+  - L68 : makeCatalogId
+  - L76 : deriveStatus
+  - L81 : catalogService
 - `src/services/communityService.ts` (149 lines) : Cup Check community layer: browser-created posts, likes, and comments. Likes are stored per browser (no accounts needed to
+- `src/services/placeMapping.test.ts` (155 lines) : src/services module: placeMapping.test
+- `src/services/placeMapping.ts` (368 lines) : Place Portal data: the application a place owner sends (place_applications), the public listing row
+  - L12 : PLACE_TYPES
+  - L17 : PlaceType
+  - L20 : REGION_BOUNDS
+  - L22 : APPLICATION_LIMITS
+  - L31 : LISTING_LIMITS
+  - L44 : LISTING_AMENITIES
+  - L46 : City
+  - L48 : PlaceApplicationInput
+  - L63 : PlaceApplicationRow
+  - L85 : CafeRow
+  - L113 : ListingInput
+  - L147 : placeTypeLabel
+  - L151 : emptyHours
+  - L160 : validatePlaceApplication
+  - L185 : toApplicationInsertRow
+  - L204 : parseHours
+  - L219 : parseMenu
+  - L239 : cafeRowToCafe
+  - L271 : listingFromCafe
+  - L293 : validateListing
+  - L331 : toCafeUpdateRow
+  - L358 : describePlaceError
+- `src/services/placeService.ts` (206 lines) : Public listings (table cafes) and Place Portal applications (table place_applications). Listings are
 - `src/services/roasterService.ts` (115 lines) : Roaster-facing facade over the catalog: everything an approved roaster or
+- `src/services/sessionService.ts` (279 lines) : The signed-in account: Supabase Auth session plus the caller's row in public.profiles (role, status,
 - `src/services/spotMapping.test.ts` (116 lines) : src/services module: spotMapping.test
 - `src/services/spotMapping.ts` (178 lines) : Community spot submissions: the row shape stored in Supabase (spot_submissions), the form input, the
-- `src/services/spotService.ts` (223 lines) : Add a Spot backed by Supabase (table spot_submissions). Row Level Security decides what each caller can
+- `src/services/spotService.ts` (169 lines) : Add a Spot backed by Supabase (table spot_submissions). Row Level Security decides what each caller can
 - `src/services/userPrefsService.ts` (367 lines) : Buyer-side preferences kept per browser: saved cafes and beans, custom coffee
   - L20 : CafeRating
   - L27 : CustomList
@@ -184,7 +193,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/types/
 
-- `src/types/auth.ts` (36 lines) : Roaster, cafe owner, and admin accounts for the Haraya Roaster Suite.
+- `src/types/auth.ts` (61 lines) : Accounts. Real sign-in is Supabase Auth; the row in public.profiles carries the role. The legacy
 - `src/types/coffee.ts` (261 lines) : Haraya domain model: Davao Region cafes and study spots (listed or added by the community), plus the
 
 ## src/utils/
@@ -197,15 +206,19 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/views/
 
-- `src/views/AddSpotView.tsx` (422 lines) : Email sign-in with a one-time link; Supabase creates the account on first use.
+- `src/views/AddSpotView.tsx` (369 lines) : Email sign-in with a one-time link; Supabase creates the account on first use.
   - L21 : AddSpotViewProps
-  - L370 : AddSpotView
+  - L305 : AddSpotView
 - `src/views/CommunityView.tsx` (74 lines) : Cup Check community feed: one-to-three column masonry of today's brews.
-- `src/views/LegalView.tsx` (198 lines) : Privacy Notice and Terms. Statements of fact describe what the code does today; anything that needs a
-- `src/views/ProfileView.tsx` (437 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
+- `src/views/LegalView.tsx` (206 lines) : Privacy Notice and Terms. Statements of fact describe what the code does today; anything that needs a
+- `src/views/LoginView.tsx` (296 lines) : What the page is doing: the two account modes, the two email-link flows, and the new-password form.
+- `src/views/PlacePortalView.tsx` (680 lines) : What the portal offers, for visitors who are not signed in or have not applied.
+  - L27 : PlacePortalViewProps
+  - L583 : PlacePortalView
+- `src/views/ProfileView.tsx` (497 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
   - L23 : ProfileSection
   - L25 : ProfileViewProps
-  - L66 : ProfileView
+  - L70 : ProfileView
 - `src/views/SavedView.tsx` (319 lines) : Tasting journal: bookmarked cafes and beans, drop alerts, custom shareable lists.
   - L13 : SavedTab
   - L15 : SavedViewProps

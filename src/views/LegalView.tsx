@@ -65,14 +65,21 @@ const Privacy: React.FC = () => (
             can confirm your order with you.
           </>,
           <>
-            <strong>Roaster applications</strong>: business name, storefront handle, city, district, description,
-            DTI or Mayor's permit number, contact name, email and password, to verify the business and run the
-            Roaster Suite. Passwords are stored only as a salted hash. We do not collect ID photos in this form.
+            <strong>Your account</strong>: your email address, your name, and a password if you choose one, so you
+            can sign in. Passwords are handled by Supabase Auth and stored only as a hash; you can also sign in with
+            a one-time email link instead. Your role (member, place owner, admin) is stored with your account.
           </>,
           <>
-            <strong>Add a Spot</strong>: your email address, used only to send your sign-in link and to know which
-            spots are yours; and the details you submit about a place (name, area, landmark, map pin, amenities,
-            hours, price range, tip). Approved spots are shown publicly without your email.
+            <strong>Add a Spot</strong>: the details you submit about a place (name, area, landmark, map pin,
+            amenities, hours, price range, tip), linked to your account so you can see which spots are yours.
+            Approved spots are shown publicly without your email.
+          </>,
+          <>
+            <strong>Place Portal applications</strong>: the name of your place, its type, address and map pin, your
+            DTI or Mayor's permit number, a contact name and optional phone number, and a description, used to
+            verify the business before its listing goes live. We do not collect ID photos. Once approved, the listing
+            details you edit (hours, amenities, menu and the like) are shown publicly; the permit number and phone
+            number are not.
           </>,
           <>
             <strong>Location</strong>: read on your device when you tap Near me, Use my current location, or Navigate
@@ -85,7 +92,8 @@ const Privacy: React.FC = () => (
 
     <Section title="Where your data is kept">
       <p>
-        Your sign-in account and the spots you add are stored in our database, hosted by Supabase. Everything else
+        Your account, the spots you add, place applications and place listings are stored in our database, hosted
+        by Supabase. Everything else
         above (saves, ratings, lists, reminders, likes and posts) is stored in your browser on this device, and
         clearing this site's data in your browser settings removes it.
       </p>
@@ -95,7 +103,7 @@ const Privacy: React.FC = () => (
       <List
         items={[
           'Vercel, which hosts the app, receives standard request data such as your IP address.',
-          'Supabase, which runs our database and sign-in, stores your email and the spots you add, and sends the sign-in email.',
+          'Supabase, which runs our database and sign-in, stores your account, the spots you add and place listings, and sends sign-in, confirmation and password-reset emails.',
           'Google Fonts delivers the typeface and receives your IP address.',
           'OpenStreetMap map tiles are requested from your browser and include your IP address.',
           'Open-Meteo provides the weather hint. We send fixed city coordinates, not your location.',

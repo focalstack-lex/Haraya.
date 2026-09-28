@@ -2,8 +2,10 @@ import { useSyncExternalStore } from 'react';
 import { catalogService } from '../services/catalogService';
 import { userPrefsService } from '../services/userPrefsService';
 import { communityService } from '../services/communityService';
-import { authService } from '../services/authService';
+import { sessionService } from '../services/sessionService';
 import { spotService } from '../services/spotService';
+import { placeService } from '../services/placeService';
+import { adminService } from '../services/adminService';
 
 /**
  * Subscriber-version hooks: each service exposes a monotonically increasing
@@ -23,10 +25,18 @@ export function useCommunityVersion(): number {
   return useSyncExternalStore(communityService.subscribe, communityService.getVersion);
 }
 
-export function useAuthVersion(): number {
-  return useSyncExternalStore(authService.subscribe, authService.getVersion);
+export function useSessionVersion(): number {
+  return useSyncExternalStore(sessionService.subscribe, sessionService.getVersion);
 }
 
 export function useSpotVersion(): number {
   return useSyncExternalStore(spotService.subscribe, spotService.getVersion);
+}
+
+export function usePlaceVersion(): number {
+  return useSyncExternalStore(placeService.subscribe, placeService.getVersion);
+}
+
+export function useAdminVersion(): number {
+  return useSyncExternalStore(adminService.subscribe, adminService.getVersion);
 }

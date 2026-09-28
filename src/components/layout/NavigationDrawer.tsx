@@ -1,7 +1,7 @@
 import React from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { X, LogOut, ShieldCheck, UserRound, Check, ChevronRight, ChevronsUpDown, MapPin } from 'lucide-react';
-import { NAV_TABS } from './NavigationHeader';
+import { X, LogOut, LogIn, ShieldCheck, UserRound, Check, ChevronRight, ChevronsUpDown, MapPin, Store } from 'lucide-react';
+import { ADMIN_TAB_ID, LOGIN_TAB_ID, NAV_TABS, PORTAL_TAB_ID } from './NavigationHeader';
 import { BrandLogo } from '../common/BrandLogo';
 import { DAVAO_CITIES } from '../../types/coffee';
 import type { PortalRole } from '../../types/auth';
@@ -17,6 +17,7 @@ interface NavigationDrawerProps {
   portalRole: PortalRole;
   accountName: string | null;
   onSignOut: () => void;
+  onOpenLogin: () => void;
 }
 
 const PANEL_SPRING = { type: 'spring', stiffness: 380, damping: 38, mass: 0.9 } as const;
@@ -40,6 +41,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
   portalRole,
   accountName,
   onSignOut,
+  onOpenLogin,
 }) => {
   const reduceMotion = useReducedMotion();
 
@@ -70,6 +72,8 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
       </button>
     );
   };
+
+  const signedIn = portalRole !== 'guest';
 
   return (
     <AnimatePresence>
@@ -103,10 +107,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
               </button>
             </div>
 
-            <nav
-              className={`flex-1 overflow-y-auto overscroll-contain px-4 pt-2 pb-4 space-y-6 ${portalRole === 'guest' ? 'sheet-safe' : ''}`}
-              aria-label="Mobile"
-            >
+            <nav className="flex-1 overflow-y-auto overscroll-contain px-4 pt-2 pb-4 space-y-6" aria-label="Mobile">
               <div className="ios-group">
                 {NAV_TABS.map((tab) =>
                   navRow(
@@ -144,36 +145,65 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
                   </select>
                 </label>
               </div>
+
+              {/* Places and admin: the portal for owners, the Control Room for admins */}
+              <div className="ios-group">
+                {navRow(
+                  PORTAL_TAB_ID,
+                  portalRole === 'roaster' ? 'My place listing' : 'List your place',
+                  <Store className="w-4 h-4" strokeWidth={2.2} />,
+                )}
+                {portalRole === 'admin' && navRow(ADMIN_TAB_ID, 'Control Room', <ShieldCheck className="w-4 h-4" strokeWidth={2.2} />)}
+              </div>
             </nav>
 
-            {portalRole !== 'guest' && (
-              <div className="px-4 pt-2 space-y-3 sheet-safe">
-                <div className="ios-group">
-                  <div className="ios-group-row">
-                    <RowIcon>
-                      {portalRole === 'admin' ? (
-                        <ShieldCheck className="w-4 h-4" strokeWidth={2.2} />
-                      ) : (
-                        <UserRound className="w-4 h-4" strokeWidth={2.2} />
-                      )}
-                    </RowIcon>
-                    <span className="flex-1 min-w-0 truncate text-[15px] text-[#13191F]">{accountName ?? 'Signed in'}</span>
+            <div className="px-4 pt-2 space-y-3 sheet-safe">
+              {signedIn ? (
+                <>
+                  <div className="ios-group">
+                    <div className="ios-group-row">
+                      <RowIcon>
+                        {portalRole === 'admin' ? (
+                          <ShieldCheck className="w-4 h-4" strokeWidth={2.2} />
+                        ) : (
+                          <UserRound className="w-4 h-4" strokeWidth={2.2} />
+                        )}
+                      </RowIcon>
+                      <span className="flex-1 min-w-0 truncate text-[15px] text-[#13191F]">{accountName ?? 'Signed in'}</span>
+                    </div>
                   </div>
-                </div>
+                  <div className="ios-group">
+                    <button
+                      onClick={() => {
+                        onSignOut();
+                        onClose();
+                      }}
+                      className="ios-group-row ios-press text-[15px] text-[#8C3A2E]"
+                    >
+                      <LogOut className="w-4.5 h-4.5 shrink-0" strokeWidth={2.2} />
+                      Sign out
+                    </button>
+                  </div>
+                </>
+              ) : (
                 <div className="ios-group">
                   <button
                     onClick={() => {
-                      onSignOut();
+                      onOpenLogin();
                       onClose();
                     }}
-                    className="ios-group-row ios-press text-[15px] text-[#8C3A2E]"
+                    aria-current={activeTab === LOGIN_TAB_ID ? 'page' : undefined}
+                    className="ios-group-row ios-press"
                   >
-                    <LogOut className="w-4.5 h-4.5 shrink-0" strokeWidth={2.2} />
-                    Sign out
+                    <RowIcon>
+                      <LogIn className="w-4 h-4" strokeWidth={2.2} />
+                    </RowIcon>
+                    <span className="flex-1 min-w-0 truncate text-[15px] text-[#13191F]">Sign in or create account</span>
+                    <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]/60" strokeWidth={2.5} />
                   </button>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </motion.div>
         </div>
       )}

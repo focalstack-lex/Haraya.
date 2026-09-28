@@ -33,16 +33,36 @@ npm run preview    # serve the production build
 ## Data
 
 Haraya is a Davao coffee and study spot guide (discovery pivot, 2026-09-29). There is no
-bundled dataset. Places come from Add a Spot: signed-in visitors submit spots to the Supabase
-table `spot_submissions` (`supabase/migrations/20260929000000_spot_submissions.sql`), an admin
-approves them, and approved spots appear for everyone (`src/services/spotService.ts`). Saves,
-ratings and lists stay in `localStorage`. Roast drops, beans, the Roaster Suite and Cup Check are
-hidden from navigation; their code is kept. Curated trails are defined in `src/data/trails.ts`
-(empty until real ones are added).
+bundled dataset. Places come from two sources:
 
-Before Add a Spot works in production: apply the migrations (`supabase db push`), add the
-site's URL to Supabase Auth redirect URLs, and grant the first admin role in the SQL editor
-(see the comment at the end of `20260928230000_fix_rls_privilege_escalation.sql`).
+- **Add a Spot**: signed-in visitors submit spots to the Supabase table `spot_submissions`
+  (`supabase/migrations/20260929000000_spot_submissions.sql`), an admin approves them, and
+  approved spots appear for everyone (`src/services/spotService.ts`).
+- **Place Portal** (`#/tab/portal`): a cafe or study-spot owner applies with a permit number
+  (`place_applications`); an admin approves it, which creates the public `cafes` row, marks it
+  verified and makes the applicant its owner, who then edits hours, amenities, menu and the
+  rest from the portal (`src/services/placeService.ts`, migration
+  `20260929020000_accounts_and_place_portal.sql`).
+
+Saves, ratings and lists stay in `localStorage`. Roast drops, beans, the Roaster Suite and Cup
+Check are hidden from navigation; their code is kept. Curated trails are defined in
+`src/data/trails.ts` (empty until real ones are added).
+
+## Accounts
+
+Sign-in is Supabase Auth (`src/services/sessionService.ts`): email and password, a one-time
+email link, or a password reset link. Every user gets a row in `profiles` with a role: `guest`
+(any member), `roaster` (approved place owner) or `admin`. The role is never writable from the
+app; the first admin is granted in the SQL editor (see the comment at the end of
+`20260928230000_fix_rls_privilege_escalation.sql`), and admins can then change other roles from
+the Control Room (`#/tab/admin`), which also holds the spot and place review queues, the listed
+places with their verified badge, and the account list. Row Level Security and
+`security definer` functions in the migrations enforce all of this server side.
+
+Before any of this works in production: apply the migrations (`supabase db push`), add the
+site's URL to Supabase Auth redirect URLs (email links land on `/` with `?code=`), and decide
+whether new password sign-ups must confirm their email (Supabase Auth setting; the app handles
+both).
 
 ## Ecosystem bridge
 
@@ -57,9 +77,11 @@ See `docs/CODE_MAP.md` for the generated, per-file navigation map. High level:
 
 ```
 src/
-  components/   feed, cafe, map (live navigation), community, layout, common; drops, roaster, auth, admin kept
+  components/   feed, cafe, map (live navigation), community, layout, common, admin (Control Room); drops, roaster kept
   data/         trails.ts (curated trails, empty until real ones are added)
-  services/     catalogService, spotService + spotMapping (Add a Spot), userPrefsService, authService, others kept
+  services/     sessionService (accounts), spotService + spotMapping (Add a Spot), placeService + placeMapping
+                (Place Portal, listings), adminService (roles), catalogService, userPrefsService, others kept
+  views/        LoginView, PlacePortalView, AddSpotView, ProfileView, LegalView, SharedListView
   types/        coffee.ts, auth.ts
   utils/        router.ts (hash routes), calendar.ts (.ics + open hours), geo.ts (distances)
 ```

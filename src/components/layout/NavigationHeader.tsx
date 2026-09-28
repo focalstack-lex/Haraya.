@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { Menu, Search, ShieldCheck, UserRound, X } from 'lucide-react';
-import { FeedIcon, MapIcon, SavedIcon, RoasterIcon, AddSpotIcon } from '../common/CustomIcons';
+import { Menu, Search, X } from 'lucide-react';
+import { FeedIcon, MapIcon, SavedIcon, AddSpotIcon } from '../common/CustomIcons';
 import { BrandLogo } from '../common/BrandLogo';
 import { DAVAO_CITIES } from '../../types/coffee';
 import type { PortalRole } from '../../types/auth';
 
-/**
- * The legacy roaster portal (sign-in, roaster dashboard, admin panel). Hidden from navigation since the
- * discovery pivot; the code stays so it can return. Reachable only by its hash route.
- */
-export const PORTAL_TAB_ID = 'roaster';
+/** Tab ids reachable by hash route but not shown in the primary navigation. */
+export const LOGIN_TAB_ID = 'login';
+/** The Place Portal: apply to list a cafe or study spot, then manage the listing. */
+export const PORTAL_TAB_ID = 'portal';
+/** The admin Control Room. */
+export const ADMIN_TAB_ID = 'admin';
 
-/** Tab id of the community submission flow that replaced the roaster portal in navigation. */
+/** Tab id of the community submission flow. */
 export const SUBMIT_TAB_ID = 'submit';
 
 export const NAV_TABS: { id: string; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
@@ -20,18 +21,6 @@ export const NAV_TABS: { id: string; label: string; icon: React.ComponentType<{ 
   { id: SUBMIT_TAB_ID, label: 'Add a Spot', icon: AddSpotIcon },
   { id: 'profile', label: 'Saved Spots', icon: SavedIcon },
 ];
-
-export const PortalIcon: React.FC<{ role: PortalRole; className?: string }> = ({ role, className = 'w-4 h-4' }) => {
-  if (role === 'admin') return <ShieldCheck className={className} />;
-  if (role === 'roaster') return <RoasterIcon className={className} />;
-  return <UserRound className={className} />;
-};
-
-export const PORTAL_LABELS: Record<PortalRole, { short: string; long: string }> = {
-  guest: { short: 'Roaster Sign In', long: 'Roaster Sign In' },
-  roaster: { short: 'Roaster Suite', long: 'My Roaster Suite' },
-  admin: { short: 'Control Room', long: 'Admin Control Room' },
-};
 
 interface NavigationHeaderProps {
   activeTab: string;
@@ -44,7 +33,9 @@ interface NavigationHeaderProps {
   isDrawerOpen: boolean;
   setIsDrawerOpen: (open: boolean) => void;
   portalRole: PortalRole;
+  accountName: string | null;
   onOpenWelcome?: () => void;
+  onOpenLogin: () => void;
 }
 
 interface TabButtonProps {
@@ -84,7 +75,9 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
   isDrawerOpen,
   setIsDrawerOpen,
   portalRole,
+  accountName,
   onOpenWelcome,
+  onOpenLogin,
 }) => {
   // iOS bar behavior: transparent over the page top, material plus hairline once content scrolls under it
   const [scrolled, setScrolled] = useState(false);
@@ -97,6 +90,7 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
 
   // Discover carries its own search field and city menu, so the bar only shows them elsewhere
   const showBarSearch = activeTab !== 'feed';
+  const initial = (accountName ?? '').trim()[0]?.toUpperCase() ?? '';
 
   return (
     <header
@@ -174,13 +168,32 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
               </select>
             </div>
 
-            {/* Welcome / Get Started Button for guests */}
-            {portalRole === 'guest' && onOpenWelcome && (
+            {portalRole === 'guest' ? (
+              <>
+                {/* Sign in and Get Started for guests */}
+                <button
+                  onClick={onOpenLogin}
+                  className="hidden sm:inline-flex items-center h-9 px-4 rounded-full ios-fill text-[#7D5C3D] text-[13px] font-semibold font-sans hover:bg-[#766046]/20 ios-press"
+                >
+                  Sign in
+                </button>
+                {onOpenWelcome && (
+                  <button
+                    onClick={onOpenWelcome}
+                    className="hidden sm:inline-flex items-center h-9 px-4 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[13px] font-semibold font-sans hover:bg-[#7D5C3D] ios-press"
+                  >
+                    Get Started
+                  </button>
+                )}
+              </>
+            ) : (
+              /* Account avatar: opens Saved Spots, where the account rows live */
               <button
-                onClick={onOpenWelcome}
-                className="hidden sm:inline-flex items-center h-9 px-4 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[13px] font-semibold font-sans hover:bg-[#7D5C3D] ios-press"
+                onClick={() => setActiveTab('profile')}
+                aria-label={`Account: ${accountName ?? 'signed in'}`}
+                className="hidden lg:flex h-9 w-9 rounded-full bg-[#906D4B] text-[#FFFDF9] items-center justify-center text-[14px] font-semibold ios-press"
               >
-                Get Started
+                {initial || 'H'}
               </button>
             )}
 
