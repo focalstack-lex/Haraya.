@@ -6,6 +6,7 @@ import { sessionService } from '../services/sessionService';
 import { spotService } from '../services/spotService';
 import { placeService } from '../services/placeService';
 import { adminService } from '../services/adminService';
+import { visitService } from '../services/visitService';
 
 /**
  * Subscriber-version hooks: each service exposes a monotonically increasing
@@ -39,4 +40,8 @@ export function usePlaceVersion(): number {
 
 export function useAdminVersion(): number {
   return useSyncExternalStore(adminService.subscribe, adminService.getVersion);
+}
+
+export function useVisitVersion(): number {
+  return useSyncExternalStore(visitService.subscribe, visitService.getVersion);
 }

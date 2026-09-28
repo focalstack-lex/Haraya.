@@ -1,0 +1,237 @@
+import React, { useCallback, useEffect, useState } from 'react';
+import { Navigation, RotateCw, LocateFixed } from 'lucide-react';
+import type { Cafe } from '../../types/coffee';
+import { Modal, ModalHeader, PrimaryButton, SecondaryButton, ErrorNote } from '../common/FormControls';
+import { AyaMascot } from '../common/AyaMascot';
+import { FocusTimerIcon, RubberStampIcon } from '../common/CustomIcons';
+import { PassportStamp } from '../passport/PassportStamp';
+import { calculateDistanceMeters, CHECK_IN_RADIUS_M, formatKm, type GeoPoint } from '../../utils/geo';
+import { focusSessionStore, useActiveFocusSession } from '../../hooks/useFocusSession';
+import { visitService } from '../../services/visitService';
+import { sessionService } from '../../services/sessionService';
+import { VISIT_LIMITS } from '../../services/visitMapping';
+
+interface CheckInModalProps {
+  cafe: Cafe | null;
+  onClose: () => void;
+  onDirections: (cafe: Cafe) => void;
+  /** A focus session just started; the caller closes the sheets so the banner shows. */
+  onFocusStarted: () => void;
+  /** Opens the end sheet for the session already running. */
+  onFinishActive: () => void;
+  onOpenPassport: () => void;
+}
+
+type Phase =
+  | { kind: 'locating' }
+  | { kind: 'denied' }
+  | { kind: 'unavailable' }
+  | { kind: 'located'; device: GeoPoint; distance: number }
+  | { kind: 'stamped'; stampedAt: string; synced: boolean };
+
+/**
+ * Check in at a spot. The device position is read once, in memory, and compared with the spot: within
+ * 120 m the visitor can start a Deep Focus Session or take a Quick Stamp; farther away the sheet shows the
+ * distance and offers directions instead. Aya cheers on arrival and holds up a map pin when it is too far.
+ */
+export const CheckInModal: React.FC<CheckInModalProps> = ({ cafe, onClose, onDirections, onFocusStarted, onFinishActive, onOpenPassport }) => {
+  const active = useActiveFocusSession();
+  const [phase, setPhase] = useState<Phase>({ kind: 'locating' });
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const locate = useCallback(() => {
+    if (!cafe) return;
+    setError(null);
+    if (!('geolocation' in navigator)) {
+      setPhase({ kind: 'unavailable' });
+      return;
+    }
+    setPhase({ kind: 'locating' });
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const device = { lat: position.coords.latitude, lng: position.coords.longitude };
+        setPhase({ kind: 'located', device, distance: calculateDistanceMeters(device.lat, device.lng, cafe.lat, cafe.lng) });
+      },
+      (geoError) => setPhase({ kind: geoError.code === geoError.PERMISSION_DENIED ? 'denied' : 'unavailable' }),
+      // Always a fresh fix: a cached one could still say "far away" after the visitor walks up
+      { enableHighAccuracy: true, timeout: 15_000, maximumAge: 0 }
+    );
+  }, [cafe]);
+
+  useEffect(() => {
+    if (cafe) locate();
+  }, [cafe, locate]);
+
+  if (!cafe) return null;
+
+  const signedIn = Boolean(sessionService.getUser());
+
+  const startFocus = () => {
+    if (phase.kind !== 'located') return;
+    focusSessionStore.start(cafe, phase.device);
+    onFocusStarted();
+  };
+
+  const quickStamp = async () => {
+    if (phase.kind !== 'located') return;
+    setBusy(true);
+    setError(null);
+    try {
+      const { visit, synced } = await visitService.recordVisit({
+        cafe,
+        sessionType: 'stamp',
+        durationMinutes: VISIT_LIMITS.stampMinutes,
+        isPublic: signedIn && visitService.isPassportPublic(),
+        device: phase.device,
+        distanceMeters: phase.distance,
+      });
+      setPhase({ kind: 'stamped', stampedAt: visit.createdAt, synced });
+    } catch (stampError) {
+      setError(stampError instanceof Error ? stampError.message : 'Could not collect the stamp.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const body = (() => {
+    switch (phase.kind) {
+      case 'locating':
+        return (
+          <div className="py-10 flex flex-col items-center gap-3 text-center" aria-live="polite">
+            <LocateFixed className="w-7 h-7 text-[#906D4B] animate-pulse" />
+            <p className="text-[15px] text-[#594C3D]">Checking where you are...</p>
+          </div>
+        );
+      case 'denied':
+      case 'unavailable':
+        return (
+          <div className="py-6 flex flex-col items-center gap-3 text-center">
+            <AyaMascot pose="wander" size={112} alt="" />
+            <h3 className="ios-title text-[19px] text-[#13191F]">
+              {phase.kind === 'denied' ? 'Location is off for Haraya' : 'Your location is unavailable'}
+            </h3>
+            <p className="text-[14px] text-[#594C3D] max-w-xs">
+              {phase.kind === 'denied'
+                ? 'Check-ins need your location to confirm you are at the spot. Allow it for this site in your browser settings, then try again.'
+                : 'Haraya could not get a GPS fix. Step near a window or outdoors and try again.'}
+            </p>
+            <SecondaryButton onClick={locate} className="inline-flex items-center justify-center gap-2 w-full sm:w-auto">
+              <RotateCw className="w-4 h-4" />
+              Try again
+            </SecondaryButton>
+          </div>
+        );
+      case 'stamped':
+        return (
+          <div className="py-4 flex flex-col items-center gap-3 text-center">
+            <PassportStamp cafeName={cafe.name} city={cafe.city} stampedAt={phase.stampedAt} seed={cafe.id} size={132} />
+            <h3 className="ios-title text-[19px] text-[#13191F]">Stamp collected</h3>
+            <p className="text-[14px] text-[#594C3D] max-w-xs">
+              {phase.synced
+                ? `${cafe.name} is in your Davao Passport, with a 30 minute drop-in logged.`
+                : `${cafe.name} is in your passport on this device.${signedIn ? '' : ' Sign in to keep your passport across devices.'}`}
+            </p>
+            <div className="w-full flex flex-col sm:flex-row gap-2 pt-1">
+              <PrimaryButton onClick={onOpenPassport} className="w-full sm:flex-1">
+                View passport
+              </PrimaryButton>
+              <SecondaryButton onClick={onClose} className="w-full sm:flex-1">
+                Done
+              </SecondaryButton>
+            </div>
+          </div>
+        );
+      case 'located': {
+        const near = phase.distance <= CHECK_IN_RADIUS_M;
+        if (!near) {
+          return (
+            <div className="py-4 flex flex-col items-center gap-3 text-center">
+              <AyaMascot pose="wander" size={120} alt="" />
+              <h3 className="ios-title text-[19px] text-[#13191F]">
+                You are <span className="font-mono">{formatKm(phase.distance / 1000)}</span> away
+              </h3>
+              <p className="text-[14px] text-[#594C3D] max-w-xs">
+                Visit {cafe.name} in person to stamp your passport and log focus time. Check-ins open within{' '}
+                <span className="font-mono">{CHECK_IN_RADIUS_M} m</span> of the spot.
+              </p>
+              <div className="w-full flex flex-col sm:flex-row gap-2 pt-1">
+                <PrimaryButton onClick={() => onDirections(cafe)} className="inline-flex items-center justify-center gap-2 w-full sm:flex-1">
+                  <Navigation className="w-4 h-4" />
+                  Get directions
+                </PrimaryButton>
+                <SecondaryButton onClick={locate} className="inline-flex items-center justify-center gap-2 w-full sm:flex-1">
+                  <RotateCw className="w-4 h-4" />
+                  Check again
+                </SecondaryButton>
+              </div>
+            </div>
+          );
+        }
+        return (
+          <div className="py-2 flex flex-col items-center gap-3 text-center">
+            <AyaMascot pose="arrive" size={124} alt="" />
+            <div className="space-y-1">
+              <h3 className="ios-title text-[19px] text-[#13191F] inline-flex items-center gap-2">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#3E5C48] shadow-[0_0_0_4px_rgba(62,92,72,0.18)]" aria-hidden="true" />
+                You are at {cafe.name}
+              </h3>
+              <p className="ios-footnote text-[#594C3D]">
+                <span className="font-mono">{Math.round(phase.distance)} m</span> from the spot, verified by GPS
+              </p>
+            </div>
+
+            {active ? (
+              <div className="w-full rounded-[14px] bg-[#FAF5EB] px-4 py-3 text-left space-y-2">
+                <p className="text-[14px] text-[#13191F]">
+                  You are already focusing at <span className="font-semibold">{active.cafeName}</span>. Finish that session first.
+                </p>
+                <SecondaryButton onClick={onFinishActive} className="w-full">
+                  Finish current session
+                </SecondaryButton>
+              </div>
+            ) : (
+              <div className="w-full grid gap-2 pt-1">
+                <button
+                  onClick={startFocus}
+                  disabled={busy}
+                  className="w-full min-h-14 px-4 py-3 rounded-[16px] bg-[#906D4B] hover:bg-[#7D5C3D] text-[#FFFDF9] text-left flex items-center gap-3 ios-press disabled:opacity-60"
+                >
+                  <FocusTimerIcon className="w-6 h-6 shrink-0" />
+                  <span className="min-w-0">
+                    <span className="block text-[15px] font-semibold">Start Focus Session</span>
+                    <span className="block text-[12px] text-[#FFFDF9]/80">A timer runs while you study. It saves itself if you leave.</span>
+                  </span>
+                </button>
+                <button
+                  onClick={quickStamp}
+                  disabled={busy}
+                  className="w-full min-h-14 px-4 py-3 rounded-[16px] ios-fill text-left flex items-center gap-3 text-[#13191F] ios-press disabled:opacity-60"
+                >
+                  <RubberStampIcon className="w-6 h-6 shrink-0 text-[#7D5C3D]" />
+                  <span className="min-w-0">
+                    <span className="block text-[15px] font-semibold">{busy ? 'Stamping...' : 'Quick Stamp'}</span>
+                    <span className="block text-[12px] text-[#594C3D]">Log a 30 minute drop-in and collect the stamp now.</span>
+                  </span>
+                </button>
+                {!signedIn && (
+                  <p className="ios-footnote text-[#594C3D] pt-1">Signed out, your visits stay on this device.</p>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      }
+    }
+  })();
+
+  return (
+    <Modal isOpen={Boolean(cafe)} onClose={onClose} maxWidth="sm:max-w-md" labelledBy="check-in-title">
+      <ModalHeader title="Check in" subtitle={`${cafe.name}, ${cafe.city}`} onClose={onClose} />
+      <div className="px-4 sm:px-6 pb-4 pt-2 space-y-3">
+        {body}
+        {error && <ErrorNote message={error} />}
+      </div>
+    </Modal>
+  );
+};

@@ -38,6 +38,8 @@ interface DavaoCoffeeMapProps {
   /** Destination of live walking navigation started from the directions sheet, or null. */
   navTarget?: Cafe | null;
   onEndNavigation?: () => void;
+  /** Opens the geofenced check-in for the spot just reached. */
+  onCheckIn?: (cafe: Cafe) => void;
 }
 
 /**
@@ -45,7 +47,7 @@ interface DavaoCoffeeMapProps {
  * and hop-by-hop distance. Leaflet is imported imperatively so the map canvas
  * only mounts on this view.
  */
-export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectCafe, selectedCity, navTarget = null, onEndNavigation }) => {
+export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectCafe, selectedCity, navTarget = null, onEndNavigation, onCheckIn }) => {
   const mapRef = useRef<L.Map | null>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
   const [activeTrail, setActiveTrail] = useState<Trail | null>(null);
@@ -364,10 +366,22 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
                   <div className="min-w-0 flex-1">
                     <h3 className="ios-headline text-[#13191F]">You're here</h3>
                     <p className="ios-footnote text-[#594C3D] truncate">{navTarget.name}, {navTarget.address}</p>
-                    <div className="flex gap-2 pt-2">
+                    <div className="flex flex-wrap gap-2 pt-2">
+                      {onCheckIn && (
+                        <button
+                          onClick={() => onCheckIn(navTarget)}
+                          className="h-9 px-4 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[14px] font-semibold hover:bg-[#7D5C3D] ios-press"
+                        >
+                          Check in
+                        </button>
+                      )}
                       <button
                         onClick={() => onSelectCafe(navTarget.id)}
-                        className="h-9 px-4 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[14px] font-semibold hover:bg-[#7D5C3D] ios-press"
+                        className={
+                          onCheckIn
+                            ? 'h-9 px-4 rounded-full ios-fill text-[14px] font-semibold text-[#7D5C3D] ios-press'
+                            : 'h-9 px-4 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[14px] font-semibold hover:bg-[#7D5C3D] ios-press'
+                        }
                       >
                         View spot
                       </button>

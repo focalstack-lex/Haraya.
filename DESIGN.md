@@ -40,7 +40,12 @@ The tokens live in `src/index.css`; this file is the contract behind them.
   sticker: `welcome` (WelcomeModal, first tour step), `mood` (Discover mood card, where she rises out of the
   card's top edge, and Mood Finder idle), `empty` (cafe, bean, saved, visited and mood
   no-match empty states, Add a Spot title), `welcome` again on the live navigation arrival card; `drops` belongs to the
-  hidden Roast Drops view. Idle motion (bob, blink, steam, wave) rests under reduced
+  hidden Roast Drops view. The sanctuary passport adds six poses, one emotion each: `focus` (calm, half-lidded
+  over an open book; peeks over the floating focus banner), `arrive` (delight, both paws up with steam sparkles;
+  check-in within range), `wander` (wistful, gazing up at a map pin with one ear drooped and a dotted trail;
+  check-in too far away, location off), `content` (happy closed eyes and blush, cup held to her chest; finishing a
+  session), `stamp` (proud, rubber stamp raised over a stamped passport page; Passport tab) and `clink` (cheerful,
+  cup raised in a toast; empty Diary). Idle motion (bob, blink, steam, wave) rests under reduced
   motion. Beside text that already carries the message, pass `alt=""` so she stays decorative.
 - Numbers (prices, counts, timers) use tabular figures (`font-mono` maps to the UI face with
   `tabular-nums`). No monospace costume.
@@ -101,6 +106,19 @@ Color is information. The tint marks the one active or primary thing in a region
   inset from the leading edge, chevron on navigable rows.
 - **Sheet:** grabber on phones, 28px top radius, header with a centered title and a round
   close button.
+- **Sanctuary passport** (spec `docs/superpowers/specs/2026-09-29-sanctuary-passport-and-focus-logs.md`):
+  - Check-in sheet (`src/components/session/CheckInModal.tsx`): one fresh GPS fix, 120 m geofence. In range, two
+    large rows: Start Focus Session (tint, the one primary) and Quick Stamp (fill). Out of range, the distance in
+    tabular figures and Get directions.
+  - Focus banner (`FloatingFocusBanner.tsx`): 44px River Styx pill 12px above the tab dock (bottom 24px on
+    desktop), Aya `focus` peeking over its left edge, spot name, steam pulse dot, live `HH:MM:SS`, tint Finish.
+    Session toasts sit above it with a green (saved) or red (error) dot and dismiss after six seconds.
+  - Passport stamp (`src/components/passport/PassportStamp.tsx`): double ring, spot name on the top arc, city on the
+    bottom arc, cup mark and date. Stamped in `--ios-tint` (#906D4B) with an SVG turbulence filter for a worn
+    woodblock edge and a small stable tilt; unvisited as a dotted ghost (#594C3D at 20%, lettering at 42%).
+  - Profile (`Your Passport`): three metrics (focus hours, sanctuaries, clinks) in tabular figures, a privacy
+    switch (green when public), then Diary, Passport and Saved tabs. Account rows sit below the tabs.
+  - Cup Clink (`CupClinkIcon`): two tipped cups; a filled tint wash marks a clink you sent.
 - **Mood finder** (`src/components/moodFinder/`): entry card on Discover, sheet with mood and must-have chips,
   describe field, location and weather group rows, result cards with the pick label as a dark-material pill on
   the photo. Map routes draw a dotted tint line from a blue "You" dot (iOS location convention, the only blue in

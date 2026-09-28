@@ -8,8 +8,27 @@ import React from 'react';
  * - drops: Roast Drops, hugging a bean sack
  * - holding-cup: the master reference pose
  * - portrait: head only, for compact marks
+ * Sanctuary passport poses, one emotion each:
+ * - focus: calm concentration, eyes half-lidded over an open book (floating focus banner)
+ * - arrive: delight, both paws up with sparkles (check-in, you are at the spot)
+ * - wander: wistful, gazing up at a map pin with one ear drooped (check-in, too far away)
+ * - content: satisfied, happy closed eyes, cup held to her chest (end of a session)
+ * - stamp: proud, rubber stamp raised over a stamped passport page (passport tab)
+ * - clink: cheerful, cup raised in a toast with clink sparks (diary)
  */
-export type AyaPose = 'holding-cup' | 'welcome' | 'mood' | 'empty' | 'drops' | 'portrait';
+export type AyaPose =
+  | 'holding-cup'
+  | 'welcome'
+  | 'mood'
+  | 'empty'
+  | 'drops'
+  | 'portrait'
+  | 'focus'
+  | 'arrive'
+  | 'wander'
+  | 'content'
+  | 'stamp'
+  | 'clink';
 
 export interface AyaMascotProps {
   pose?: AyaPose;
@@ -71,16 +90,35 @@ const Leaves: React.FC = () => {
   );
 };
 
-type Gaze = 'forward' | 'up' | 'down';
+type Gaze = 'forward' | 'up' | 'down' | 'upLeft';
 
 const PUPIL_OFFSET: Record<Gaze, { dx: number; dy: number }> = {
   forward: { dx: 0, dy: 0 },
   up: { dx: 6, dy: -30 },
   down: { dx: 0, dy: 38 },
+  upLeft: { dx: -34, dy: -26 },
 };
 
-const Eyes: React.FC<{ gaze?: Gaze; sparkle?: boolean; blink: boolean }> = ({ gaze = 'forward', sparkle, blink }) => {
+/** half: calm lids over the top of each eye; happy: eyes closed into upward arcs. */
+type Lids = 'open' | 'half' | 'happy';
+
+const Eyes: React.FC<{ gaze?: Gaze; sparkle?: boolean; blink: boolean; lids?: Lids }> = ({
+  gaze = 'forward',
+  sparkle,
+  blink,
+  lids = 'open',
+}) => {
   const { dx, dy } = PUPIL_OFFSET[gaze];
+  if (lids === 'happy') {
+    return (
+      <g>
+        <path d="M180 462 Q275 360 370 462" stroke={CREAM} strokeWidth="30" strokeLinecap="round" fill="none" />
+        <path d="M477 462 Q572 360 667 462" stroke={CREAM} strokeWidth="30" strokeLinecap="round" fill="none" />
+        <ellipse cx="190" cy="548" rx="46" ry="26" fill={STEAM} opacity="0.55" />
+        <ellipse cx="660" cy="548" rx="46" ry="26" fill={STEAM} opacity="0.55" />
+      </g>
+    );
+  }
   return (
     <g className={blink ? 'aya-blink' : undefined}>
       <ellipse cx="275" cy="425" rx="112" ry="130" fill={WHITE} />
@@ -95,22 +133,49 @@ const Eyes: React.FC<{ gaze?: Gaze; sparkle?: boolean; blink: boolean }> = ({ ga
           <circle cx={505 + dx} cy={466 + dy} r="10" fill={WHITE} />
         </>
       )}
+      {lids === 'half' && (
+        <>
+          <path d="M152 440 A123 152 0 0 1 398 440 Z" fill={ROAST} />
+          <path d="M449 440 A123 152 0 0 1 695 440 Z" fill={ROAST} />
+          <path d="M170 440 L380 440 M467 440 L677 440" stroke={INK} strokeWidth="6" strokeLinecap="round" />
+        </>
+      )}
     </g>
   );
 };
 
-const Head: React.FC<{ gaze?: Gaze; sparkle?: boolean; droopRightEar?: boolean; blink: boolean }> = ({
+const Head: React.FC<{ gaze?: Gaze; sparkle?: boolean; droopRightEar?: boolean; blink: boolean; lids?: Lids }> = ({
   gaze,
   sparkle,
   droopRightEar,
   blink,
+  lids,
 }) => (
   <g>
     <Ear side="left" />
     <Ear side="right" droop={droopRightEar} />
     <Leaves />
     <ellipse cx="425" cy="415" rx="325" ry="262" fill={ROAST} />
-    <Eyes gaze={gaze} sparkle={sparkle} blink={blink} />
+    <Eyes gaze={gaze} sparkle={sparkle} blink={blink} lids={lids} />
+  </g>
+);
+
+/** Four-point sparkle in steam, centered on (cx, cy). */
+const Sparkle: React.FC<{ cx: number; cy: number; r?: number }> = ({ cx, cy, r = 34 }) => {
+  const k = r * 0.18;
+  return (
+    <path
+      d={`M${cx} ${cy - r} Q${cx + k} ${cy - k} ${cx + r} ${cy} Q${cx + k} ${cy + k} ${cx} ${cy + r} Q${cx - k} ${cy + k} ${cx - r} ${cy} Q${cx - k} ${cy - k} ${cx} ${cy - r} Z`}
+      fill={STEAM}
+    />
+  );
+};
+
+/** A raised arm ending in a round paw. */
+const RaisedArm: React.FC<{ d: string; paw: [number, number] }> = ({ d, paw }) => (
+  <g>
+    <path d={d} stroke={ROAST} strokeWidth="70" strokeLinecap="round" fill="none" />
+    <circle cx={paw[0]} cy={paw[1]} r="44" fill={ROAST} />
   </g>
 );
 
@@ -251,6 +316,127 @@ export const AyaMascot: React.FC<AyaMascotProps> = ({
             <ellipse cx="300" cy="835" rx="38" ry="52" fill={ROAST} />
             <ellipse cx="550" cy="835" rx="38" ry="52" fill={ROAST} />
             <path d="M318 822 L346 826 M318 846 L346 850 M532 826 L504 830 M532 850 L504 854" stroke={INK} strokeWidth="5" strokeLinecap="round" />
+          </>
+        );
+      case 'focus':
+        return (
+          <>
+            <Body />
+            <Head gaze="down" lids="half" blink={false} />
+            {/* Open book held low; the cover peeks out behind the pages */}
+            <path d="M425 772 C375 752 305 750 268 766 L268 896 C305 882 375 884 425 904 C475 884 545 882 582 896 L582 766 C545 750 475 752 425 772 Z" fill={TAN} />
+            <path d="M425 760 C380 740 320 738 282 752 L282 880 C320 866 380 868 425 888 Z" fill={CREAM} />
+            <path d="M425 760 C470 740 530 738 568 752 L568 880 C530 866 470 868 425 888 Z" fill={CREAM} />
+            <path d="M425 762 L425 886" stroke={TAN} strokeWidth="6" strokeLinecap="round" />
+            <path
+              d="M312 786 C340 778 372 780 402 790 M312 816 C340 808 372 810 402 820 M312 846 C340 838 362 840 380 846 M448 790 C478 780 510 778 538 786 M448 820 C478 810 510 808 538 816"
+              stroke="#E4D2BD"
+              strokeWidth="8"
+              strokeLinecap="round"
+              fill="none"
+            />
+            <ellipse cx="270" cy="852" rx="36" ry="48" fill={ROAST} />
+            <ellipse cx="580" cy="852" rx="36" ry="48" fill={ROAST} />
+          </>
+        );
+      case 'arrive':
+        return (
+          <>
+            <Body />
+            <g className={animated ? 'aya-wave' : undefined}>
+              <RaisedArm d="M600 772 Q690 730 735 620" paw={[738, 602]} />
+            </g>
+            <RaisedArm d="M250 772 Q160 730 118 620" paw={[114, 602]} />
+            <Head gaze="up" sparkle blink={animated} />
+            <g className={animated ? 'aya-float' : undefined}>
+              <Sparkle cx={58} cy={470} />
+              <Sparkle cx={805} cy={455} r={26} />
+            </g>
+            <g className={animated ? 'aya-float aya-float-late' : undefined}>
+              <Sparkle cx={176} cy={505} r={20} />
+              <Sparkle cx={700} cy={510} r={18} />
+            </g>
+            <ellipse cx="338" cy="840" rx="38" ry="44" fill={ROAST} />
+            <ellipse cx="512" cy="840" rx="38" ry="44" fill={ROAST} />
+          </>
+        );
+      case 'wander':
+        return (
+          <>
+            <Body />
+            <Head gaze="upLeft" droopRightEar blink={animated} />
+            <RaisedArm d="M252 780 Q170 770 128 712" paw={[124, 700]} />
+            {/* Map pin held up like a lantern */}
+            <g className={animated ? 'aya-float' : undefined}>
+              <path d="M112 500 C70 500 48 532 48 562 C48 602 112 656 112 656 C112 656 176 602 176 562 C176 532 154 500 112 500 Z" fill={STEAM} />
+              <circle cx="112" cy="560" r="24" fill={CREAM} />
+            </g>
+            <ellipse cx="560" cy="846" rx="38" ry="48" fill={ROAST} />
+            {/* The dotted trail still to walk */}
+            <g fill={TAN} opacity="0.75">
+              <circle cx="640" cy="950" r="11" />
+              <circle cx="700" cy="938" r="11" />
+              <circle cx="756" cy="918" r="11" />
+              <circle cx="806" cy="892" r="11" />
+            </g>
+          </>
+        );
+      case 'content':
+        return (
+          <>
+            <Body />
+            <g transform="rotate(5 425 690)">
+              <Head lids="happy" blink={false} />
+            </g>
+            <g className={animated ? 'aya-steam' : undefined}>
+              <path d="M425 716 C405 696 440 682 425 660" {...STEAM_STROKE} strokeWidth={14} />
+            </g>
+            <g transform="translate(0 18)">
+              <Cup />
+            </g>
+            <ellipse cx="330" cy="818" rx="44" ry="56" fill={ROAST} />
+            <ellipse cx="520" cy="818" rx="44" ry="56" fill={ROAST} />
+            <path d="M306 806 L350 809 M306 830 L350 833 M544 809 L500 812 M544 833 L500 836" stroke={INK} strokeWidth="5" strokeLinecap="round" />
+          </>
+        );
+      case 'stamp':
+        return (
+          <>
+            <Body />
+            {/* Passport page with a fresh steam-ink ring */}
+            <g transform="rotate(-8 330 830)">
+              <rect x="222" y="752" width="220" height="160" rx="16" fill={CREAM} />
+              <circle cx="332" cy="832" r="48" stroke={STEAM} strokeWidth="10" fill="none" />
+              <circle cx="332" cy="832" r="30" stroke={STEAM} strokeWidth="5" fill="none" strokeDasharray="10 8" />
+            </g>
+            <ellipse cx="238" cy="860" rx="38" ry="50" fill={ROAST} />
+            <Head sparkle blink={animated} />
+            {/* Rubber stamp raised in the right paw */}
+            <g className={animated ? 'aya-wave' : undefined}>
+              <path d="M600 790 Q720 780 772 700" stroke={ROAST} strokeWidth="70" strokeLinecap="round" fill="none" />
+              <rect x="732" y="600" width="80" height="34" rx="10" fill={INK} />
+              <rect x="754" y="540" width="36" height="66" rx="12" fill={TAN} />
+              <circle cx="772" cy="520" r="36" fill={TAN} />
+              <rect x="740" y="632" width="64" height="10" rx="5" fill={STEAM} />
+              <circle cx="772" cy="680" r="42" fill={ROAST} />
+            </g>
+          </>
+        );
+      case 'clink':
+        return (
+          <>
+            <Body />
+            <Head sparkle gaze="up" blink={animated} />
+            <RaisedArm d="M600 800 Q712 790 716 690" paw={[716, 676]} />
+            {/* Cup raised to the right in a toast, scaled about its own center */}
+            <g transform="translate(300 -170) rotate(14 425 790) translate(425 790) scale(0.72) translate(-425 -790)">
+              <Cup />
+            </g>
+            <g className={animated ? 'aya-float' : undefined}>
+              <path d="M800 520 L840 484 M818 566 L866 558 M752 500 L760 452" stroke={STEAM} strokeWidth="14" strokeLinecap="round" />
+            </g>
+            <ellipse cx="338" cy="820" rx="40" ry="52" fill={ROAST} />
+            <path d="M314 806 L354 809 M314 830 L354 833" stroke={INK} strokeWidth="5" strokeLinecap="round" />
           </>
         );
       case 'portrait':

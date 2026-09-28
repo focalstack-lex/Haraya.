@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-28 : commit 1c4e663 : fingerprint f7263298a1a22295
+Generated 2026-09-28 : commit 9ace50a : fingerprint f16ce5f307e8cc39
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -11,10 +11,10 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 - `index.html` (30 lines) : . module: index.html
 - `scripts/generate-code-map.mjs` (212 lines) : One-line purpose per file, inferred from its path and leading doc comment.
-- `src/App.tsx` (634 lines) : Older links: the roaster portal is now the Place Portal.
-  - L53 : SharedList
-  - L79 : App
-- `src/index.css` (720 lines) : src entry point
+- `src/App.tsx` (697 lines) : Older links: the roaster portal is now the Place Portal.
+  - L58 : SharedList
+  - L84 : App
+- `src/index.css` (749 lines) : src entry point
 - `src/main.tsx` (13 lines) : src entry point
 - `vite.config.ts` (15 lines) : . module: vite.config
 
@@ -29,19 +29,25 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 ## src/components/cafe/
 
 - `src/components/cafe/BeanDetailModal.tsx` (201 lines) : Grouped list on the white sheet: the linen canvas tone lets the inset group read as a group.
-- `src/components/cafe/CafeDetailModal.tsx` (351 lines) : Grouped list on the white sheet: the linen canvas tone lets the inset group read as a group.
-  - L51 : AmenityBadges
-  - L73 : MenuSheet
-  - L101 : CafeDetailModalProps
-  - L118 : CafeDetailModal
+- `src/components/cafe/CafeDetailModal.tsx` (371 lines) : Grouped list on the white sheet: the linen canvas tone lets the inset group read as a group.
+  - L52 : AmenityBadges
+  - L74 : MenuSheet
+  - L102 : CafeDetailModalProps
+  - L124 : CafeDetailModal
+- `src/components/cafe/CafeRecentVisitors.tsx` (142 lines) : "Focused 2h 15m, Americano, quiet" or "Quick stamp"
 - `src/components/cafe/RateCafeModal.tsx` (134 lines) : src/components/cafe module: RateCafeModal
 
 ## src/components/common/
 
 - `src/components/common/AddToListSheet.tsx` (105 lines) : List picker used by the cafe and bean modals and the saved view.
-- `src/components/common/AyaMascot.tsx` (292 lines) : One pose per surface, so Aya reads as a character rather than a repeated sticker:
+- `src/components/common/AyaMascot.tsx` (478 lines) : One pose per surface, so Aya reads as a character rather than a repeated sticker:
+  - L19 : AyaPose
+  - L33 : AyaMascotProps
+  - L93 : Gaze
+  - L103 : Lids
+  - L244 : AyaMascot
 - `src/components/common/BrandLogo.tsx` (36 lines) : Haraya logo cut from the brand master (Haraya Files/LOGO.webp) with the background keyed out,
-- `src/components/common/CustomIcons.tsx` (193 lines) : Haraya Custom Icon Set: high-precision vector icons tailored for the Davao
+- `src/components/common/CustomIcons.tsx` (219 lines) : Haraya Custom Icon Set: high-precision vector icons tailored for the Davao
 - `src/components/common/FormControls.tsx` (254 lines) : Shared form primitives for Haraya: an iOS-style sheet (bottom sheet with a
 - `src/components/common/ImageUploadField.tsx` (81 lines) : File input that stores the image as a dataURL with type and size validation.
 - `src/components/common/LargeTitle.tsx` (46 lines) : iOS large title: the first thing on every primary page, left aligned.
@@ -84,9 +90,9 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/map/
 
-- `src/components/map/DavaoCoffeeMap.tsx` (587 lines) : Escapes catalog text before it is placed into Leaflet tooltip HTML.
+- `src/components/map/DavaoCoffeeMap.tsx` (601 lines) : Escapes catalog text before it is placed into Leaflet tooltip HTML.
   - L34 : DavaoCoffeeMapProps
-  - L48 : DavaoCoffeeMap
+  - L50 : DavaoCoffeeMap
 - `src/components/map/DirectionsActionSheet.tsx` (58 lines) : External map apps. Apple Maps uses its https form so the link also works outside Apple devices.
 - `src/components/map/liveNavMath.test.ts` (71 lines) : src/components/map module: liveNavMath.test
 - `src/components/map/liveNavMath.ts` (63 lines) : Pure math for in-app walking navigation. These straight-line figures are the fallback when no street route
@@ -111,6 +117,10 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/components/moodFinder/useLocation.ts` (35 lines) : Asks for the visitor's position only when request() is called (the "Near me" tap).
 - `src/components/moodFinder/weather.ts` (63 lines) : Current Davao weather from Open-Meteo (free, no key). Fixed city coordinates, never the
 
+## src/components/passport/
+
+- `src/components/passport/PassportStamp.tsx` (108 lines) : Ghost outline: #594C3D at 20% for the ring, a little stronger for the lettering so it still reads.
+
 ## src/components/roaster/
 
 - `src/components/roaster/BeanForm.tsx` (238 lines) : Neutral placeholder until the roaster uploads a real bag photo.
@@ -120,6 +130,12 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L23 : RoasterDashboard
 - `src/components/roaster/RoasteryStorefront.tsx` (194 lines) : Public roastery storefront: brand header, bean shelf, drop schedule, menu, hours.
 - `src/components/roaster/RoastScheduleTab.tsx` (199 lines) : Roast scheduling: create batches, watch countdowns, mark sold out.
+
+## src/components/session/
+
+- `src/components/session/CheckInModal.tsx` (238 lines) : Check in at a spot. The device position is read once, in memory, and compared with the spot: within
+- `src/components/session/EndSessionModal.tsx` (214 lines) : A small segmented control: one choice, or none until tapped.
+- `src/components/session/FloatingFocusBanner.tsx` (112 lines) : The running Deep Focus Session, floating just above the tab dock on phones (bottom of the screen on
 
 ## src/components/tour/
 
@@ -139,7 +155,9 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/hooks/
 
-- `src/hooks/useServiceVersions.ts` (43 lines) : Subscriber-version hooks: each service exposes a monotonically increasing
+- `src/hooks/useFocusSession.test.ts` (76 lines) : src/hooks module: useFocusSession.test
+- `src/hooks/useFocusSession.ts` (237 lines) : The running Deep Focus Session. It lives in localStorage (haraya_active_focus) so a refresh, a tab change or
+- `src/hooks/useServiceVersions.ts` (48 lines) : Subscriber-version hooks: each service exposes a monotonically increasing
 
 ## src/services/
 
@@ -193,17 +211,33 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L58 : notify
   - L63 : makeListId
   - L67 : userPrefsService
+- `src/services/visitMapping.ts` (290 lines) : Sanctuary visits (focus sessions and Quick Stamps): the row shape stored in Supabase (sanctuary_visits),
+- `src/services/visitService.test.ts` (253 lines) : Records every builder call so the query shape can be asserted without a network. The chain's last call
+- `src/services/visitService.ts` (333 lines) : The sanctuary ledger. Local first: every visit is written to this device (localStorage) so the diary and
+  - L45 : notify
+  - L50 : isVisit
+  - L56 : readLocal
+  - L67 : writeLocal
+  - L75 : makeLocalId
+  - L81 : fetchOwnVisits
+  - L90 : fetchCafeVisits
+  - L100 : insertVisitRow
+  - L107 : localForCurrentUser
+  - L112 : loadOwnRemote
+  - L128 : RecordResult
+  - L134 : visitService
 
 ## src/types/
 
-- `src/types/auth.ts` (61 lines) : Accounts. Real sign-in is Supabase Auth; the row in public.profiles carries the role. The legacy
+- `src/types/auth.ts` (65 lines) : Accounts. Real sign-in is Supabase Auth; the row in public.profiles carries the role. The legacy
 - `src/types/coffee.ts` (261 lines) : Haraya domain model: Davao Region cafes and study spots (listed or added by the community), plus the
 
 ## src/utils/
 
 - `src/utils/calendar.test.ts` (40 lines) : src/utils module: calendar.test
 - `src/utils/calendar.ts` (157 lines) : Calendar and clock helpers shared by roast drops, cafe hours, and the
-- `src/utils/geo.ts` (54 lines) : Distance and directions helpers for the coffee map and trails.
+- `src/utils/geo.test.ts` (53 lines) : Meters per degree of latitude on the 6,371 km sphere.
+- `src/utils/geo.ts` (74 lines) : Distance and directions helpers for the coffee map and trails.
 - `src/utils/router.ts` (68 lines) : Hash routes so cafes, beans, roasteries, drops, and shared lists have shareable
 - `src/utils/weekdays.ts` (13 lines) : Canonical weekday iteration order for hours tables.
 
@@ -218,10 +252,11 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/views/PlacePortalView.tsx` (680 lines) : What the portal offers, for visitors who are not signed in or have not applied.
   - L27 : PlacePortalViewProps
   - L583 : PlacePortalView
-- `src/views/ProfileView.tsx` (497 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
-  - L23 : ProfileSection
-  - L25 : ProfileViewProps
-  - L70 : ProfileView
+- `src/views/ProfileView.tsx` (721 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
+  - L27 : ProfileSection
+  - L29 : ProfileViewProps
+  - L139 : StampEntry
+  - L150 : ProfileView
 - `src/views/SavedView.tsx` (319 lines) : Tasting journal: bookmarked cafes and beans, drop alerts, custom shareable lists.
   - L13 : SavedTab
   - L15 : SavedViewProps

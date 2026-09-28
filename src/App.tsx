@@ -21,7 +21,7 @@ import { AdminDashboard } from './components/admin/AdminDashboard';
 import { AddSpotView } from './views/AddSpotView';
 import { LoginView, type LoginMode } from './views/LoginView';
 import { PlacePortalView } from './views/PlacePortalView';
-import { ProfileView } from './views/ProfileView';
+import { ProfileView, type ProfileSection } from './views/ProfileView';
 import { SharedListView } from './views/SharedListView';
 import { LegalView } from './views/LegalView';
 import { RateCafeModal } from './components/cafe/RateCafeModal';
@@ -32,6 +32,10 @@ import { isTourDone, markTourDone } from './components/tour/tourStorage';
 import { MoodCard } from './components/moodFinder/MoodCard';
 import { MoodFinderSheet } from './components/moodFinder/MoodFinderSheet';
 import type { MoodId } from './components/moodFinder/moods';
+import { CheckInModal } from './components/session/CheckInModal';
+import { EndSessionModal } from './components/session/EndSessionModal';
+import { FloatingFocusBanner, SessionToast, type ToastMessage } from './components/session/FloatingFocusBanner';
+import { useActiveFocusSession, useFocusBoundaryWatch } from './hooks/useFocusSession';
 
 import { catalogService } from './services/catalogService';
 import { userPrefsService } from './services/userPrefsService';
@@ -39,6 +43,7 @@ import { communityService } from './services/communityService';
 import { sessionService, RESET_RETURN_TAB } from './services/sessionService';
 import { spotService } from './services/spotService';
 import { placeService } from './services/placeService';
+import { visitService } from './services/visitService';
 import { useCatalogVersion, usePrefsVersion, useCommunityVersion, useSessionVersion, useSpotVersion, usePlaceVersion } from './hooks/useServiceVersions';
 import { buildHash, parseHash, setHash } from './utils/router';
 import { distanceKm } from './utils/geo';
@@ -115,6 +120,15 @@ export const App: React.FC = () => {
   // Sign-in page: how it opens and where it returns to afterwards
   const [loginIntent, setLoginIntent] = useState<{ mode: LoginMode; returnTab: string }>({ mode: 'signin', returnTab: 'profile' });
 
+  // Sanctuary check-ins: the geofenced check-in sheet, the end-of-session sheet, and one toast line
+  const [checkInCafe, setCheckInCafe] = useState<Cafe | null>(null);
+  const [isEndSessionOpen, setIsEndSessionOpen] = useState(false);
+  const [sessionToast, setSessionToast] = useState<ToastMessage | null>(null);
+  const [profileRequest, setProfileRequest] = useState<{ section: ProfileSection; at: number } | null>(null);
+  const activeFocus = useActiveFocusSession();
+  const dismissToast = useCallback(() => setSessionToast(null), []);
+  useFocusBoundaryWatch((outcome) => setSessionToast({ text: outcome.message, tone: outcome.kind === 'failed' ? 'error' : 'success' }));
+
   const baseHashRef = useRef(buildHash('/tab/feed'));
 
   const setActiveTab = useCallback((tab: string) => {
@@ -144,7 +158,7 @@ export const App: React.FC = () => {
     };
     sessionService
       .start()
-      .then(() => Promise.all([spotService.start(), placeService.start()]))
+      .then(() => Promise.all([spotService.start(), placeService.start(), visitService.start()]))
       .then(() => {
         // A failed load skips pruning rather than deleting saves on a flaky connection
         if (!spotService.getLoadError() && !placeService.getLoadError()) prune();
@@ -301,6 +315,17 @@ export const App: React.FC = () => {
   };
 
   const openAddSpot = () => setActiveTab(SUBMIT_TAB_ID);
+
+  // Check-ins and focus sessions ------------------------------------------------
+
+  const openCheckIn = (cafe: Cafe) => setCheckInCafe(cafe);
+
+  const openPassport = () => {
+    setCheckInCafe(null);
+    setSelectedCafeId(null);
+    setProfileRequest({ section: 'passport', at: Date.now() });
+    setActiveTab('profile');
+  };
 
   // Catalog queries -----------------------------------------------------------
 
@@ -531,6 +556,7 @@ export const App: React.FC = () => {
             selectedCity={selectedCity}
             navTarget={navTarget}
             onEndNavigation={() => setNavTarget(null)}
+            onCheckIn={openCheckIn}
           />
         )}
 
@@ -546,6 +572,7 @@ export const App: React.FC = () => {
             onOpenAdmin={openAdmin}
             onSignOut={handleSignOut}
             onStartTour={startTour}
+            sectionRequest={profileRequest}
           />
         )}
 
@@ -585,6 +612,38 @@ export const App: React.FC = () => {
         onToggleSave={toggleSaveCafe}
         onDirections={openDirections}
         onRateCafe={setRatingCafe}
+        onCheckIn={openCheckIn}
+        focusingHere={Boolean(activeFocus && selectedCafe && activeFocus.cafeId === selectedCafe.id)}
+        onFinishSession={() => setIsEndSessionOpen(true)}
+      />
+
+      <CheckInModal
+        cafe={checkInCafe}
+        onClose={() => setCheckInCafe(null)}
+        onDirections={(cafe) => {
+          setCheckInCafe(null);
+          openDirections(cafe);
+        }}
+        onFocusStarted={() => {
+          const name = checkInCafe?.name ?? 'the spot';
+          setCheckInCafe(null);
+          closeCafe();
+          setSessionToast({ text: `Focus session started at ${name}. It saves itself if you leave.`, tone: 'success' });
+        }}
+        onFinishActive={() => {
+          setCheckInCafe(null);
+          setIsEndSessionOpen(true);
+        }}
+        onOpenPassport={openPassport}
+      />
+
+      <EndSessionModal
+        isOpen={isEndSessionOpen && Boolean(activeFocus)}
+        onClose={() => setIsEndSessionOpen(false)}
+        onDone={(message) => {
+          setIsEndSessionOpen(false);
+          setSessionToast({ text: message, tone: 'success' });
+        }}
       />
 
       <DirectionsActionSheet cafe={directionsFor} onClose={() => setDirectionsFor(null)} onNavigateInApp={navigateInApp} />
@@ -619,12 +678,16 @@ export const App: React.FC = () => {
       <FooterSection setActiveTab={setActiveTab} setSelectedCity={setSelectedCity} onAddSpot={openAddSpot} />
 
       <div className="h-[92px] lg:hidden" aria-hidden="true" />
+      {activeFocus && <div className="h-14" aria-hidden="true" />}
+
+      <FloatingFocusBanner onFinish={() => setIsEndSessionOpen(true)} isHidden={isWelcomeOpen} />
+      <SessionToast message={sessionToast} onDismiss={dismissToast} aboveBanner={Boolean(activeFocus)} />
 
       <BottomTabBar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         savedCount={savedCount}
-        isHidden={Boolean(selectedCafe || directionsFor || ratingCafe || isWelcomeOpen || moodSheet.open)}
+        isHidden={Boolean(selectedCafe || directionsFor || ratingCafe || isWelcomeOpen || moodSheet.open || checkInCafe || isEndSessionOpen)}
       />
     </div>
   );

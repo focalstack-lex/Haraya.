@@ -20,6 +20,26 @@ function toRad(deg: number): number {
   return (deg * Math.PI) / 180;
 }
 
+/** Check-ins need the device within this many meters of the venue. */
+export const CHECK_IN_RADIUS_M = 120;
+/** A running focus session ends itself once the device is farther than this from the venue. */
+export const SESSION_EXIT_RADIUS_M = 150;
+
+const EARTH_RADIUS_M = 6_371_000;
+
+/** Haversine great-circle distance in meters. */
+export function calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return 2 * EARTH_RADIUS_M * Math.asin(Math.min(1, Math.sqrt(h)));
+}
+
+/** True when a device position is close enough to the venue to check in. */
+export function isWithinCheckIn(device: GeoPoint, venue: GeoPoint): boolean {
+  return calculateDistanceMeters(device.lat, device.lng, venue.lat, venue.lng) <= CHECK_IN_RADIUS_M;
+}
+
 /** Human "1.2 km" formatting. */
 export function formatKm(km: number): string {
   if (km < 1) return `${Math.round(km * 1000)} m`;

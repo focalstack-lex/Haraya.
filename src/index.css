@@ -311,6 +311,35 @@ html {
   transition: transform 0.4s var(--ios-ease);
 }
 
+/* Focus session banner and its toast: just above the 58px tab dock on phones with a 12px gap (the toast
+   clears the 44px banner and Aya peeking 20px over it), at the bottom edge on desktop where there is no dock. */
+.focus-banner-slot {
+  bottom: calc(max(0.5rem, env(safe-area-inset-bottom, 0px)) + 70px);
+}
+
+.focus-toast-slot-raised {
+  bottom: calc(max(0.5rem, env(safe-area-inset-bottom, 0px)) + 138px);
+}
+
+@media (min-width: 1024px) {
+  .focus-banner-slot {
+    bottom: 24px;
+  }
+
+  .focus-toast-slot-raised {
+    bottom: 92px;
+  }
+}
+
+.focus-pulse {
+  animation: focus-pulse 1.8s ease-out infinite;
+}
+
+@keyframes focus-pulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+
 /* Hide scrollbar for clean chip rails */
 .scrollbar-none::-webkit-scrollbar {
   display: none;

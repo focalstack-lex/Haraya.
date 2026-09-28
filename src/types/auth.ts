@@ -18,6 +18,10 @@ export interface Profile {
   status: ReviewStatus;
   /** cafes.id of the listing this owner manages, set on approval. */
   cafe_profile_id: string | null;
+  /** Passport privacy (20260929030000); absent until that migration is applied. */
+  is_public_passport?: boolean;
+  /** Focus minutes across all visits, kept by a database trigger. */
+  total_focus_minutes?: number;
   created_at: string;
   updated_at: string;
 }

@@ -27,7 +27,8 @@ import { isOpenNow, hoursTodayLabel, hasListedHours } from '../../utils/calendar
 import { catalogService } from '../../services/catalogService';
 import { useCatalogVersion } from '../../hooks/useServiceVersions';
 import { AddToListSheet } from '../common/AddToListSheet';
-import { V60DripperIcon } from '../common/CustomIcons';
+import { V60DripperIcon, FocusTimerIcon } from '../common/CustomIcons';
+import { CafeRecentVisitors } from './CafeRecentVisitors';
 
 const AMENITY_ICONS: Record<AmenityKey, React.ComponentType<{ className?: string }>> = {
   fastWifi: Wifi,
@@ -109,6 +110,11 @@ interface CafeDetailModalProps {
   onSelectRoastery?: (cafeId: string) => void;
   onViewBean?: (beanId: string) => void;
   onRateCafe?: (cafe: Cafe) => void;
+  /** Opens the geofenced check-in sheet (focus session or Quick Stamp). */
+  onCheckIn?: (cafe: Cafe) => void;
+  /** A focus session is running at this spot: the check-in button becomes Finish. */
+  focusingHere?: boolean;
+  onFinishSession?: () => void;
 }
 
 /**
@@ -124,6 +130,9 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
   onSelectRoastery,
   onViewBean,
   onRateCafe,
+  onCheckIn,
+  focusingHere = false,
+  onFinishSession,
 }) => {
   const catalogVersion = useCatalogVersion();
   const [isListSheetOpen, setIsListSheetOpen] = useState(false);
@@ -255,10 +264,19 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
               </button>
             </div>
             <div className="grid grid-cols-2 gap-2">
+              {onCheckIn && (
+                <button
+                  onClick={() => (focusingHere && onFinishSession ? onFinishSession() : onCheckIn(cafe))}
+                  className={SECONDARY_ACTION}
+                >
+                  <FocusTimerIcon className="w-4.5 h-4.5" />
+                  {focusingHere ? 'Finish session' : 'Check in'}
+                </button>
+              )}
               {onRateCafe && (
                 <button
                   onClick={() => onRateCafe(cafe)}
-                  className={`${SECONDARY_ACTION} ${cafe.isRoastery && onSelectRoastery ? '' : 'col-span-2'}`}
+                  className={`${SECONDARY_ACTION} ${(onCheckIn ? 1 : 0) + (cafe.isRoastery && onSelectRoastery ? 1 : 0) === 0 ? 'col-span-2' : ''}`}
                 >
                   <Star className="w-4 h-4" />
                   Rate
@@ -267,7 +285,7 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
               {cafe.isRoastery && onSelectRoastery && (
                 <button
                   onClick={() => onSelectRoastery(cafe.id)}
-                  className={`${SECONDARY_ACTION} ${onRateCafe ? '' : 'col-span-2'}`}
+                  className={`${SECONDARY_ACTION} ${(onCheckIn ? 1 : 0) + (onRateCafe ? 1 : 0) === 1 ? '' : 'col-span-2'}`}
                 >
                   <Flame className="w-4 h-4" />
                   Roastery profile
@@ -295,6 +313,8 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
               <AmenityBadges amenities={cafe.amenities} wifiMbps={cafe.wifiMbps} />
             </section>
           )}
+
+          <CafeRecentVisitors cafe={cafe} />
 
           {cafe.brewMethods.length > 0 && (
           <section className="space-y-1.5">

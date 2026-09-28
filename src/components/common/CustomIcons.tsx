@@ -190,3 +190,29 @@ export const CupperStarIcon: React.FC<IconProps> = ({ className = 'w-4 h-4' }) =
     <polygon points="12 2 14.8 8.5 21.8 9.3 16.5 14 18.2 21 12 17.2 5.8 21 7.5 14 2.2 9.3 9.2 8.5 12 2" />
   </svg>
 );
+
+// Cup Clink: two cups tipped toward each other, with the clink between them
+export const CupClinkIcon: React.FC<IconProps> = ({ className = 'w-5 h-5' }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M3.2 10.5l5.6-1.5 1.3 6.1c.3 1.4-.6 2.7-2 3l-.3.1c-1.4.3-2.7-.6-3-2L3.2 10.5Z" />
+    <path d="M20.8 10.5l-5.6-1.5-1.3 6.1c-.3 1.4.6 2.7 2 3l.3.1c1.4.3 2.7-.6 3-2l1.6-5.7Z" />
+    <path d="M12 3.2v2.2M9.2 4.4l.9 1.6M14.8 4.4l-.9 1.6" className="opacity-70" />
+  </svg>
+);
+
+// Focus timer: a stopwatch with the hand at the quarter
+export const FocusTimerIcon: React.FC<IconProps> = ({ className = 'w-5 h-5' }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <circle cx="12" cy="13.5" r="7.5" />
+    <path d="M12 13.5V9.5M12 13.5l2.6 1.6M10 3h4M12 3v2.5" />
+  </svg>
+);
+
+// Passport stamp: a rubber stamp over its ink line
+export const RubberStampIcon: React.FC<IconProps> = ({ className = 'w-5 h-5' }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M9.5 11.5V9a2.5 2.5 0 1 1 5 0v2.5" />
+    <path d="M5 15.5c0-2.2 1.8-4 4-4h6c2.2 0 4 1.8 4 4v1H5v-1Z" />
+    <path d="M4 20h16" className="opacity-70" />
+  </svg>
+);
