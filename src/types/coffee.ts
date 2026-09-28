@@ -12,7 +12,7 @@ export const DAVAO_CITIES = [
   'Mati City',
   'Samal Island',
 ] as const;
-
+//okey keyow
 export type DavaoCity = (typeof DAVAO_CITIES)[number];
 
 export const DAVAO_DISTRICTS = [
