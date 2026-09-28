@@ -1,6 +1,7 @@
 import React from 'react';
 import { Bookmark, BookmarkCheck, Flame, Navigation, Star } from 'lucide-react';
 import type { Cafe } from '../../types/coffee';
+import { AyaMascot } from '../common/AyaMascot';
 import { isOpenNow } from '../../utils/calendar';
 import { directionsUrl } from '../../utils/geo';
 import { userPrefsService } from '../../services/userPrefsService';
@@ -11,7 +12,6 @@ interface CafeGridProps {
   onToggleSave: (cafe: Cafe) => void;
   onSelectCafe: (cafeId: string) => void;
   onSelectRoastery: (cafeId: string) => void;
-  onRateCafe?: (cafe: Cafe) => void;
   emptyTitle?: string;
   emptyBody?: string;
   emptyAction?: { label: string; onClick: () => void };
@@ -23,10 +23,9 @@ const CafeCard: React.FC<{
   onToggleSave: (cafe: Cafe) => void;
   onSelectCafe: (cafeId: string) => void;
   onSelectRoastery: (cafeId: string) => void;
-  onRateCafe?: (cafe: Cafe) => void;
   /** Marks this card's bookmark as the guided tour's save step. */
   isTourTarget?: boolean;
-}> = ({ cafe, saved, onToggleSave, onSelectCafe, onSelectRoastery, onRateCafe, isTourTarget }) => {
+}> = ({ cafe, saved, onToggleSave, onSelectCafe, onSelectRoastery, isTourTarget }) => {
   const openNow = isOpenNow(cafe.hours);
   const rating = userPrefsService.getRating(cafe.id);
 
@@ -98,24 +97,17 @@ const CafeCard: React.FC<{
               <Navigation className="w-3.5 h-3.5" />
               <span className="hidden min-[400px]:inline">Route</span>
             </a>
-            {onRateCafe && (
-              <button
-                onClick={() => onRateCafe(cafe)}
-                aria-label={rating ? `Your rating: ${rating.rating} of 5. Change rating` : `Rate ${cafe.name}`}
-                className="h-9 px-1.5 font-medium text-[#7D5C3D] inline-flex items-center gap-1 ios-press"
-              >
-                <Star className={`w-3.5 h-3.5 ${rating ? 'fill-[#CA9C68] text-[#CA9C68]' : ''}`} />
-                {rating ? <span className="font-mono">{rating.rating}</span> : 'Rate'}
-              </button>
+            {rating && (
+              <span className="h-9 px-1.5 font-medium text-[#7D5C3D] inline-flex items-center gap-1" aria-label={`Your rating: ${rating.rating} of 5`}>
+                <Star className="w-3.5 h-3.5 fill-[#CA9C68] text-[#CA9C68]" aria-hidden="true" />
+                <span className="font-mono">{rating.rating}</span>
+              </span>
             )}
           </div>
-          {cafe.isRoastery ? (
+          {/* The card itself opens details; only the roastery storefront earns its own link */}
+          {cafe.isRoastery && (
             <button onClick={() => onSelectRoastery(cafe.id)} className="h-9 px-1 font-semibold text-[#7D5C3D] ios-press">
               Roastery
-            </button>
-          ) : (
-            <button onClick={() => onSelectCafe(cafe.id)} className="h-9 px-1 font-semibold text-[#7D5C3D] ios-press">
-              Details
             </button>
           )}
         </div>
@@ -130,14 +122,14 @@ export const CafeGrid: React.FC<CafeGridProps> = ({
   onToggleSave,
   onSelectCafe,
   onSelectRoastery,
-  onRateCafe,
   emptyTitle = 'No cafes match this pour',
   emptyBody = 'Try clearing a vibe filter or widening the city to find your next cup.',
   emptyAction,
 }) => {
   if (cafes.length === 0) {
     return (
-      <div className="py-16 text-center space-y-2">
+      <div className="py-12 text-center space-y-2">
+        <AyaMascot pose="empty" size={112} alt="" className="mb-1" />
         <h3 className="ios-title text-[19px]">{emptyTitle}</h3>
         <p className="text-[14px] font-sans text-[#594C3D] max-w-xs mx-auto">{emptyBody}</p>
         {emptyAction && (
@@ -163,7 +155,6 @@ export const CafeGrid: React.FC<CafeGridProps> = ({
           onToggleSave={onToggleSave}
           onSelectCafe={onSelectCafe}
           onSelectRoastery={onSelectRoastery}
-          onRateCafe={onRateCafe}
         />
       ))}
     </div>

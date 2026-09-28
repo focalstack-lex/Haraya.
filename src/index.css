@@ -415,6 +415,72 @@ html {
   animation: status-pulse 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+/* Aya mascot idle motion (AyaMascot.tsx). Values are in the art's 860 unit frame.
+   Every 100% keyframe is the rest pose, so the reduced-motion rule below lands on it. */
+.aya-bob {
+  animation: aya-bob 3.6s ease-in-out infinite;
+}
+
+.aya-blink {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: aya-blink 5.5s ease-in-out infinite;
+}
+
+.aya-steam {
+  animation: aya-steam 3s ease-in-out infinite;
+}
+
+.aya-wave {
+  transform-box: view-box;
+  transform-origin: 600px 772px;
+  animation: aya-wave 1.8s ease-in-out infinite;
+}
+
+.aya-float {
+  animation: aya-float 2.6s ease-in-out infinite;
+}
+
+.aya-float-late {
+  animation-delay: -1.3s;
+}
+
+/* Aya rises out of the Discover mood card once, with a small overshoot */
+.aya-rise {
+  animation: aya-rise 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+}
+
+@keyframes aya-rise {
+  0% { transform: translateY(36px) rotate(-6deg); opacity: 0; }
+  100% { transform: translateY(0) rotate(0deg); opacity: 1; }
+}
+
+@keyframes aya-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+
+@keyframes aya-blink {
+  0%, 93%, 100% { transform: scaleY(1); }
+  96% { transform: scaleY(0.08); }
+}
+
+@keyframes aya-steam {
+  0%, 100% { transform: translateY(0); opacity: 1; }
+  50% { transform: translateY(-16px); opacity: 0.55; }
+}
+
+@keyframes aya-wave {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg); }
+  75% { transform: rotate(6deg); }
+}
+
+@keyframes aya-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-18px); }
+}
+
 /* Keyboard focus ring. Kept in the base layer so a component that draws its own
    focus state (search field, sheet inputs) can replace it with a utility. */
 @layer base {

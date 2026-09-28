@@ -34,6 +34,13 @@ The tokens live in `src/index.css`; this file is the contract behind them.
   `wordmark` variant (mountain and name). The `full` variant carries "Find your daily cup.", which only stays
   legible at 160px tall or more, so it is reserved for large brand placements.
   App icons use the mountain mark on the logo's own peach (#FFE9CA).
+- Mascot: Aya, drawn from the official master art (`Haraya Files/MASCOT/FULL BODY.png`) as flat SVG in
+  `AyaMascot`, using only the master palette (roast #574835, tan #997247, cream #FFF6EE, steam #E7AC67, coffee
+  #FFC183, ink #1D1203). No outlines, gradients or mouth. One pose per surface so she reads as a character, not a
+  sticker: `welcome` (WelcomeModal, first tour step), `mood` (Discover mood card, where she rises out of the
+  card's top edge, and Mood Finder idle), `empty` (cafe, bean, saved, visited and mood
+  no-match empty states), `drops` (Roast Drops title). Idle motion (bob, blink, steam, wave) rests under reduced
+  motion. Beside text that already carries the message, pass `alt=""` so she stays decorative.
 - Numbers (prices, counts, timers) use tabular figures (`font-mono` maps to the UI face with
   `tabular-nums`). No monospace costume.
 - Section headers are sentence case. No uppercase tracked eyebrows above headings.
@@ -87,6 +94,10 @@ Color is information. The tint marks the one active or primary thing in a region
   inset from the leading edge, chevron on navigable rows.
 - **Sheet:** grabber on phones, 28px top radius, header with a centered title and a round
   close button.
+- **Mood finder** (`src/components/moodFinder/`): entry card on Discover, sheet with mood and must-have chips,
+  describe field, location and weather group rows, result cards with the pick label as a dark-material pill on
+  the photo. Map routes draw a dotted tint line from a blue "You" dot (iOS location convention, the only blue in
+  the app: it means "your position").
 
 ## Touch and responsiveness
 

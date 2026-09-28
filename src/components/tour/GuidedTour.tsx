@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { TOUR_STEPS } from './tourSteps';
+import { AyaMascot } from '../common/AyaMascot';
 
 interface GuidedTourProps {
   isOpen: boolean;
@@ -189,7 +190,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ isOpen, onFinish }) => {
   const aboveTop = (arrowAbove ? arrowTop : box.top) - calloutHeight - 12;
   const fitsBelow = belowTop + calloutHeight < vh - EDGE;
   const calloutTop = Math.max(EDGE, fitsBelow ? belowTop : aboveTop);
-  const calloutWidth = vw < 640 ? vw - EDGE * 2 : 320;
+  const calloutWidth = vw < 640 ? vw - EDGE * 2 : 368;
   const calloutLeft = vw < 640 ? EDGE : Math.min(Math.max(centerX - calloutWidth / 2, EDGE), vw - EDGE - calloutWidth);
 
   const radius = Math.min(18, box.height / 2);
@@ -252,16 +253,19 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ isOpen, onFinish }) => {
         animate={{ x: calloutLeft, y: calloutTop }}
         transition={glide}
       >
-        <motion.p
-          key={index}
-          initial={reduceMotion ? false : { opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          aria-live="polite"
-          className="text-[15px] leading-snug text-[#13191F]"
-        >
-          {step.text}
-        </motion.p>
+        <div className="flex items-center gap-3">
+          <AyaMascot key={step.aya} pose={step.aya} size={92} alt="" className="-ml-2 -my-1" />
+          <motion.p
+            key={index}
+            initial={reduceMotion ? false : { opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            aria-live="polite"
+            className="flex-1 min-w-0 text-[15px] leading-snug text-[#13191F]"
+          >
+            {step.text}
+          </motion.p>
+        </div>
         <div className="mt-3.5 flex items-center gap-2">
           <span className="ios-footnote font-mono text-[#594C3D]">
             {index + 1} of {TOUR_STEPS.length}

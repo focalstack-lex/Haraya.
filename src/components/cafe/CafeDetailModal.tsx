@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import type { Cafe, AmenityKey, Bean } from '../../types/coffee';
 import { AMENITY_LABELS } from '../../types/coffee';
-import { Modal, ModalHeader, SecondaryButton } from '../common/FormControls';
+import { Modal, ModalHeader } from '../common/FormControls';
 import { isOpenNow, hoursTodayLabel } from '../../utils/calendar';
 import { directionsUrl } from '../../utils/geo';
 import { catalogService } from '../../services/catalogService';
@@ -210,30 +210,38 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
 
           {/* Actions */}
           <div className="space-y-2">
-            <a
-              href={directionsUrl([{ lat: cafe.lat, lng: cafe.lng }])}
-              target="_blank"
-              rel="noreferrer"
-              className="h-11 w-full rounded-full bg-[#906D4B] text-[#FFFDF9] text-[15px] font-semibold font-sans inline-flex items-center justify-center gap-2 hover:bg-[#7D5C3D] ios-press"
-            >
-              <Navigation className="w-4 h-4" />
-              Directions
-            </a>
-            <div className="grid grid-cols-2 gap-2">
+            {/* One primary action; save and list ride beside it as icon buttons */}
+            <div className="flex items-center gap-2">
+              <a
+                href={directionsUrl([{ lat: cafe.lat, lng: cafe.lng }])}
+                target="_blank"
+                rel="noreferrer"
+                className="h-11 flex-1 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[15px] font-semibold font-sans inline-flex items-center justify-center gap-2 hover:bg-[#7D5C3D] ios-press"
+              >
+                <Navigation className="w-4 h-4" />
+                Directions
+              </a>
               <button
                 onClick={() => onToggleSave(cafe)}
                 aria-pressed={saved}
-                className={SECONDARY_ACTION}
+                aria-label={saved ? `Remove ${cafe.name} from saved` : `Save ${cafe.name}`}
+                className={
+                  saved
+                    ? 'h-11 w-11 rounded-full bg-[#906D4B] text-[#FFFDF9] inline-flex items-center justify-center hover:bg-[#7D5C3D] ios-press'
+                    : `${SECONDARY_ACTION} w-11 px-0`
+                }
               >
-                {saved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
-                {saved ? 'Saved' : 'Save'}
+                {saved ? <BookmarkCheck className="w-4.5 h-4.5" /> : <Bookmark className="w-4.5 h-4.5" />}
               </button>
-              <SecondaryButton onClick={() => setIsListSheetOpen(true)} className="px-3">
-                <span className="inline-flex items-center justify-center gap-2">
-                  <ListPlus className="w-4 h-4" />
-                  Add to list
-                </span>
-              </SecondaryButton>
+              <button
+                onClick={() => setIsListSheetOpen(true)}
+                aria-label={`Add ${cafe.name} to a list`}
+                className={`${SECONDARY_ACTION} w-11 px-0`}
+              >
+                <ListPlus className="w-4.5 h-4.5" />
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
               {onRateCafe && (
                 <button
                   onClick={() => onRateCafe(cafe)}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CalendarPlus, Bell, BellRing, Check, Download } from 'lucide-react';
+import { CalendarPlus, Bell, BellRing, Check, ChevronDown, Download } from 'lucide-react';
 import type { RoastDrop, Bean } from '../../types/coffee';
 import { catalogService } from '../../services/catalogService';
 import { userPrefsService } from '../../services/userPrefsService';
@@ -13,15 +13,20 @@ interface BeanDropCardProps {
   onInspectBean: (beanId: string) => void;
 }
 
-/** Vault card for one roast batch: countdown, calendar sync, reminders, reserve. */
+/** Vault card for one roast batch: one primary action (reserve), one Remind me disclosure that holds
+ * the in-app reminder and both calendar hand-offs. */
 export const BeanDropCard: React.FC<BeanDropCardProps> = ({ drop, bean, onInspectBean }) => {
   usePrefsVersion();
   const [synced, setSynced] = useState(false);
+  const [remindOpen, setRemindOpen] = useState(false);
 
   const status = catalogService.getDropStatus(drop);
   const reminded = userPrefsService.isReminded(drop.id);
 
   const start = new Date(drop.dropAt);
+  // A running clock only earns its space in the last day; before that the date reads faster
+  const msToDrop = start.getTime() - Date.now();
+  const showCountdown = status === 'scheduled' && msToDrop > 0 && msToDrop < 86_400_000;
   const end = new Date(start.getTime() + 2 * 3_600_000);
 
   const syncGoogle = () => {
@@ -96,15 +101,18 @@ export const BeanDropCard: React.FC<BeanDropCardProps> = ({ drop, bean, onInspec
           </p>
 
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-0.5">
-            <DropCountdownTimer dropAt={drop.dropAt} />
-            <span className="ios-footnote text-[#594C3D] font-mono">
-              {new Date(drop.dropAt).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
+            {showCountdown ? (
+              <DropCountdownTimer dropAt={drop.dropAt} />
+            ) : status === 'scheduled' ? (
+              <span className="ios-footnote text-[#594C3D] font-mono">
+                {start.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
+              </span>
+            ) : null}
+            <span className="text-[14px] font-mono font-semibold text-[#13191F]">
+              ₱{drop.price}
+              <span className="font-sans font-normal ios-footnote text-[#594C3D]"> / bag, {drop.batchBags} in batch</span>
             </span>
           </div>
-          <p className="text-[14px] font-mono font-semibold text-[#13191F]">
-            ₱{drop.price}
-            <span className="font-sans font-normal ios-footnote text-[#594C3D]"> per bag, {drop.batchBags} in the batch</span>
-          </p>
         </div>
       </div>
 
@@ -117,25 +125,34 @@ export const BeanDropCard: React.FC<BeanDropCardProps> = ({ drop, bean, onInspec
             Reserve or Inquire
           </button>
         )}
-        <button onClick={syncGoogle} className={fillButton} aria-label="Add to Google Calendar">
-          <CalendarPlus className="w-4 h-4" />
-          <span>Google</span>
-        </button>
-        <button onClick={downloadIcsFile} className={fillButton} aria-label={synced ? 'Calendar file saved' : 'Download calendar file'}>
-          {synced ? <Check className="w-4 h-4" /> : <Download className="w-4 h-4" />}
-          <span className="font-mono">.ics</span>
-        </button>
         <button
-          onClick={() => userPrefsService.toggleReminder(drop.id)}
-          aria-pressed={reminded}
-          className={`h-11 px-3.5 rounded-full text-[14px] font-semibold font-sans inline-flex items-center gap-1.5 ios-press ml-auto ${
-            reminded ? 'bg-[#906D4B] text-[#FFFDF9] hover:bg-[#7D5C3D]' : 'ios-fill text-[#7D5C3D] hover:bg-[#766046]/20'
-          }`}
+          onClick={() => setRemindOpen((open) => !open)}
+          aria-expanded={remindOpen}
+          aria-controls={`remind-${drop.id}`}
+          className={`${fillButton} ml-auto`}
         >
           {reminded ? <BellRing className="w-4 h-4" /> : <Bell className="w-4 h-4" />}
           {reminded ? 'Reminding' : 'Remind me'}
+          <ChevronDown className={`w-4 h-4 transition-transform ${remindOpen ? 'rotate-180' : ''}`} />
         </button>
       </div>
+
+      {remindOpen && (
+        <div id={`remind-${drop.id}`} className="grid grid-cols-1 min-[420px]:grid-cols-3 gap-2 px-3.5 sm:px-4 pb-3.5 sm:pb-4">
+          <button onClick={() => userPrefsService.toggleReminder(drop.id)} aria-pressed={reminded} className={fillButton}>
+            {reminded ? <Check className="w-4 h-4" /> : <Bell className="w-4 h-4" />}
+            In Haraya
+          </button>
+          <button onClick={syncGoogle} className={fillButton}>
+            <CalendarPlus className="w-4 h-4" />
+            Google Calendar
+          </button>
+          <button onClick={downloadIcsFile} className={fillButton}>
+            {synced ? <Check className="w-4 h-4" /> : <Download className="w-4 h-4" />}
+            {synced ? 'Saved' : 'Calendar file'}
+          </button>
+        </div>
+      )}
     </article>
   );
 };

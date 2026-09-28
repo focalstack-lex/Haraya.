@@ -33,13 +33,16 @@ import { WelcomeModal } from './components/common/WelcomeModal';
 import { LargeTitle, CityMenu } from './components/common/LargeTitle';
 import { GuidedTour } from './components/tour/GuidedTour';
 import { isTourDone, markTourDone } from './components/tour/tourStorage';
+import { MoodCard } from './components/moodFinder/MoodCard';
+import { MoodFinderSheet } from './components/moodFinder/MoodFinderSheet';
+import type { MoodId } from './components/moodFinder/moods';
 
 import { catalogService } from './services/catalogService';
 import { userPrefsService } from './services/userPrefsService';
 import { authService } from './services/authService';
 import { useCatalogVersion, usePrefsVersion, useCommunityVersion, useAuthVersion } from './hooks/useServiceVersions';
 import { buildHash, parseHash, setHash } from './utils/router';
-import { distanceKm } from './utils/geo';
+import { distanceKm, type GeoPoint } from './utils/geo';
 import { PRICE_RANGES } from './types/coffee';
 import type { Account } from './types/auth';
 import type { Bean, Cafe } from './types/coffee';
@@ -103,6 +106,10 @@ export const App: React.FC = () => {
 
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [isTourOpen, setIsTourOpen] = useState(false);
+
+  // Mood finder sheet and its hand-off to the Coffee Map
+  const [moodSheet, setMoodSheet] = useState<{ open: boolean; mood: MoodId | null }>({ open: false, mood: null });
+  const [route, setRoute] = useState<{ cafe: Cafe; origin: GeoPoint | null } | null>(null);
 
   // Auth state
   const [account, setAccount] = useState<Account | null>(() => authService.getCurrentAccount());
@@ -265,6 +272,11 @@ export const App: React.FC = () => {
 
   const handleAuthenticated = (nextAccount: Account) => {
     setAccount(nextAccount);
+    // First sign-in on this device: Aya walks them through Discover once, same as Get started
+    if (!isTourDone()) {
+      startTour();
+      return;
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -286,6 +298,12 @@ export const App: React.FC = () => {
   const finishTour = () => {
     setIsTourOpen(false);
     markTourDone();
+  };
+
+  const openRoute = (cafe: Cafe, origin: GeoPoint | null) => {
+    setMoodSheet((current) => ({ ...current, open: false }));
+    setRoute({ cafe, origin });
+    setActiveTab('map');
   };
 
   const handleJoinRoaster = () => {
@@ -508,6 +526,9 @@ export const App: React.FC = () => {
           <FeedSearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
         </div>
 
+        {/* Mood finder entry */}
+        <MoodCard onOpen={(mood) => setMoodSheet({ open: true, mood })} />
+
         {/* Featured: next roast drops and verified roasteries from the catalog */}
         <EditorialHero
           cafes={featuredRoasteries}
@@ -517,11 +538,11 @@ export const App: React.FC = () => {
           onInspectBean={openBean}
         />
 
+        {/* Most saved shelf: real cafes reach the first screen on phones */}
+        <PopularPicksSection cafes={mostSavedCafes} onSelectCafe={openCafe} onViewAll={handleViewAllPicks} />
+
         {/* Category shortcuts */}
         <CategoryIconRow showingBeans={feedMode === 'beans'} activeFilters={vibeFilters} onSelectCategory={handleSelectCategory} />
-
-        {/* Most saved shelf */}
-        <PopularPicksSection cafes={mostSavedCafes} onSelectCafe={openCafe} onViewAll={handleViewAllPicks} />
 
         {/* Full catalog */}
         <section id="full-catalog-section" aria-labelledby="catalog-title" className="space-y-3 scroll-mt-20">
@@ -572,7 +593,6 @@ export const App: React.FC = () => {
               onToggleSave={toggleSaveCafe}
               onSelectCafe={openCafe}
               onSelectRoastery={openRoastery}
-              onRateCafe={setRatingCafe}
               emptyTitle={feedMode === 'following' ? 'Nothing new from your roasters' : 'No cafes match this pour'}
               emptyBody={
                 feedMode === 'following'
@@ -619,7 +639,16 @@ export const App: React.FC = () => {
       <main className="flex-1 pb-28 sm:pb-32">
         {activeTab === 'feed' && renderFeed()}
 
-        {activeTab === 'map' && <DavaoCoffeeMap cafes={cafes} onSelectCafe={openCafe} selectedCity={selectedCity} />}
+        {activeTab === 'map' && (
+          <DavaoCoffeeMap
+            cafes={cafes}
+            onSelectCafe={openCafe}
+            selectedCity={selectedCity}
+            routeCafe={route?.cafe ?? null}
+            origin={route?.origin ?? null}
+            onClearRoute={() => setRoute(null)}
+          />
+        )}
 
         {(activeTab === 'profile' || activeTab === 'saved') && (
           <ProfileView
@@ -648,6 +677,20 @@ export const App: React.FC = () => {
 
         {activeTab === PORTAL_TAB_ID && renderPortal()}
       </main>
+
+      <MoodFinderSheet
+        isOpen={moodSheet.open}
+        initialMood={moodSheet.mood}
+        cafes={allCafes}
+        cityOrigin={cityCentroid}
+        cityLabel={selectedCity === 'All Davao Region' ? 'Davao Region' : selectedCity}
+        savedIds={savedCafeIds}
+        recentIds={userPrefsService.getRecentViews()}
+        onClose={() => setMoodSheet((current) => ({ ...current, open: false }))}
+        onOpenCafe={openCafe}
+        onToggleSave={toggleSaveCafe}
+        onRoute={openRoute}
+      />
 
       <CafeDetailModal
         cafe={selectedCafe}
@@ -710,7 +753,7 @@ export const App: React.FC = () => {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         savedCount={savedCount}
-        isHidden={Boolean(selectedCafe || selectedBean || reserveBean || ratingCafe || isWelcomeOpen)}
+        isHidden={Boolean(selectedCafe || selectedBean || reserveBean || ratingCafe || isWelcomeOpen || moodSheet.open)}
       />
     </div>
   );

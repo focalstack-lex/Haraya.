@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { LargeTitle } from '../common/LargeTitle';
+import { AyaMascot } from '../common/AyaMascot';
 import type { RoastDrop } from '../../types/coffee';
 import { catalogService } from '../../services/catalogService';
 import { localDayKey } from '../../utils/calendar';
@@ -33,7 +34,11 @@ export const DropsView: React.FC<DropsViewProps> = ({ drops, onInspectBean }) =>
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-1 pb-6 sm:pt-4 space-y-6">
-      <LargeTitle title="Roast Drops" subtitle="Fresh batches across the Davao Region, fourteen days out." />
+      <LargeTitle
+        title="Roast Drops"
+        subtitle="Fresh batches across the Davao Region, fourteen days out."
+        trailing={<AyaMascot pose="drops" size={76} alt="" />}
+      />
 
       <section className="space-y-2" aria-labelledby="drops-calendar-title">
         <div className="flex items-center justify-between gap-3 min-h-11">

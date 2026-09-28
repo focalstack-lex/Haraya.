@@ -3,6 +3,7 @@ import { MapPin, X } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { CoffeeBagIcon, RoasterDrumIcon } from './CustomIcons';
 import { BrandLogo } from './BrandLogo';
+import { AyaMascot } from './AyaMascot';
 
 interface WelcomeModalProps {
   isOpen: boolean;
@@ -19,17 +20,17 @@ const FEATURES = [
   {
     icon: MapPin,
     title: 'Cafe discovery',
-    body: 'Find cafes across the Davao Region by vibe and amenities, and see which are open now.',
+    body: 'By vibe, amenities and open now.',
   },
   {
     icon: RoasterDrumIcon,
     title: 'Local micro-roasteries',
-    body: 'See who roasts in the region and which beans they have on the shelf.',
+    body: 'Who roasts nearby, and what is on the shelf.',
   },
   {
     icon: CoffeeBagIcon,
     title: 'Single-origin bean drops',
-    body: 'Follow small-batch roasts and reserve bags directly with the roaster.',
+    body: 'Reserve small batches from the roaster.',
   },
 ];
 
@@ -99,7 +100,7 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
         {/* Skip */}
         <button
           onClick={onClose}
-          aria-label="Skip and explore"
+          aria-label="Close and explore as a guest"
           className="absolute top-2 right-2 sm:top-3 sm:right-3 z-10 h-11 w-11 flex items-center justify-center ios-press"
         >
           <span className="h-7.5 w-7.5 rounded-full bg-[#766046]/15 flex items-center justify-center text-[#594C3D]">
@@ -110,13 +111,13 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
         <div className="px-4 sm:px-6 pt-5 sm:pt-7 pb-2 space-y-6">
           {/* Brand mark and headline */}
           <div className="space-y-3 pr-10">
-            <BrandLogo className="h-16 sm:h-[72px] -ml-1" eager />
+            <div className="flex items-end justify-between gap-3">
+              <BrandLogo className="h-24 sm:h-28 -ml-2" eager />
+              <AyaMascot pose="welcome" size={88} alt="Aya, the Haraya mascot, waving hello" className="-mb-1" />
+            </div>
             <h1 id="welcome-title" className="ios-large-title">
               Specialty coffee from the Davao Region
             </h1>
-            <p className="text-[15px] font-sans text-[#594C3D] leading-relaxed">
-              Cafes, micro-roasteries and single-origin beans from Davao, in one place.
-            </p>
           </div>
 
           {/* What the app does */}
@@ -151,12 +152,6 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
                 Log in
               </button>
             </div>
-            <button
-              onClick={onClose}
-              className="w-full min-h-11 text-[14px] font-sans text-[#594C3D] hover:text-[#13191F] ios-press"
-            >
-              Continue as guest
-            </button>
           </div>
         </div>
       </motion.div>

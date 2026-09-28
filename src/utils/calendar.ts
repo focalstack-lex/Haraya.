@@ -119,6 +119,29 @@ export function isOpenNow(hours: WeeklyHours, now: Date = new Date()): boolean {
   return false;
 }
 
+/**
+ * Minutes left before the cafe closes, 0 when it is closed. Counts overnight windows
+ * (an 18:00 to 01:00 day runs past midnight, and just after midnight the previous day's window applies).
+ */
+export function minutesUntilClose(hours: WeeklyHours, now: Date = new Date()): number {
+  const minutesNow = now.getHours() * 60 + now.getMinutes();
+
+  const today = hours[WEEKDAYS[now.getDay()]];
+  if (today.open && today.close) {
+    const open = toMinutes(today.open);
+    let close = toMinutes(today.close);
+    if (close <= open) close += 24 * 60;
+    if (open <= minutesNow && minutesNow < close) return close - minutesNow;
+  }
+
+  const yesterday = hours[WEEKDAYS[(now.getDay() + 6) % 7]];
+  if (yesterday.open && yesterday.close) {
+    const close = toMinutes(yesterday.close);
+    if (close <= toMinutes(yesterday.open) && minutesNow < close) return close - minutesNow;
+  }
+  return 0;
+}
+
 /** Human "closes 10:00 PM" style summary for the open-now pill. */
 export function hoursTodayLabel(hours: WeeklyHours, now: Date = new Date()): string {
   const today = hours[WEEKDAYS[now.getDay()]];

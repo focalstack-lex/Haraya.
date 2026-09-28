@@ -30,3 +30,8 @@ node_modules/.tmp/
 
 # Browser automation artifacts
 .playwright-mcp/
+
+# Local agent and deployment caches
+.claude/
+.vercel/
+

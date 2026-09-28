@@ -19,10 +19,11 @@ save a cafe. They finish with something in Profile.
 | --- | --- | --- | --- |
 | 1 | `search` | Search anything: a cafe, a bean, an origin like Mt. Apo, or a note like chocolate. | Next |
 | 2 | `city` | Pick your city. Discover, the map and Most saved all follow it. | Next |
-| 3 | `categories` | Shortcuts. Work finds laptop-friendly cafes, Pour-Over finds hand-brew bars. | Next |
-| 4 | `save` (first cafe card bookmark) | Save a cafe you would try. Tap the bookmark. | Tapping the real bookmark |
-| 5 | `tab-profile` | Everything you save lives in Profile. | Next |
-| 6 | `tab-map` | See every cafe on the map, plus walking trails between them. | Done |
+| 3 | `mood` (mood finder card, added with the mood finder) | Not sure where to go? Tap how you feel and Haraya suggests a cafe that fits, near you. | Next |
+| 4 | `categories` | Shortcuts. Work finds laptop-friendly cafes, Pour-Over finds hand-brew bars. | Next |
+| 5 | `save` (first cafe card bookmark) | Save a cafe you would try. Tap the bookmark. | Tapping the real bookmark |
+| 6 | `tab-profile` | Everything you save lives in Profile. | Next |
+| 7 | `tab-map` | See every cafe on the map, plus walking trails between them. | Done |
 
 When several elements share a `data-tour` value (the bottom tab bar on phones, the top bar tabs on desktop), the
 tour uses the one that is rendered and visible. A step whose target is missing is skipped.
@@ -30,7 +31,7 @@ tour uses the one that is rendered and visible. A step whose target is missing i
 ## Look and motion
 
 - Dim layer at 55% ink with a rounded cutout (8px padding) around the target.
-- Callout: white card, 20px radius, soft shadow, step text 15px, "n of 6" in tabular figures, tint Next or Done,
+- Callout: white card, 20px radius, soft shadow, step text 15px, "n of 7" in tabular figures, tint Next or Done,
   plain Skip. Below the target, or above when there is no room. Phones: full width minus 16px; desktop max 320px.
 - Guide arrow: drawn brown arrow in the logo's line style. It flies between targets with a spring (about 0.6s)
   while the cutout glides, then nudges toward the target every 1.4s. It is the only repeating animation.
@@ -50,7 +51,11 @@ tour uses the one that is rendered and visible. A step whose target is missing i
 - `src/components/tour/GuidedTour.tsx`: overlay, cutout, blockers, arrow, callout; props `isOpen`, `onFinish`.
 - Tags: `data-tour` on FeedSearchBar, CityMenu, CategoryIconRow, the first CafeGrid bookmark, and tab buttons in
   BottomTabBar and NavigationHeader.
-- App: `isTourOpen` state, started from welcome Get started and from Profile's replay row.
+- App: `isTourOpen` state, started from welcome Get started, from Profile's replay row, and on the first
+  sign-in on a device when the done flag is not yet set (`handleAuthenticated`).
+- Aya: every step carries an `aya` pose shown at 60px beside the callout text. She introduces herself on step 1
+  (`welcome`), uses `mood` on the mood step, `drops` on the save step, waves goodbye (`welcome`) on the last, and
+  holds her cup elsewhere.
 
 ## Verification
 

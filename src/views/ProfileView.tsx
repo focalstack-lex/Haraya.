@@ -7,7 +7,6 @@ import {
   CoffeeBagIcon,
   TopoTrailIcon,
   RoasterDrumIcon,
-  CeramicCupIcon,
 } from '../components/common/CustomIcons';
 import type { Cafe } from '../types/coffee';
 import { userPrefsService } from '../services/userPrefsService';
@@ -19,6 +18,7 @@ import { isOpenNow, hoursTodayLabel } from '../utils/calendar';
 import { RateCafeModal } from '../components/cafe/RateCafeModal';
 import { LargeTitle } from '../components/common/LargeTitle';
 import { PrimaryButton } from '../components/common/FormControls';
+import { AyaMascot } from '../components/common/AyaMascot';
 
 export type ProfileSection = 'overview' | 'visited' | 'saved';
 
@@ -282,7 +282,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       {section === 'visited' &&
         (ratedCafes.length === 0 ? (
           <EmptyState
-            icon={<CeramicCupIcon className="w-10 h-10" />}
+            icon={<AyaMascot pose="empty" size={112} alt="" />}
             title="No visited cafes yet"
             body="Rate your cup at a Davao cafe and keep your tasting notes here."
             onAction={onExploreFeed}
@@ -354,7 +354,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       {section === 'saved' &&
         (savedCafes.length === 0 ? (
           <EmptyState
-            icon={<CoffeeBagIcon className="w-10 h-10" />}
+            icon={<AyaMascot pose="empty" size={112} alt="" />}
             title="No saved places yet"
             body="Bookmark cafes around Davao Region to keep them on your wishlist."
             onAction={onExploreFeed}

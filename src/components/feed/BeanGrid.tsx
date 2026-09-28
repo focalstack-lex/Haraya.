@@ -1,6 +1,7 @@
 import React from 'react';
 import { Bookmark, BookmarkCheck } from 'lucide-react';
 import { BeanIcon } from '../common/CustomIcons';
+import { AyaMascot } from '../common/AyaMascot';
 import type { Bean } from '../../types/coffee';
 
 interface BeanGridProps {
@@ -87,7 +88,8 @@ export const BeanGrid: React.FC<BeanGridProps> = ({
 }) => {
   if (beans.length === 0) {
     return (
-      <div className="py-16 text-center space-y-2">
+      <div className="py-12 text-center space-y-2">
+        <AyaMascot pose="empty" size={112} alt="" className="mb-1" />
         <h3 className="ios-title text-[19px]">{emptyTitle}</h3>
         <p className="text-[14px] font-sans text-[#594C3D] max-w-xs mx-auto">{emptyBody}</p>
       </div>

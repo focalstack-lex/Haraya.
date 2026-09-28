@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-28 : commit aa8ac17 : fingerprint 36135dda16ca205a
+Generated 2026-09-28 : commit 2a4b997 : fingerprint a777d7720a5bf303
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -11,10 +11,10 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 - `index.html` (31 lines) : . module: index.html
 - `scripts/generate-code-map.mjs` (212 lines) : One-line purpose per file, inferred from its path and leading doc comment.
-- `src/App.tsx` (720 lines) : Storage can throw in private windows or with blocked site data; the welcome sheet is a convenience.
-  - L49 : SharedList
-  - L75 : App
-- `src/index.css` (577 lines) : src entry point
+- `src/App.tsx` (763 lines) : Storage can throw in private windows or with blocked site data; the welcome sheet is a convenience.
+  - L52 : SharedList
+  - L78 : App
+- `src/index.css` (643 lines) : src entry point
 - `src/main.tsx` (11 lines) : src entry point
 - `vite.config.ts` (15 lines) : . module: vite.config
 
@@ -33,7 +33,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 ## src/components/cafe/
 
 - `src/components/cafe/BeanDetailModal.tsx` (201 lines) : Grouped list on the white sheet: the linen canvas tone lets the inset group read as a group.
-- `src/components/cafe/CafeDetailModal.tsx` (324 lines) : Grouped list on the white sheet: the linen canvas tone lets the inset group read as a group.
+- `src/components/cafe/CafeDetailModal.tsx` (332 lines) : Grouped list on the white sheet: the linen canvas tone lets the inset group read as a group.
   - L52 : AmenityBadges
   - L74 : MenuSheet
   - L102 : CafeDetailModalProps
@@ -43,12 +43,13 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 ## src/components/common/
 
 - `src/components/common/AddToListSheet.tsx` (105 lines) : List picker used by the cafe and bean modals and the saved view.
+- `src/components/common/AyaMascot.tsx` (292 lines) : One pose per surface, so Aya reads as a character rather than a repeated sticker:
 - `src/components/common/BrandLogo.tsx` (36 lines) : Haraya logo cut from the brand master (Haraya Files/LOGO.webp) with the background keyed out,
 - `src/components/common/CustomIcons.tsx` (185 lines) : Haraya Custom Icon Set: high-precision vector icons tailored for the Davao
 - `src/components/common/FormControls.tsx` (254 lines) : Shared form primitives for Haraya: an iOS-style sheet (bottom sheet with a
 - `src/components/common/ImageUploadField.tsx` (81 lines) : File input that stores the image as a dataURL with type and size validation.
 - `src/components/common/LargeTitle.tsx` (46 lines) : iOS large title: the first thing on every primary page, left aligned.
-- `src/components/common/WelcomeModal.tsx` (166 lines) : What the app does, stated plainly: one row per real surface.
+- `src/components/common/WelcomeModal.tsx` (161 lines) : What the app does, stated plainly: one row per real surface.
 
 ## src/components/community/
 
@@ -59,18 +60,18 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/drops/
 
-- `src/components/drops/BeanDropCard.tsx` (142 lines) : Vault card for one roast batch: countdown, calendar sync, reminders, reserve.
+- `src/components/drops/BeanDropCard.tsx` (159 lines) : Vault card for one roast batch: one primary action (reserve), one Remind me disclosure that holds
 - `src/components/drops/BeanReservationModal.tsx` (132 lines) : Direct reservation: pre-order whole bean bags or drip packs from the roaster.
 - `src/components/drops/DropCalendarStrip.tsx` (79 lines) : 14-day horizontal calendar of roast batches. Each cell shows the weekday,
-- `src/components/drops/DropCountdownTimer.tsx` (44 lines) : Live countdown digits (DD:HH:MM:SS) that tick once per second.
-- `src/components/drops/DropsView.tsx` (93 lines) : Bean Drops: 14-day roast calendar on top, micro-lot vault under it.
+- `src/components/drops/DropCountdownTimer.tsx` (52 lines) : Live countdown digits (DD:HH:MM:SS) that tick once per second. `onDark` swaps to cream text for photo overlays.
+- `src/components/drops/DropsView.tsx` (98 lines) : Bean Drops: 14-day roast calendar on top, micro-lot vault under it.
 
 ## src/components/feed/
 
-- `src/components/feed/BeanGrid.tsx` (111 lines) : src/components/feed module: BeanGrid
-- `src/components/feed/CafeGrid.tsx` (172 lines) : src/components/feed module: CafeGrid
+- `src/components/feed/BeanGrid.tsx` (113 lines) : src/components/feed module: BeanGrid
+- `src/components/feed/CafeGrid.tsx` (163 lines) : src/components/feed module: CafeGrid
 - `src/components/feed/CategoryIconRow.tsx` (61 lines) : Shortcut categories: 'beans' switches the catalog to the bean vault, the rest toggle a cafe filter.
-- `src/components/feed/EditorialHero.tsx` (136 lines) : Featured shelf built from the live catalog: the next open roast drops first, then verified
+- `src/components/feed/EditorialHero.tsx` (162 lines) : Featured shelf built from the live catalog: the next open roast drops first, then verified
 - `src/components/feed/FeedControls.tsx` (151 lines) : src/components/feed module: FeedControls
 - `src/components/feed/FeedSearchBar.tsx` (38 lines) : iOS search field: filled, borderless, with the round clear button once text is entered.
 - `src/components/feed/PopularPicksSection.tsx` (72 lines) : "Most saved" shelf: the venues Haraya users bookmark most, from real save counts.
@@ -85,9 +86,25 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/map/
 
-- `src/components/map/DavaoCoffeeMap.tsx` (340 lines) : Escapes catalog text before it is placed into Leaflet tooltip HTML.
+- `src/components/map/DavaoCoffeeMap.tsx` (434 lines) : Escapes catalog text before it is placed into Leaflet tooltip HTML.
   - L28 : DavaoCoffeeMapProps
-  - L39 : DavaoCoffeeMap
+  - L43 : DavaoCoffeeMap
+
+## src/components/moodFinder/
+
+- `src/components/moodFinder/MoodCard.tsx` (53 lines) : Discover entry point for the mood finder: one question and the four most common moods.
+- `src/components/moodFinder/MoodFinderSheet.tsx` (352 lines) : The mood finder: say how you feel and what you need, get three explained picks and a route.
+  - L16 : MoodFinderSheetProps
+  - L39 : MoodFinderSheet
+- `src/components/moodFinder/MoodResultCard.tsx` (83 lines) : One suggestion: why it fits (real catalog facts), how far, how long it stays open, what to order.
+- `src/components/moodFinder/moods.ts` (44 lines) : Moods rank cafes softly; must-haves filter strictly. See docs/superpowers/specs/2026-09-28-mood-finder-design.md.
+- `src/components/moodFinder/moodStorage.ts` (25 lines) : Remembers the last chosen must-haves. Storage can throw or hold stale values, so reads validate.
+- `src/components/moodFinder/parseQuery.test.ts` (50 lines) : src/components/moodFinder module: parseQuery.test
+- `src/components/moodFinder/parseQuery.ts` (85 lines) : Deterministic reading of a typed request ("quiet place to study, not too pricey, near Matina").
+- `src/components/moodFinder/scoreCafes.test.ts` (160 lines) : src/components/moodFinder module: scoreCafes.test
+- `src/components/moodFinder/scoreCafes.ts` (233 lines) : The mood finder's matcher. Pure: the same catalog, request and context always give the same
+- `src/components/moodFinder/useLocation.ts` (35 lines) : Asks for the visitor's position only when request() is called (the "Near me" tap).
+- `src/components/moodFinder/weather.ts` (63 lines) : Current Davao weather from Open-Meteo (free, no key). Fixed city coordinates, never the
 
 ## src/components/roaster/
 
@@ -101,8 +118,8 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/tour/
 
-- `src/components/tour/GuidedTour.tsx` (290 lines) : Space the sticky nav bar and the bottom tab bar cover, so targets are scrolled clear of them.
-- `src/components/tour/tourSteps.ts` (43 lines) : First-visit guided tour steps. Each step highlights the element tagged with the matching
+- `src/components/tour/GuidedTour.tsx` (294 lines) : Space the sticky nav bar and the bottom tab bar cover, so targets are scrolled clear of them.
+- `src/components/tour/tourSteps.ts` (59 lines) : First-visit guided tour steps. Each step highlights the element tagged with the matching
 - `src/components/tour/tourStorage.ts` (20 lines) : Remembers that the first-visit tour was finished or skipped. Storage can throw in private
 
 ## src/config/
@@ -157,7 +174,8 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/utils/
 
-- `src/utils/calendar.ts` (128 lines) : Calendar and clock helpers shared by roast drops, cafe hours, and the
+- `src/utils/calendar.test.ts` (40 lines) : src/utils module: calendar.test
+- `src/utils/calendar.ts` (151 lines) : Calendar and clock helpers shared by roast drops, cafe hours, and the
 - `src/utils/geo.ts` (54 lines) : Distance and directions helpers for the coffee map and trails.
 - `src/utils/router.ts` (68 lines) : Hash routes so cafes, beans, roasteries, drops, and shared lists have shareable
 - `src/utils/weekdays.ts` (13 lines) : Canonical weekday iteration order for hours tables.
