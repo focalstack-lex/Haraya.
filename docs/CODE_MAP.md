@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-28 : commit 2999b56 : fingerprint 12530f4bfb29df07
+Generated 2026-09-28 : commit 26e95be : fingerprint 9d3c509b89e2b0b4
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -78,7 +78,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 ## src/components/layout/
 
 - `src/components/layout/BottomTabBar.tsx` (67 lines) : Persistent mobile bottom navigation (hidden while a detail modal is open). A floating dock: the
-- `src/components/layout/FooterSection.tsx` (97 lines) : Global footer: light canvas with a hairline top, the city directory and roaster links.
+- `src/components/layout/FooterSection.tsx` (151 lines) : Global footer: Responsive layout tailored for both mobile and desktop.
 - `src/components/layout/NavigationDrawer.tsx` (213 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
 - `src/components/layout/NavigationHeader.tsx` (217 lines) : Tab ids reachable by hash route but not shown in the primary navigation.
 
