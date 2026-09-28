@@ -95,11 +95,6 @@
   --ios-green: #3E5C48;
   --ios-red: #8C3A2E;
   --ios-ease: cubic-bezier(0.32, 0.72, 0, 1);
-
-  /* Tab dock (see DESIGN.md): mascot ink bar, steam puck on the active tab */
-  --ios-dock: #1D1203;
-  --ios-dock-accent: #E7AC67;
-  --ios-dock-label: rgba(250, 245, 235, 0.64);
 }
 
 /* Typography: headings use the system display face (SF Pro on Apple devices). */
@@ -289,42 +284,31 @@ html {
   padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
 }
 
-/* Tab dock: a floating bar with a notch carved under the active tab. The notch is a mask
-   (not a painted circle), so page content shows through it. --dock-i is the active index,
-   --dock-n the tab count; cqw keeps the notch, puck and tab centers on one axis. */
+/* Tab dock: a floating surface bar; the active tab sits on a tint arch (semicircular top, straight
+   sides, resting on the bar's bottom edge) that rises above the bar's top edge and slides between tabs. --dock-i is the active index, --dock-n the tab count; cqw keeps
+   the pill and the tab centers on one axis. */
 .dock {
   container-type: inline-size;
-  filter: drop-shadow(0 10px 22px rgba(29, 18, 3, 0.26));
   --dock-pad: 10px;
-  --dock-x: calc(var(--dock-pad) + (var(--dock-i) + 0.5) * ((100cqw - 2 * var(--dock-pad)) / var(--dock-n)));
+  --dock-cell: calc((100cqw - 2 * var(--dock-pad)) / var(--dock-n));
+  --dock-x: calc(var(--dock-pad) + (var(--dock-i) + 0.5) * var(--dock-cell));
 }
 
 .dock-bar {
-  background-color: var(--ios-dock);
+  background-color: var(--ios-surface);
+  box-shadow: 0 0.5px 1px rgba(19, 25, 31, 0.06), 0 10px 28px -8px rgba(19, 25, 31, 0.22);
 }
 
-.dock-bar[data-notched] {
-  --dock-notch: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 88 34'%3E%3Cpath d='M0 0C8 0 14.3 4 15.6 10A29 29 0 0 0 72.4 10C73.7 4 80 0 88 0Z'/%3E%3C/svg%3E");
-  -webkit-mask-image: var(--dock-notch), linear-gradient(#000 0 0);
-  -webkit-mask-repeat: no-repeat;
-  -webkit-mask-size: 88px 34px, 100% 100%;
-  -webkit-mask-position: calc(var(--dock-x) - 44px) 0, 0 0;
-  -webkit-mask-composite: xor;
-  mask-image: var(--dock-notch), linear-gradient(#000 0 0);
-  mask-repeat: no-repeat;
-  mask-size: 88px 34px, 100% 100%;
-  mask-position: calc(var(--dock-x) - 44px) 0, 0 0;
-  mask-composite: exclude;
-  transition: -webkit-mask-position 0.5s var(--ios-ease), mask-position 0.5s var(--ios-ease);
-}
-
-.dock-puck {
-  background-color: var(--ios-dock-accent);
+.dock-pill {
+  width: min(68px, calc(var(--dock-cell) - 6px));
+  background-color: var(--ios-tint);
+  border-radius: 999px 999px 8px 8px;
+  box-shadow: 0 -4px 12px -6px rgba(144, 109, 75, 0.45);
   transform: translateX(calc(var(--dock-x) - 50%));
   transition: transform 0.5s var(--ios-ease);
 }
 
-.dock-icon {
+.dock-item {
   transition: translate 0.5s var(--ios-ease), color 0.3s var(--ios-ease);
 }
 

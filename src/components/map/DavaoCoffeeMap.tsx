@@ -6,6 +6,8 @@ import { curatedTrails } from '../../data/trails';
 import { distanceKm, directionsUrl, formatKm, trailLengthKm, walkMinutes } from '../../utils/geo';
 import { useLiveNavigation } from './useLiveNavigation';
 import { formatRemaining } from './liveNavMath';
+import { progressAlongRoute, routeMinutesLeft, routeProgress } from './routeMath';
+import { ROUTE_ATTRIBUTION, useWalkingRoute } from './walkingRoute';
 import { externalMapLinks } from './DirectionsActionSheet';
 import { AyaMascot } from '../common/AyaMascot';
 import { isOpenNow, hasListedHours } from '../../utils/calendar';
@@ -49,8 +51,18 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
   const [activeTrail, setActiveTrail] = useState<Trail | null>(null);
   const nav = useLiveNavigation();
   const [followMe, setFollowMe] = useState(true);
-  const navLayers = useRef<{ you: L.Marker; accuracy: L.Circle; line: L.Polyline } | null>(null);
+  const navLayers = useRef<{ you: L.Marker; accuracy: L.Circle; casing: L.Polyline; line: L.Polyline } | null>(null);
   const framedFirstFix = useRef(false);
+  const framedRoute = useRef(false);
+  const walk = useWalkingRoute(navTarget, nav.position);
+  // Along the streets once a route is in; the straight line only as a fallback
+  const along = useMemo(
+    () => (walk.route && nav.position ? progressAlongRoute(walk.route.points, nav.position) : null),
+    [walk.route, nav.position]
+  );
+  const remainingKm = along ? along.remainingKm : nav.remainingKm;
+  const minutesLeft = along ? routeMinutesLeft(along.remainingKm) : nav.minutesLeft;
+  const progress = along && walk.totalKm !== null ? routeProgress(walk.totalKm, along.remainingKm) : nav.progress;
 
   const trailsWithCafes = useMemo(
     () =>
@@ -165,6 +177,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
   const { start: startNav, stop: stopNav } = nav;
   useEffect(() => {
     framedFirstFix.current = false;
+    framedRoute.current = false;
     setFollowMe(true);
     if (navTarget) startNav({ lat: navTarget.lat, lng: navTarget.lng });
     else stopNav();
@@ -197,18 +210,26 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
       layer.remove();
       navLayers.current?.you.remove();
       navLayers.current?.accuracy.remove();
+      navLayers.current?.casing.remove();
       navLayers.current?.line.remove();
       navLayers.current = null;
     };
   }, [navTarget]);
 
-  // The visitor: pulsing dot with a heading cone, accuracy ring, and the dashed line to the destination
+  // The visitor: pulsing dot with a heading cone, accuracy ring, and the path still ahead: the street route,
+  // or a dotted straight line while no route is available
   useEffect(() => {
     const map = mapRef.current;
     const here = nav.position;
     if (!map || !navTarget || !here) return;
     const latLng: [number, number] = [here.lat, here.lng];
     const target: [number, number] = [navTarget.lat, navTarget.lng];
+    const path: [number, number][] = along
+      ? [latLng, ...along.ahead.map((point) => [point.lat, point.lng] as [number, number])]
+      : [latLng, target];
+    const lineStyle: L.PolylineOptions = along
+      ? { color: '#906D4B', weight: 5, dashArray: undefined, lineCap: 'round', lineJoin: 'round', opacity: 1 }
+      : { color: '#906D4B', weight: 4, dashArray: '2 10', lineCap: 'round', opacity: 0.95 };
     const cone =
       here.heading === null
         ? ''
@@ -223,22 +244,39 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
     if (!navLayers.current) {
       navLayers.current = {
         accuracy: L.circle(latLng, { radius: here.accuracy, color: '#2F6FDB', weight: 1, opacity: 0.35, fillOpacity: 0.08 }).addTo(map),
-        line: L.polyline([latLng, target], { color: '#906D4B', weight: 4, dashArray: '2 10', lineCap: 'round', opacity: 0.95 }).addTo(map),
+        casing: L.polyline(path, { color: '#FFFDF9', weight: 9, lineCap: 'round', lineJoin: 'round', opacity: along ? 0.9 : 0 }).addTo(map),
+        line: L.polyline(path, lineStyle).addTo(map),
         you: L.marker(latLng, { icon, keyboard: false, zIndexOffset: 1100 }).addTo(map),
       };
     } else {
       navLayers.current.accuracy.setLatLng(latLng).setRadius(here.accuracy);
-      navLayers.current.line.setLatLngs([latLng, target]);
+      navLayers.current.casing.setLatLngs(path).setStyle({ opacity: along ? 0.9 : 0 });
+      navLayers.current.line.setLatLngs(path).setStyle(lineStyle);
       navLayers.current.you.setLatLng(latLng).setIcon(icon);
     }
 
     if (!framedFirstFix.current) {
       framedFirstFix.current = true;
       map.fitBounds(L.latLngBounds([latLng, target]).pad(0.35), { maxZoom: 17 });
+    } else if (along && !framedRoute.current) {
+      // Streets can bend away from the straight line: frame the whole route once it arrives
+      framedRoute.current = true;
+      map.fitBounds(L.latLngBounds(path).pad(0.2), { maxZoom: 17 });
     } else if (followMe) {
       map.panTo(latLng, { animate: true });
     }
-  }, [nav.position, navTarget, followMe]);
+  }, [nav.position, navTarget, followMe, along]);
+
+  // Credit the router while its route is on screen
+  const routeShown = walk.status === 'ready';
+  useEffect(() => {
+    const control = mapRef.current?.attributionControl;
+    if (!control || !routeShown) return;
+    control.addAttribution(ROUTE_ATTRIBUTION);
+    return () => {
+      control.removeAttribution(ROUTE_ATTRIBUTION);
+    };
+  }, [routeShown]);
 
   const recenterOnMe = () => {
     const map = mapRef.current;
@@ -277,8 +315,8 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
       <LargeTitle title="Map & Spots" subtitle={navTarget ? `Walking to ${navTarget.name}` : `Showing ${selectedCity}`} />
 
       <div className="grid lg:grid-cols-3 gap-4 lg:gap-6">
-        {/* Map canvas */}
-        <div className="lg:col-span-2 space-y-3">
+        {/* Map canvas. min-w-0 lets the long one-line address truncate instead of widening the grid */}
+        <div className="lg:col-span-2 space-y-3 min-w-0">
           <div className="relative isolate rounded-[20px] overflow-hidden ios-card-shadow bg-[#FFFDF9]">
             <div
               ref={canvasRef}
@@ -287,13 +325,13 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
               aria-label="Interactive map of Davao cafes and study spots"
             />
             {/* Navigation banner: destination, distance and time left */}
-            {navTarget && nav.remainingKm !== null && nav.status !== 'arrived' && (
+            {navTarget && remainingKm !== null && nav.status !== 'arrived' && (
               <div className="absolute top-2.5 left-2.5 right-14 z-[500] rounded-[14px] ios-material-bar shadow-[0_4px_16px_-6px_rgba(19,25,31,0.35)] px-3.5 py-2.5" aria-live="polite">
                 <p className="ios-footnote text-[#594C3D] truncate">To {navTarget.name}</p>
                 <p className="text-[17px] font-semibold text-[#13191F]">
-                  <span className="font-mono">{formatRemaining(nav.remainingKm)}</span>
+                  <span className="font-mono">{formatRemaining(remainingKm)}</span>
                   <span className="text-[#594C3D] font-normal"> left, about </span>
-                  <span className="font-mono">{nav.minutesLeft}</span>
+                  <span className="font-mono">{minutesLeft}</span>
                   <span className="text-[#594C3D] font-normal"> min walk</span>
                 </p>
               </div>
@@ -390,13 +428,17 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
                         aria-label="Walk progress"
                         aria-valuemin={0}
                         aria-valuemax={100}
-                        aria-valuenow={Math.round(nav.progress * 100)}
+                        aria-valuenow={Math.round(progress * 100)}
                       >
-                        <div className="h-full rounded-full bg-[#906D4B] transition-[width] duration-500" style={{ width: `${Math.round(nav.progress * 100)}%` }} />
+                        <div className="h-full rounded-full bg-[#906D4B] transition-[width] duration-500" style={{ width: `${Math.round(progress * 100)}%` }} />
                       </div>
                       <p className="ios-footnote text-[#594C3D]">
-                        <span className="font-mono">{Math.round(nav.progress * 100)}%</span> of the walk done. Straight-line guide, so
-                        follow the streets you know.
+                        <span className="font-mono">{Math.round(progress * 100)}%</span> of the walk done.{' '}
+                        {walk.status === 'ready'
+                          ? 'Follow the brown line along the streets.'
+                          : walk.status === 'failed'
+                            ? 'Street route unavailable, so this is a straight-line guide. Follow the streets you know.'
+                            : 'Finding a walking route.'}
                       </p>
                     </>
                   )}

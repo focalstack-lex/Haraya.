@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-28 : commit 26e95be : fingerprint 9d3c509b89e2b0b4
+Generated 2026-09-28 : commit 9441e5f : fingerprint e590e12dd7685e4f
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -14,7 +14,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/App.tsx` (634 lines) : Older links: the roaster portal is now the Place Portal.
   - L53 : SharedList
   - L79 : App
-- `src/index.css` (737 lines) : src entry point
+- `src/index.css` (721 lines) : src entry point
 - `src/main.tsx` (13 lines) : src entry point
 - `vite.config.ts` (15 lines) : . module: vite.config
 
@@ -77,20 +77,23 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/layout/
 
-- `src/components/layout/BottomTabBar.tsx` (67 lines) : Persistent mobile bottom navigation (hidden while a detail modal is open). A floating dock: the
+- `src/components/layout/BottomTabBar.tsx` (70 lines) : Persistent mobile bottom navigation (hidden while a detail modal is open). A floating surface bar: the
 - `src/components/layout/FooterSection.tsx` (151 lines) : Global footer: Responsive layout tailored for both mobile and desktop.
 - `src/components/layout/NavigationDrawer.tsx` (213 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
 - `src/components/layout/NavigationHeader.tsx` (217 lines) : Tab ids reachable by hash route but not shown in the primary navigation.
 
 ## src/components/map/
 
-- `src/components/map/DavaoCoffeeMap.tsx` (545 lines) : Escapes catalog text before it is placed into Leaflet tooltip HTML.
-  - L32 : DavaoCoffeeMapProps
-  - L46 : DavaoCoffeeMap
+- `src/components/map/DavaoCoffeeMap.tsx` (587 lines) : Escapes catalog text before it is placed into Leaflet tooltip HTML.
+  - L34 : DavaoCoffeeMapProps
+  - L48 : DavaoCoffeeMap
 - `src/components/map/DirectionsActionSheet.tsx` (58 lines) : External map apps. Apple Maps uses its https form so the link also works outside Apple devices.
 - `src/components/map/liveNavMath.test.ts` (71 lines) : src/components/map module: liveNavMath.test
-- `src/components/map/liveNavMath.ts` (63 lines) : Pure math for in-app walking navigation. The route is a straight line to the destination (there is no
+- `src/components/map/liveNavMath.ts` (63 lines) : Pure math for in-app walking navigation. These straight-line figures are the fallback when no street route
+- `src/components/map/routeMath.test.ts` (53 lines) : src/components/map module: routeMath.test
+- `src/components/map/routeMath.ts` (63 lines) : Pure math for following a street route: snap the visitor onto the nearest route segment, measure what is
 - `src/components/map/useLiveNavigation.ts` (125 lines) : Walking navigation driven by navigator.geolocation.watchPosition with high accuracy. Positions stay in
+- `src/components/map/walkingRoute.ts` (110 lines) : Street-following walking routes from the FOSSGIS OSRM server (OpenStreetMap data, foot profile, no key).
 
 ## src/components/moodFinder/
 

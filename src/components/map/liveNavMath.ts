@@ -1,8 +1,8 @@
 import { distanceKm, type GeoPoint } from '../../utils/geo';
 
 /**
- * Pure math for in-app walking navigation. The route is a straight line to the destination (there is no
- * street router), so walking figures apply a detour factor to the straight-line distance.
+ * Pure math for in-app walking navigation. These straight-line figures are the fallback when no street route
+ * is available (see routeMath.ts and walkingRoute.ts), so they apply a detour factor to the straight line.
  */
 
 /** Streets are rarely straight: walking distance is about 1.3 times the straight line. */

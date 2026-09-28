@@ -88,13 +88,13 @@ Color is information. The tint marks the one active or primary thing in a region
 - **Large title:** each primary page opens with a left-aligned large title and one line of
   context (city picker on Discover).
 - **Tab bar (dock):** a floating bar, 64px tall with a 22px radius, inset 12px from the screen edges
-  above the safe area. It is filled with the mascot ink (`--ios-dock` #1D1203) so it reads as the one
-  dark object on the linen canvas. The active tab's icon lifts into a 48px puck in steam
-  (`--ios-dock-accent` #E7AC67) that sits in a notch carved out of the bar; the notch is a CSS mask,
-  so content shows through it. Puck, notch and icon slide together on `--ios-ease` (0.5s).
-  Every tab keeps its 10px label on one baseline; the active label turns steam, inactive icons and
-  labels use `--ios-dock-label` (linen at 64%). Geometry is in px, not Tailwind spacing units, because
-  it must match the notch mask. No indicator lines.
+  above the safe area, on `--ios-surface` with a soft lifted shadow. The active tab sits on a tint arch
+  (`--ios-tint`, up to 68px wide): a semicircular top that rises 14px above the bar's top edge, straight
+  sides, and a base resting on the bar's bottom edge (8px corners so it stays inside the bar's radius on
+  narrow phones). It slides between tabs on `--ios-ease` (0.5s); its icon and label turn cream (#FFFDF9,
+  4.6:1 on the tint) and lift 5px to center in the arch. Inactive tabs use `--ios-label-3` (5.9:1 on the surface). Every tab
+  keeps its 24px icon and 10px label. Geometry is in px, not Tailwind spacing units, because the project
+  scales its spacing. No indicator lines.
 - **Segmented control:** fill track, white thumb that slides between segments.
 - **Search field:** 36-40px tall, 10px radius, fill background, no border.
 - **Grouped list:** inset rows on `--ios-surface`, 14px radius container, hairline separators

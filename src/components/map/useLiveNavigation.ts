@@ -100,6 +100,10 @@ export function useLiveNavigation(): LiveNavigation {
           }
         },
         (error) => {
+          // Once there is a position, a timeout (walker standing still) or a brief signal loss (under an
+          // awning, between buildings) is transient: the watch keeps running, so keep the last fix and wait.
+          // Only a revoked permission ends the walk.
+          if (error.code !== error.PERMISSION_DENIED && last.current !== null) return;
           console.warn('Haraya: live navigation location error', error.code, error.message);
           setStatus(error.code === error.PERMISSION_DENIED ? 'denied' : 'unavailable');
           clearWatch();
