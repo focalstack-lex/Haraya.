@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-28 : commit 460e469 : fingerprint ab6626d59e5507b9
+Generated 2026-09-28 : commit a7a6244 : fingerprint 5bc3b35ca10a99a9
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -11,6 +11,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 - `index.html` (31 lines) : . module: index.html
 - `scripts/generate-code-map.mjs` (212 lines) : One-line purpose per file, inferred from its path and leading doc comment.
+- `scripts/seed-supabase.ts` (130 lines) : scripts module: seed-supabase
 - `src/App.tsx` (763 lines) : Storage can throw in private windows or with blocked site data; the welcome sheet is a convenience.
   - L52 : SharedList
   - L78 : App

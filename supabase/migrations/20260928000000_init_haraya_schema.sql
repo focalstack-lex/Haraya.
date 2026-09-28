@@ -9,14 +9,14 @@ create table if not exists public.profiles (
   business_name text,
   role text not null default 'guest' check (role in ('guest', 'roaster', 'admin')),
   status text not null default 'pending' check (status in ('pending', 'approved', 'rejected')),
-  cafe_profile_id uuid,
+  cafe_profile_id text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
 -- 2. Cafes and Micro-Roasteries
 create table if not exists public.cafes (
-  id uuid primary key default gen_random_uuid(),
+  id text primary key default gen_random_uuid()::text,
   handle text unique not null,
   name text not null,
   is_roastery boolean not null default false,
@@ -44,8 +44,8 @@ create table if not exists public.cafes (
 
 -- 3. Single-Origin Beans
 create table if not exists public.beans (
-  id uuid primary key default gen_random_uuid(),
-  roaster_id uuid references public.cafes(id) on delete set null,
+  id text primary key default gen_random_uuid()::text,
+  roaster_id text references public.cafes(id) on delete set null,
   roaster_name text not null,
   name text not null,
   origin text not null default 'Mt. Apo, Davao del Sur',
@@ -67,10 +67,10 @@ create table if not exists public.beans (
 
 -- 4. Roast Drops (Small-Batch Roastery Releases)
 create table if not exists public.roast_drops (
-  id uuid primary key default gen_random_uuid(),
-  roaster_id uuid references public.cafes(id) on delete cascade,
+  id text primary key default gen_random_uuid()::text,
+  roaster_id text references public.cafes(id) on delete cascade,
   roaster_name text not null,
-  bean_id uuid references public.beans(id) on delete set null,
+  bean_id text references public.beans(id) on delete set null,
   title text not null,
   description text not null default '',
   drop_at timestamptz not null,
@@ -84,10 +84,10 @@ create table if not exists public.roast_drops (
 
 -- 5. Cup Check Community Feed
 create table if not exists public.cup_checks (
-  id uuid primary key default gen_random_uuid(),
+  id text primary key default gen_random_uuid()::text,
   user_id uuid references auth.users(id) on delete cascade,
   user_name text not null,
-  cafe_id uuid references public.cafes(id) on delete cascade,
+  cafe_id text references public.cafes(id) on delete cascade,
   cafe_name text not null,
   bean_name text,
   rating smallint not null default 5 check (rating between 1 and 5),
@@ -99,8 +99,8 @@ create table if not exists public.cup_checks (
 
 -- 6. Bean Reservations
 create table if not exists public.bean_reservations (
-  id uuid primary key default gen_random_uuid(),
-  drop_id uuid references public.roast_drops(id) on delete cascade,
+  id text primary key default gen_random_uuid()::text,
+  drop_id text references public.roast_drops(id) on delete cascade,
   user_name text not null,
   user_phone text not null,
   quantity integer not null default 1,
@@ -111,7 +111,7 @@ create table if not exists public.bean_reservations (
 -- 7. Cafe Bookmarks / Saves
 create table if not exists public.cafe_saves (
   user_id uuid references auth.users(id) on delete cascade,
-  cafe_id uuid references public.cafes(id) on delete cascade,
+  cafe_id text references public.cafes(id) on delete cascade,
   created_at timestamptz not null default now(),
   primary key (user_id, cafe_id)
 );

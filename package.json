@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "map:code": "node scripts/generate-code-map.mjs",
     "map:code:check": "node scripts/generate-code-map.mjs --check",
-    "test": "vitest run"
+    "test": "vitest run",
+    "seed:supabase": "npx tsx scripts/seed-supabase.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",
