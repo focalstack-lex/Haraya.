@@ -9,44 +9,51 @@ interface MoodCardProps {
 }
 
 /**
- * Discover entry point for the mood finder: one question and the four most common moods.
- * Aya breaks out of the card's top edge (her ears sit on the page canvas), rises in once on
- * mount (`aya-rise` in index.css), then idles through AyaMascot's own bob, blink and heart steam.
+ * Discover entry point for the mood finder: warm linen inset card with a contained
+ * Aya mascot vignette, clear typographic hierarchy, and responsive mood chips.
  */
 export const MoodCard: React.FC<MoodCardProps> = ({ onOpen }) => (
   <section
     aria-labelledby="mood-card-title"
     data-tour="mood"
-    className="relative mt-[52px] bg-[#906D4B] rounded-[20px] ios-card-shadow pt-3.5 pb-3.5"
+    className="bg-[#FFFDF9] rounded-2xl border border-[#594C3D]/10 ios-card-shadow p-4 sm:p-5"
   >
-    <div className="absolute right-1 -top-[44px] pointer-events-none aya-rise">
-      <AyaMascot pose="mood" size={120} alt="" />
+    {/* Header: Title, Subtitle, and Contained Aya Vignette */}
+    <div className="flex items-center justify-between gap-3">
+      <div className="min-w-0">
+        <h2 id="mood-card-title" className="text-[17px] sm:text-[18px] font-semibold text-[#13191F] tracking-tight">
+          How are you feeling?
+        </h2>
+        <p className="text-[13px] sm:text-[13.5px] text-[#594C3D] leading-snug mt-0.5">
+          Let Aya match a sanctuary to your mood.
+        </p>
+      </div>
+
+      <div className="w-[68px] h-[68px] sm:w-[76px] sm:h-[76px] rounded-full bg-[#FAF5EB] border border-[#E4D9C8]/80 flex items-center justify-center shrink-0 shadow-[inset_0_1px_2px_rgba(89,76,61,0.06)] overflow-hidden">
+        <AyaMascot pose="mood" size={58} alt="Aya the Scout" />
+      </div>
     </div>
 
-    <div className="pl-4 pr-[124px] flex items-center gap-2 min-h-11">
-      <h2 id="mood-card-title" className="ios-headline text-[#FFFDF9]">
-        How are you feeling?
-      </h2>
-    </div>
-    <div className="px-4 -mt-1 pr-[124px]">
-      <button
-        onClick={() => onOpen(null)}
-        className="inline-flex items-center gap-0.5 min-h-11 -my-2 text-[14px] font-medium text-[#FFFDF9] ios-press"
-      >
-        Ask Aya for more moods
-        <ChevronRight className="w-4 h-4" strokeWidth={2.5} />
-      </button>
-    </div>
-    <div className="relative z-10 ios-shelf gap-2 px-4 pt-3" style={{ scrollPaddingInline: 16 }}>
+    {/* Quick Mood Chips & Full Sheet Trigger */}
+    <div className="mt-3.5 pt-3 border-t border-[#594C3D]/8 flex flex-wrap items-center gap-2">
       {MOODS.slice(0, 4).map((mood) => (
         <button
           key={mood.id}
           onClick={() => onOpen(mood.id)}
-          className="shrink-0 h-9 px-4 rounded-full bg-[#FFFDF9] text-[14px] font-medium text-[#13191F] hover:bg-[#FAF5EB] ios-press"
+          className="h-8.5 px-3.5 rounded-full bg-[#FAF5EB] text-[13px] font-medium text-[#594C3D] hover:bg-[#906D4B] hover:text-[#FFFDF9] border border-[#594C3D]/8 transition-colors ios-press"
         >
           {mood.label}
         </button>
       ))}
+
+      <button
+        onClick={() => onOpen(null)}
+        className="h-8.5 px-3 rounded-full text-[12.5px] font-semibold text-[#906D4B] hover:text-[#7D5C3D] inline-flex items-center gap-0.5 ios-press ml-auto"
+      >
+        All moods
+        <ChevronRight className="w-3.5 h-3.5" strokeWidth={2.5} />
+      </button>
     </div>
   </section>
 );
+

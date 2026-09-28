@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-28 : commit 9ace50a : fingerprint f16ce5f307e8cc39
+Generated 2026-09-28 : commit 122fec1 : fingerprint f58386486e112bc7
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -103,7 +103,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/moodFinder/
 
-- `src/components/moodFinder/MoodCard.tsx` (53 lines) : Discover entry point for the mood finder: one question and the four most common moods.
+- `src/components/moodFinder/MoodCard.tsx` (60 lines) : Discover entry point for the mood finder: warm linen inset card with a contained
 - `src/components/moodFinder/MoodFinderSheet.tsx` (352 lines) : The mood finder: say how you feel and what you need, get three explained picks and a route.
   - L16 : MoodFinderSheetProps
   - L39 : MoodFinderSheet
