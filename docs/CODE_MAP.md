@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-28 : commit 2a4b997 : fingerprint a777d7720a5bf303
+Generated 2026-09-28 : commit 460e469 : fingerprint ab6626d59e5507b9
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -125,6 +125,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 ## src/config/
 
 - `src/config/ecosystem.ts` (14 lines) : Sister ecosystem bridge between Haraya (coffee) and Habi (fashion).
+- `src/config/supabase.ts` (16 lines) : Haraya Supabase Client.
 
 ## src/data/
 

@@ -35,3 +35,5 @@ node_modules/.tmp/
 .claude/
 .vercel/
 
+
+.vercel
