@@ -38,7 +38,9 @@ The tokens live in `src/index.css`; this file is the contract behind them.
   `AyaMascot`, using only the master palette (roast #574835, tan #997247, cream #FFF6EE, steam #E7AC67, coffee
   #FFC183, ink #1D1203). No outlines, gradients or mouth. One pose per surface so she reads as a character, not a
   sticker: `welcome` (WelcomeModal, first tour step), `mood` (Discover mood card, where she rises out of the
-  card's top edge, and Mood Finder idle), `empty` (cafe, bean, saved, visited and mood
+  card's top edge on a soft cream glow so her roast body reads on the tint card, and Mood Finder idle; tapping her
+  opens the finder. The card follows real state, one at a time: a running focus session shows `focus` with Finish
+  and View spot, late evening (8 PM to 4 AM) shows `content` with late moods first, an empty passport shows `wander`), `empty` (cafe, bean, saved, visited and mood
   no-match empty states, Add a Spot title), `welcome` again on the live navigation arrival card; `drops` belongs to the
   hidden Roast Drops view. The sanctuary passport adds six poses, one emotion each: `focus` (calm, half-lidded
   over an open book; peeks over the floating focus banner), `arrive` (delight, both paws up with steam sparkles;

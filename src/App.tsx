@@ -44,7 +44,7 @@ import { sessionService, RESET_RETURN_TAB } from './services/sessionService';
 import { spotService } from './services/spotService';
 import { placeService } from './services/placeService';
 import { visitService } from './services/visitService';
-import { useCatalogVersion, usePrefsVersion, useCommunityVersion, useSessionVersion, useSpotVersion, usePlaceVersion } from './hooks/useServiceVersions';
+import { useCatalogVersion, usePrefsVersion, useCommunityVersion, useSessionVersion, useSpotVersion, usePlaceVersion, useVisitVersion } from './hooks/useServiceVersions';
 import { buildHash, parseHash, setHash } from './utils/router';
 import { distanceKm } from './utils/geo';
 import { PRICE_RANGES } from './types/coffee';
@@ -88,6 +88,7 @@ export const App: React.FC = () => {
   useSessionVersion();
   useSpotVersion();
   usePlaceVersion();
+  useVisitVersion();
 
   // Navigation state
   const [activeTab, setActiveTabState] = useState('feed');
@@ -454,7 +455,13 @@ export const App: React.FC = () => {
         </div>
 
         {/* Mood finder entry */}
-        <MoodCard onOpen={(mood) => setMoodSheet({ open: true, mood })} />
+        <MoodCard
+          onOpen={(mood) => setMoodSheet({ open: true, mood })}
+          focusSession={activeFocus}
+          onFinishFocus={() => setIsEndSessionOpen(true)}
+          onViewFocusSpot={openCafe}
+          passportEmpty={allCafes.length > 0 && visitService.getUserVisits().length === 0}
+        />
 
         {/* Spotlight: top study spots and hidden gems, only when real ones exist */}
         <EditorialHero studySpots={studySpots} hiddenGems={hiddenGems} onSelectCafe={openCafe} />

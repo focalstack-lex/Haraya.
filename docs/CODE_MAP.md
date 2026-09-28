@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-28 : commit 864079c : fingerprint 8ae15ce57f8f6884
+Generated 2026-09-28 : commit c89f6f8 : fingerprint ec42b6b41f5f00fb
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -11,10 +11,10 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 - `index.html` (30 lines) : . module: index.html
 - `scripts/generate-code-map.mjs` (212 lines) : One-line purpose per file, inferred from its path and leading doc comment.
-- `src/App.tsx` (697 lines) : Older links: the roaster portal is now the Place Portal.
+- `src/App.tsx` (704 lines) : Older links: the roaster portal is now the Place Portal.
   - L58 : SharedList
   - L84 : App
-- `src/index.css` (749 lines) : src entry point
+- `src/index.css` (765 lines) : src entry point
 - `src/main.tsx` (13 lines) : src entry point
 - `vite.config.ts` (15 lines) : . module: vite.config
 
@@ -103,7 +103,8 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/moodFinder/
 
-- `src/components/moodFinder/MoodCard.tsx` (53 lines) : Discover entry point for the mood finder: one question and the four most common moods.
+- `src/components/moodFinder/MoodCard.tsx` (159 lines) : Late evening, when "open late" matters: 8 PM to 4 AM on the device clock.
+- `src/components/moodFinder/moodCardState.test.ts` (34 lines) : src/components/moodFinder module: moodCardState.test
 - `src/components/moodFinder/MoodFinderSheet.tsx` (352 lines) : The mood finder: say how you feel and what you need, get three explained picks and a route.
   - L16 : MoodFinderSheetProps
   - L39 : MoodFinderSheet
