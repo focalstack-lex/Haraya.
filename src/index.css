@@ -415,6 +415,56 @@ html {
   animation: status-pulse 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+/* Live navigation "You" marker (DavaoCoffeeMap.tsx): dot, pulse ring and heading cone.
+   The pulse rests as a faint ring under the reduced-motion rule below. */
+.haraya-you-container {
+  background: transparent;
+  border: 0;
+}
+
+.haraya-you {
+  position: relative;
+  width: 22px;
+  height: 22px;
+}
+
+.haraya-you-dot {
+  position: absolute;
+  inset: 2px;
+  border-radius: 9999px;
+  background: #2F6FDB;
+  border: 3px solid #FFFDF9;
+  box-shadow: 0 2px 6px rgba(19, 25, 31, 0.35);
+}
+
+.haraya-you-pulse {
+  position: absolute;
+  inset: -8px;
+  border-radius: 9999px;
+  background: rgba(47, 111, 219, 0.22);
+  animation: haraya-you-pulse 2s ease-out infinite;
+}
+
+.haraya-you-cone {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  margin-left: -11px;
+  margin-top: -26px;
+  border-left: 11px solid transparent;
+  border-right: 11px solid transparent;
+  border-top: 26px solid rgba(47, 111, 219, 0.3);
+  /* Apex sits on the dot; rotation turns the wide end toward the heading */
+  transform-origin: 11px 26px;
+}
+
+@keyframes haraya-you-pulse {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  100% { transform: scale(1.6); opacity: 0.35; }
+}
+
 /* Aya mascot idle motion (AyaMascot.tsx). Values are in the art's 860 unit frame.
    Every 100% keyframe is the rest pose, so the reduced-motion rule below lands on it. */
 .aya-bob {

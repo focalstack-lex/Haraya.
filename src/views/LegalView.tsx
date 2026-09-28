@@ -70,8 +70,14 @@ const Privacy: React.FC = () => (
             Roaster Suite. Passwords are stored only as a salted hash. We do not collect ID photos in this form.
           </>,
           <>
-            <strong>Location</strong>: only when you tap Near me, to sort cafes by distance. It is not stored and not
-            sent to us.
+            <strong>Add a Spot</strong>: your email address, used only to send your sign-in link and to know which
+            spots are yours; and the details you submit about a place (name, area, landmark, map pin, amenities,
+            hours, price range, tip). Approved spots are shown publicly without your email.
+          </>,
+          <>
+            <strong>Location</strong>: read on your device when you tap Near me, Use my current location, or Navigate
+            in Haraya. During navigation it updates while the walk is running and stops when you end it or arrive. It
+            is not stored and not sent to us. A spot's map pin is the place's location, not yours.
           </>,
         ]}
       />
@@ -79,9 +85,9 @@ const Privacy: React.FC = () => (
 
     <Section title="Where your data is kept">
       <p>
-        Today, the records above are stored in your browser on this device. Clearing this site's data in your browser
-        settings removes them. When listings and accounts move to our database, this notice will be updated before
-        the change goes live.
+        Your sign-in account and the spots you add are stored in our database, hosted by Supabase. Everything else
+        above (saves, ratings, lists, reminders, likes and posts) is stored in your browser on this device, and
+        clearing this site's data in your browser settings removes it.
       </p>
     </Section>
 
@@ -89,10 +95,11 @@ const Privacy: React.FC = () => (
       <List
         items={[
           'Vercel, which hosts the app, receives standard request data such as your IP address.',
+          'Supabase, which runs our database and sign-in, stores your email and the spots you add, and sends the sign-in email.',
           'Google Fonts delivers the typeface and receives your IP address.',
           'OpenStreetMap map tiles are requested from your browser and include your IP address.',
           'Open-Meteo provides the weather hint. We send fixed city coordinates, not your location.',
-          'Google Maps and Google Calendar receive details only when you choose to open a route or add a reminder there.',
+          'Google Maps, Apple Maps, Waze and Google Calendar receive the destination only when you choose to open it there.',
         ]}
       />
       <p>We do not use analytics, advertising or tracking cookies.</p>
@@ -121,9 +128,8 @@ const Terms: React.FC = () => (
 
     <Section title="What Haraya is">
       <p>
-        Haraya is a directory of specialty cafes, micro-roasteries and single-origin beans in the Davao Region.
-        Roasters and cafes listed here are independent businesses. Haraya does not sell coffee and is not a party to
-        any sale between you and a roaster.
+        Haraya is a guide to cafes, study spots and hidden gems in the Davao Region. Places listed here are independent
+        businesses. Haraya does not sell anything and is not a party to what you buy at a place.
       </p>
     </Section>
 
@@ -140,6 +146,17 @@ const Terms: React.FC = () => (
           'Keep your listing accurate: hours, menu, prices, stock and photos you have the right to use.',
           'You are responsible for your permits, product safety, labeling and any registration your products require.',
           '"Verified" means Haraya reviewed your business permit number. It is not a rating of quality.',
+        ]}
+      />
+    </Section>
+
+    <Section title="Adding a spot">
+      <List
+        items={[
+          'Add only businesses open to the public. Never add a private home or a place that asked not to be listed.',
+          'Share details that are true to your knowledge. Haraya reviews every spot and may edit, decline or remove it.',
+          'You can add up to 5 spots a day. Spam, fake places and advertising are removed and can end your access.',
+          'Walking directions in Haraya are a straight-line guide, not a street route. Watch where you walk and follow local roads and signs.',
         ]}
       />
     </Section>

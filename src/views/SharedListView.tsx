@@ -14,8 +14,9 @@ interface SharedListViewProps {
   beanIds: string[];
   onBack: () => void;
   onSelectCafe: (cafeId: string) => void;
-  onSelectBean: (beanId: string) => void;
-  onSelectRoastery: (cafeId: string) => void;
+  onDirections: (cafe: Cafe) => void;
+  /** Retired bean feature: beans on a list show only when a caller passes this. */
+  onSelectBean?: (beanId: string) => void;
 }
 
 /**
@@ -28,15 +29,15 @@ export const SharedListView: React.FC<SharedListViewProps> = ({
   beanIds,
   onBack,
   onSelectCafe,
+  onDirections,
   onSelectBean,
-  onSelectRoastery,
 }) => {
   const cafes = cafeIds
     .map((id) => catalogService.getCafeById(id))
     .filter((cafe): cafe is Cafe => Boolean(cafe));
-  const beans = beanIds
-    .map((id) => catalogService.getBeanById(id))
-    .filter((bean): bean is Bean => Boolean(bean));
+  const beans = onSelectBean
+    ? beanIds.map((id) => catalogService.getBeanById(id)).filter((bean): bean is Bean => Boolean(bean))
+    : [];
 
   const copyLink = () => {
     navigator.clipboard.writeText(window.location.href).catch(() => {
@@ -85,12 +86,12 @@ export const SharedListView: React.FC<SharedListViewProps> = ({
             savedCafeIds={userPrefsService.getSavedCafes()}
             onToggleSave={(cafe) => userPrefsService.toggleSavedCafe(cafe)}
             onSelectCafe={onSelectCafe}
-            onSelectRoastery={onSelectRoastery}
+            onDirections={onDirections}
           />
         </section>
       )}
 
-      {beans.length > 0 && (
+      {onSelectBean && beans.length > 0 && (
         <section className="space-y-3">
           <h2 className="ios-title">Beans on the list</h2>
           <BeanGrid
@@ -106,7 +107,7 @@ export const SharedListView: React.FC<SharedListViewProps> = ({
         <div className="py-12 px-6 text-center flex flex-col items-center gap-2">
           <h2 className="ios-title text-[19px] text-[#13191F]">Nothing on this list</h2>
           <p className="text-[14px] text-[#594C3D] max-w-xs">
-            This shared list has no items, or they were removed by the roaster.
+            This shared list has no items, or they were removed.
           </p>
           <button
             onClick={onBack}

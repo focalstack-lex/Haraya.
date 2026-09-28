@@ -1,7 +1,7 @@
 import React from 'react';
 import { Bookmark, ChevronRight } from 'lucide-react';
 import type { Cafe } from '../../types/coffee';
-import { isOpenNow } from '../../utils/calendar';
+import { isOpenNow, hasListedHours } from '../../utils/calendar';
 
 interface PopularPicksSectionProps {
   /** Cafes already ranked by save count. */
@@ -35,6 +35,7 @@ export const PopularPicksSection: React.FC<PopularPicksSectionProps> = ({ cafes,
         <div className="ios-shelf gap-3 px-4 sm:px-0 pb-2 sm:grid sm:grid-cols-3 sm:gap-4">
           {cafes.map((cafe) => {
             const openNow = isOpenNow(cafe.hours);
+            const hoursKnown = hasListedHours(cafe.hours);
             return (
               <button
                 key={cafe.id}
@@ -56,8 +57,8 @@ export const PopularPicksSection: React.FC<PopularPicksSectionProps> = ({ cafes,
                       {saves.format(cafe.saveCount)}
                     </span>
                     <span className="text-[#594C3D] font-mono">{'₱'.repeat(cafe.priceLevel)}</span>
-                    <span className={`ml-auto font-medium ${openNow ? 'text-[#3E5C48]' : 'text-[#8C3A2E]'}`}>
-                      {openNow ? 'Open' : 'Closed'}
+                    <span className={`ml-auto font-medium ${!hoursKnown ? 'text-[#594C3D]' : openNow ? 'text-[#3E5C48]' : 'text-[#8C3A2E]'}`}>
+                      {!hoursKnown ? 'Hours not listed' : openNow ? 'Open' : 'Closed'}
                     </span>
                   </span>
                 </span>

@@ -1,17 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { Menu, Search, ShieldCheck, UserRound, X } from 'lucide-react';
-import { FeedIcon, MapIcon, SavedIcon, RoasterIcon } from '../common/CustomIcons';
+import { FeedIcon, MapIcon, SavedIcon, RoasterIcon, AddSpotIcon } from '../common/CustomIcons';
 import { BrandLogo } from '../common/BrandLogo';
 import { DAVAO_CITIES } from '../../types/coffee';
 import type { PortalRole } from '../../types/auth';
 
-/** The portal tab is shared by the sign-in view, roaster dashboard, and admin panel. */
+/**
+ * The legacy roaster portal (sign-in, roaster dashboard, admin panel). Hidden from navigation since the
+ * discovery pivot; the code stays so it can return. Reachable only by its hash route.
+ */
 export const PORTAL_TAB_ID = 'roaster';
+
+/** Tab id of the community submission flow that replaced the roaster portal in navigation. */
+export const SUBMIT_TAB_ID = 'submit';
 
 export const NAV_TABS: { id: string; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: 'feed', label: 'Discover', icon: FeedIcon },
-  { id: 'map', label: 'Coffee Map', icon: MapIcon },
-  { id: 'profile', label: 'My Profile', icon: SavedIcon },
+  { id: 'map', label: 'Map & Spots', icon: MapIcon },
+  { id: SUBMIT_TAB_ID, label: 'Add a Spot', icon: AddSpotIcon },
+  { id: 'profile', label: 'Saved Spots', icon: SavedIcon },
 ];
 
 export const PortalIcon: React.FC<{ role: PortalRole; className?: string }> = ({ role, className = 'w-4 h-4' }) => {
@@ -135,8 +142,8 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
                   type="text"
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
-                  placeholder="Search cafes, beans..."
-                  aria-label="Search cafes and beans"
+                  placeholder="Search spots"
+                  aria-label="Search cafes and study spots"
                   className="w-28 lg:w-40 bg-transparent pl-2 pr-2 font-sans text-[13px] text-[#13191F] placeholder:text-[#6E6150] focus:outline-none"
                 />
                 {searchQuery && (
@@ -176,16 +183,6 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
                 Get Started
               </button>
             )}
-
-            {/* Portal / Roaster Button */}
-            <button
-              onClick={() => setActiveTab(PORTAL_TAB_ID)}
-              className={`hidden sm:inline-flex items-center h-9 px-4 rounded-full text-[13px] font-semibold font-sans ios-press ${
-                activeTab === PORTAL_TAB_ID ? 'bg-[#13191F] text-[#FFFDF9]' : 'ios-fill text-[#13191F] hover:bg-[#766046]/20'
-              }`}
-            >
-              {PORTAL_LABELS[portalRole].short}
-            </button>
 
             {/* Mobile menu trigger */}
             <button

@@ -6,7 +6,7 @@ import {
   CuppingSpoonIcon,
   CoffeeBagIcon,
   TopoTrailIcon,
-  RoasterDrumIcon,
+  AddSpotIcon,
 } from '../components/common/CustomIcons';
 import type { Cafe } from '../types/coffee';
 import { userPrefsService } from '../services/userPrefsService';
@@ -14,7 +14,7 @@ import { catalogService } from '../services/catalogService';
 import { authService } from '../services/authService';
 import { useCatalogVersion, usePrefsVersion, useAuthVersion } from '../hooks/useServiceVersions';
 import { directionsUrl } from '../utils/geo';
-import { isOpenNow, hoursTodayLabel } from '../utils/calendar';
+import { isOpenNow, hoursTodayLabel, hasListedHours } from '../utils/calendar';
 import { RateCafeModal } from '../components/cafe/RateCafeModal';
 import { LargeTitle } from '../components/common/LargeTitle';
 import { PrimaryButton } from '../components/common/FormControls';
@@ -122,7 +122,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-4 sm:py-6 space-y-6">
-      <LargeTitle title="Profile" />
+      <LargeTitle title="Saved Spots" />
 
       {/* Account card and explorer pass */}
       <div className="ios-group ios-card-shadow">
@@ -153,7 +153,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           <div className="min-w-0 flex-1">
             <p className="text-[15px] text-[#13191F]">Coffee Explorer Pass</p>
             <p className="ios-footnote text-[#594C3D]">
-              <span className="font-mono">{exploredPercent}%</span> of Davao specialty coffee explored,{' '}
+              <span className="font-mono">{exploredPercent}%</span> of Davao spots explored,{' '}
               <span className="font-mono">{ratedCafes.length}</span> visited
             </p>
           </div>
@@ -229,7 +229,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                   <TopoTrailIcon className="w-4.5 h-4.5" />
                 </RowIcon>
                 <span className="flex-1 min-w-0">
-                  <span className="block text-[15px] text-[#13191F]">Davao coffee map and trails</span>
+                  <span className="block text-[15px] text-[#13191F]">Map and spots</span>
                   <span className="block ios-footnote text-[#594C3D] truncate">
                     Curated regional walking and tasting routes
                   </span>
@@ -239,12 +239,12 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
               <button onClick={onOpenAuth ?? onExploreFeed} className="ios-group-row ios-press">
                 <RowIcon>
-                  <RoasterDrumIcon className="w-4.5 h-4.5" />
+                  <AddSpotIcon className="w-4.5 h-4.5" />
                 </RowIcon>
                 <span className="flex-1 min-w-0">
-                  <span className="block text-[15px] text-[#13191F]">Roaster Suite and partner portal</span>
+                  <span className="block text-[15px] text-[#13191F]">Add a hidden spot</span>
                   <span className="block ios-footnote text-[#594C3D] truncate">
-                    Micro-roastery management and beans catalog
+                    Share a quiet corner that is not on the map yet
                   </span>
                 </span>
                 <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]/60" strokeWidth={2.5} />
@@ -292,6 +292,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             {ratedCafes.map((cafe) => {
               const userRating = ratings[cafe.id];
               const openNow = isOpenNow(cafe.hours);
+              const hoursKnown = hasListedHours(cafe.hours);
               return (
                 <article key={cafe.id} className="bg-[#FFFDF9] rounded-[20px] ios-card-shadow overflow-hidden">
                   <button
@@ -314,8 +315,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                       </span>
                       <span className="block ios-footnote text-[#594C3D] truncate">
                         {cafe.district}, {cafe.city} ·{' '}
-                        <span className={openNow ? 'text-[#3E5C48] font-medium' : 'text-[#8C3A2E]'}>
-                          {openNow ? 'Open' : 'Closed'}
+                        <span className={!hoursKnown ? 'text-[#594C3D]' : openNow ? 'text-[#3E5C48] font-medium' : 'text-[#8C3A2E]'}>
+                          {!hoursKnown ? 'Hours not listed' : openNow ? 'Open' : 'Closed'}
                         </span>
                       </span>
                       {userRating?.note ? (
@@ -363,6 +364,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           <div className="space-y-3">
             {savedCafes.map((cafe) => {
               const openNow = isOpenNow(cafe.hours);
+              const hoursKnown = hasListedHours(cafe.hours);
               return (
                 <article key={cafe.id} className="bg-[#FFFDF9] rounded-[20px] ios-card-shadow overflow-hidden">
                   <button
@@ -379,8 +381,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                       <span className="block ios-headline text-[#13191F] truncate">{cafe.name}</span>
                       <span className="block ios-footnote text-[#594C3D] truncate">
                         {cafe.district}, {cafe.city} ·{' '}
-                        <span className={openNow ? 'text-[#3E5C48] font-medium' : 'text-[#8C3A2E]'}>
-                          {openNow ? `Open · ${hoursTodayLabel(cafe.hours)}` : 'Closed'}
+                        <span className={!hoursKnown ? 'text-[#594C3D]' : openNow ? 'text-[#3E5C48] font-medium' : 'text-[#8C3A2E]'}>
+                          {!hoursKnown ? 'Hours not listed' : openNow ? `Open · ${hoursTodayLabel(cafe.hours)}` : 'Closed'}
                         </span>
                       </span>
                       {cafe.signature && (

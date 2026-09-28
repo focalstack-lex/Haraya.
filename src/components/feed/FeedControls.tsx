@@ -3,8 +3,9 @@ import { ArrowUpDown, ChevronDown, SlidersHorizontal } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { PRICE_RANGES } from '../../types/coffee';
 import type { PriceRange } from '../../types/coffee';
+import { SPOT_CATEGORIES, type SpotCategory } from './spotCategories';
 
-export type FeedMode = 'cafes' | 'beans' | 'following';
+export type FeedMode = SpotCategory;
 export type SortKey = 'newest' | 'nearest' | 'mostSaved';
 
 export const SORT_LABELS: Record<SortKey, string> = {
@@ -16,7 +17,6 @@ export const SORT_LABELS: Record<SortKey, string> = {
 interface FeedControlsProps {
   mode: FeedMode;
   onModeChange: (mode: FeedMode) => void;
-  followingCount: number;
   sortKey: SortKey;
   onSortChange: (sort: SortKey) => void;
   priceRange: PriceRange['id'];
@@ -31,7 +31,6 @@ interface FeedControlsProps {
 export const FeedControls: React.FC<FeedControlsProps> = ({
   mode,
   onModeChange,
-  followingCount,
   sortKey,
   onSortChange,
   priceRange,
@@ -42,19 +41,15 @@ export const FeedControls: React.FC<FeedControlsProps> = ({
   activeFilterCount = 0,
   onClearFilters,
 }) => {
-  const modes: { id: FeedMode; label: string }[] = [
-    { id: 'cafes', label: 'Cafes' },
-    { id: 'beans', label: 'Beans' },
-    { id: 'following', label: `Following${followingCount > 0 ? ` (${followingCount})` : ''}` },
-  ];
+  const modes = SPOT_CATEGORIES;
 
   const menuClass =
     'flex items-center gap-1 h-8 pl-3 pr-2 rounded-full ios-fill text-[13px] font-medium font-sans text-[#13191F] hover:bg-[#766046]/20 transition-colors';
 
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-      {/* Segmented control: the white thumb slides between segments */}
-      <div className="flex p-0.5 rounded-[10px] ios-fill sm:w-auto" role="tablist" aria-label="Feed category">
+      {/* Segmented control: the white thumb slides between spot categories; scrolls on narrow phones */}
+      <div className="flex p-0.5 rounded-[10px] ios-fill sm:w-auto overflow-x-auto scrollbar-none" role="tablist" aria-label="Spot category">
         {modes.map((entry) => {
           const active = mode === entry.id;
           return (
@@ -63,7 +58,7 @@ export const FeedControls: React.FC<FeedControlsProps> = ({
               role="tab"
               aria-selected={active}
               onClick={() => onModeChange(entry.id)}
-              className="relative flex-1 sm:flex-none h-8 px-4 rounded-[8px] text-[13px] font-semibold font-sans"
+              className="relative flex-1 sm:flex-none shrink-0 h-8 px-3 sm:px-4 rounded-[8px] text-[13px] font-semibold font-sans whitespace-nowrap"
             >
               {active && (
                 <motion.span
@@ -80,7 +75,7 @@ export const FeedControls: React.FC<FeedControlsProps> = ({
 
       <div className="flex items-center justify-between sm:justify-end gap-2">
         <span className="ios-footnote text-[#594C3D] font-mono">
-          {itemCount} {mode === 'beans' ? (itemCount === 1 ? 'lot' : 'lots') : itemCount === 1 ? 'spot' : 'spots'}
+          {itemCount} {itemCount === 1 ? 'spot' : 'spots'}
         </span>
 
         <div className="flex items-center gap-1.5">

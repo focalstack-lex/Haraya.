@@ -2,8 +2,7 @@ import React from 'react';
 import { Bookmark, BookmarkCheck, Flame, Navigation, Star } from 'lucide-react';
 import type { Cafe } from '../../types/coffee';
 import { AyaMascot } from '../common/AyaMascot';
-import { isOpenNow } from '../../utils/calendar';
-import { directionsUrl } from '../../utils/geo';
+import { isOpenNow, hasListedHours } from '../../utils/calendar';
 import { userPrefsService } from '../../services/userPrefsService';
 
 interface CafeGridProps {
@@ -11,7 +10,8 @@ interface CafeGridProps {
   savedCafeIds: string[];
   onToggleSave: (cafe: Cafe) => void;
   onSelectCafe: (cafeId: string) => void;
-  onSelectRoastery: (cafeId: string) => void;
+  /** Opens the directions picker (Haraya live navigation or a maps app). */
+  onDirections: (cafe: Cafe) => void;
   emptyTitle?: string;
   emptyBody?: string;
   emptyAction?: { label: string; onClick: () => void };
@@ -22,11 +22,12 @@ const CafeCard: React.FC<{
   saved: boolean;
   onToggleSave: (cafe: Cafe) => void;
   onSelectCafe: (cafeId: string) => void;
-  onSelectRoastery: (cafeId: string) => void;
+  onDirections: (cafe: Cafe) => void;
   /** Marks this card's bookmark as the guided tour's save step. */
   isTourTarget?: boolean;
-}> = ({ cafe, saved, onToggleSave, onSelectCafe, onSelectRoastery, isTourTarget }) => {
+}> = ({ cafe, saved, onToggleSave, onSelectCafe, onDirections, isTourTarget }) => {
   const openNow = isOpenNow(cafe.hours);
+  const hoursKnown = hasListedHours(cafe.hours);
   const rating = userPrefsService.getRating(cafe.id);
 
   return (
@@ -63,16 +64,23 @@ const CafeCard: React.FC<{
           </button>
 
           <div className="flex items-center gap-1 ios-footnote text-[#594C3D] min-w-0">
-            {cafe.isRoastery && <Flame className="w-3 h-3 shrink-0 text-[#906D4B]" aria-label="Roasts in house" />}
+            {cafe.isRoastery && <Flame className="w-3 h-3 shrink-0 text-[#906D4B]" aria-label="Brews in-house" />}
             <span className="truncate">{cafe.district}, {cafe.city}</span>
           </div>
 
           <p className="ios-footnote text-[#13191F]/85 truncate">
-            {cafe.signature} <span className="font-mono text-[#594C3D]">{'₱'.repeat(cafe.priceLevel)}</span>
+            {cafe.community ? (
+              <span className={cafe.community.status === 'pending' ? 'text-[#7D5C3D] font-medium' : 'text-[#3E5C48] font-medium'}>
+                {cafe.community.status === 'pending' ? 'Pending review' : 'Community gem'}
+              </span>
+            ) : (
+              cafe.signature
+            )}{' '}
+            <span className="font-mono text-[#594C3D]">{'₱'.repeat(cafe.priceLevel)}</span>
           </p>
 
-          <p className={`ios-footnote font-medium ${openNow ? 'text-[#3E5C48]' : 'text-[#8C3A2E]'}`}>
-            {openNow ? 'Open now' : 'Closed'}
+          <p className={`ios-footnote font-medium ${!hoursKnown ? 'text-[#594C3D]' : openNow ? 'text-[#3E5C48]' : 'text-[#8C3A2E]'}`}>
+            {!hoursKnown ? 'Hours not listed' : openNow ? 'Open now' : 'Closed'}
           </p>
 
           <div className="hidden sm:flex flex-wrap gap-1 pt-1">
@@ -87,16 +95,14 @@ const CafeCard: React.FC<{
         {/* Action bar */}
         <div className="flex items-center justify-between -mx-1 pt-1.5 ios-hairline-t ios-footnote">
           <div className="flex items-center">
-            <a
-              href={directionsUrl([{ lat: cafe.lat, lng: cafe.lng }])}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={() => onDirections(cafe)}
               aria-label={`Directions to ${cafe.name}`}
               className="h-9 px-1 font-medium text-[#594C3D] inline-flex items-center gap-1 ios-press"
             >
               <Navigation className="w-3.5 h-3.5" />
               <span className="hidden min-[400px]:inline">Route</span>
-            </a>
+            </button>
             {rating && (
               <span className="h-9 px-1.5 font-medium text-[#7D5C3D] inline-flex items-center gap-1" aria-label={`Your rating: ${rating.rating} of 5`}>
                 <Star className="w-3.5 h-3.5 fill-[#CA9C68] text-[#CA9C68]" aria-hidden="true" />
@@ -104,12 +110,6 @@ const CafeCard: React.FC<{
               </span>
             )}
           </div>
-          {/* The card itself opens details; only the roastery storefront earns its own link */}
-          {cafe.isRoastery && (
-            <button onClick={() => onSelectRoastery(cafe.id)} className="h-9 px-1 font-semibold text-[#7D5C3D] ios-press">
-              Roastery
-            </button>
-          )}
         </div>
       </div>
     </article>
@@ -121,7 +121,7 @@ export const CafeGrid: React.FC<CafeGridProps> = ({
   savedCafeIds,
   onToggleSave,
   onSelectCafe,
-  onSelectRoastery,
+  onDirections,
   emptyTitle = 'No cafes match this pour',
   emptyBody = 'Try clearing a vibe filter or widening the city to find your next cup.',
   emptyAction,
@@ -154,7 +154,7 @@ export const CafeGrid: React.FC<CafeGridProps> = ({
           saved={savedCafeIds.includes(cafe.id)}
           onToggleSave={onToggleSave}
           onSelectCafe={onSelectCafe}
-          onSelectRoastery={onSelectRoastery}
+          onDirections={onDirections}
         />
       ))}
     </div>

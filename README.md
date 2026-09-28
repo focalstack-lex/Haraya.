@@ -32,12 +32,17 @@ npm run preview    # serve the production build
 
 ## Data
 
-There is no bundled dataset. The demo cafes, beans, drops, trails and Cup Check posts were
-removed on 2026-09-28, so the catalog holds only listings created through the Roaster Suite.
-Those records, saves, ratings and posts are currently stored in `localStorage`, which means
-they live in one browser only; moving the catalog to Supabase is what makes listings visible
-to every visitor. Curated trails are defined in `src/data/trails.ts` (empty until real ones
-are added).
+Haraya is a Davao coffee and study spot guide (discovery pivot, 2026-09-29). There is no
+bundled dataset. Places come from Add a Spot: signed-in visitors submit spots to the Supabase
+table `spot_submissions` (`supabase/migrations/20260929000000_spot_submissions.sql`), an admin
+approves them, and approved spots appear for everyone (`src/services/spotService.ts`). Saves,
+ratings and lists stay in `localStorage`. Roast drops, beans, the Roaster Suite and Cup Check are
+hidden from navigation; their code is kept. Curated trails are defined in `src/data/trails.ts`
+(empty until real ones are added).
+
+Before Add a Spot works in production: apply the migrations (`supabase db push`), add the
+site's URL to Supabase Auth redirect URLs, and grant the first admin role in the SQL editor
+(see the comment at the end of `20260928230000_fix_rls_privilege_escalation.sql`).
 
 ## Ecosystem bridge
 
@@ -52,9 +57,9 @@ See `docs/CODE_MAP.md` for the generated, per-file navigation map. High level:
 
 ```
 src/
-  components/   feed, cafe, drops, map, community, saved, roaster, auth, admin, layout, common
+  components/   feed, cafe, map (live navigation), community, layout, common; drops, roaster, auth, admin kept
   data/         trails.ts (curated trails, empty until real ones are added)
-  services/     catalogService, userPrefsService, roasterService, communityService, authService
+  services/     catalogService, spotService + spotMapping (Add a Spot), userPrefsService, authService, others kept
   types/        coffee.ts, auth.ts
   utils/        router.ts (hash routes), calendar.ts (.ics + open hours), geo.ts (distances)
 ```

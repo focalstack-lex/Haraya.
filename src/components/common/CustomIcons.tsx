@@ -37,6 +37,14 @@ export const MapIcon: React.FC<IconProps> = ({ className = 'w-5 h-5' }) => (
   </svg>
 );
 
+// 3b. Add a Spot / Pin Plus Icon (the map pin with a plus where the cup rim sits)
+export const AddSpotIcon: React.FC<IconProps> = ({ className = 'w-5 h-5' }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M12 21s-6.5-5.4-6.5-10.2A6.5 6.5 0 0 1 12 4.5a6.5 6.5 0 0 1 6.5 6.3C18.5 15.6 12 21 12 21Z" />
+    <path d="M12 8v5.2M9.4 10.6h5.2" className="opacity-80" />
+  </svg>
+);
+
 // 4. Cup Check / Camera Cup Icon (community cup moments)
 export const CupCheckIcon: React.FC<IconProps> = ({ className = 'w-5 h-5' }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className}>

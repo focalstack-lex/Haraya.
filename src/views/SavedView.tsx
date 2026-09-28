@@ -26,7 +26,6 @@ export const SavedView: React.FC<SavedViewProps> = ({
   initialTab,
   onSelectCafe,
   onSelectBean,
-  onSelectRoastery,
   onExploreDrops,
   onExploreFeed,
 }) => {
@@ -123,7 +122,7 @@ export const SavedView: React.FC<SavedViewProps> = ({
           savedCafeIds={savedCafeIds}
           onToggleSave={(cafe) => userPrefsService.toggleSavedCafe(cafe)}
           onSelectCafe={onSelectCafe}
-          onSelectRoastery={onSelectRoastery}
+          onDirections={(cafe) => onSelectCafe(cafe.id)}
           emptyTitle="No saved cafes yet"
           emptyBody="Tap the bookmark on any cafe card to keep it here."
           emptyAction={{ label: 'Discover Cafes', onClick: onExploreFeed }}

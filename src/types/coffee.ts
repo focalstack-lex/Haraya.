@@ -1,6 +1,6 @@
 /**
- * Haraya domain model: Davao Region specialty cafes, micro-roasteries, single-origin
- * beans, roast drops, coffee trails, and Cup Check community posts.
+ * Haraya domain model: Davao Region cafes and study spots (listed or added by the community), plus the
+ * retired bean, drop and Cup Check records whose code is kept while hidden from navigation.
  */
 
 export const DAVAO_CITIES = [
@@ -27,6 +27,7 @@ export const DAVAO_DISTRICTS = [
   'Digos',
   'Panabo',
   'Mati',
+  'Samal',
 ] as const;
 
 export type District = (typeof DAVAO_DISTRICTS)[number];
@@ -98,11 +99,18 @@ export interface MenuItem {
   description?: string;
 }
 
+/** A spot added through Add a Spot. Pending spots are visible only to the person who added them. */
+export interface CommunityMeta {
+  status: 'pending' | 'approved';
+  /** The contributor's local tip, for example where the sockets are. */
+  tip: string;
+}
+
 export interface Cafe {
   id: string;
   handle: string;
   name: string;
-  /** True when the venue roasts its own beans (micro-roastery). */
+  /** True when the venue roasts its own beans; shown to visitors as "Brews in-house". */
   isRoastery: boolean;
   city: DavaoCity;
   district: District;
@@ -126,6 +134,8 @@ export interface Cafe {
   saveCount: number;
   viewCount: number;
   dateAdded: string;
+  /** Present only on community-added spots. */
+  community?: CommunityMeta;
 }
 
 export interface RoastProfile {

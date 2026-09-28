@@ -15,7 +15,7 @@ export interface TourStep {
 export const TOUR_STEPS: TourStep[] = [
   {
     target: 'search',
-    text: "Hi, I'm Aya. Let me show you around. Search anything: a cafe, a bean, an origin like Mt. Apo, or a note like chocolate.",
+    text: "Hi, I'm Aya. Let me show you around. Search for a cafe, an area like Poblacion, or something like quiet or Wi-Fi.",
     advance: 'next',
     aya: 'welcome',
   },
@@ -33,25 +33,31 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     target: 'categories',
-    text: 'Shortcuts. Work finds laptop-friendly cafes, Pour-Over finds hand-brew bars.',
+    text: 'Shortcuts. Plugs and Fast Wi-Fi find study spots, Air-con finds a cool place to sit.',
     advance: 'next',
     aya: 'holding-cup',
   },
   {
     target: 'save',
-    text: 'Save a cafe you would try. Tap the bookmark.',
+    text: 'Save a spot you would try. Tap the bookmark.',
     advance: 'action',
-    aya: 'drops',
+    aya: 'holding-cup',
   },
   {
     target: 'tab-profile',
-    text: 'Everything you save lives in Profile.',
+    text: 'Everything you save lives in Saved Spots.',
     advance: 'next',
     aya: 'holding-cup',
   },
   {
     target: 'tab-map',
-    text: 'See every cafe on the map, plus walking trails between them. Enjoy your next cup.',
+    text: 'See every spot on the map. Tap Directions on any spot and Haraya can walk you there.',
+    advance: 'next',
+    aya: 'holding-cup',
+  },
+  {
+    target: 'tab-submit',
+    text: 'Know a quiet corner that is not on Google Maps? Add it here. Enjoy your next cup.',
     advance: 'next',
     aya: 'welcome',
   },

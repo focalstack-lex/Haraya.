@@ -16,8 +16,8 @@ export const FeedSearchBar: React.FC<FeedSearchBarProps> = ({ searchQuery, setSe
         enterKeyHint="search"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        placeholder="Cafes, beans, origins, tasting notes"
-        aria-label="Search cafes, beans, origins, and tasting notes"
+        placeholder="Cafes, study spots, areas"
+        aria-label="Search cafes, study spots and areas"
         className="w-full min-w-0 bg-transparent text-[15px] font-sans text-[#13191F] placeholder:text-[#6E6150] focus:outline-none [&::-webkit-search-cancel-button]:hidden"
       />
       {searchQuery && (

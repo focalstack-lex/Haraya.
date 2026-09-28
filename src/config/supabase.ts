@@ -11,5 +11,8 @@ export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
  * When unconfigured, the application falls back safely to the local reactive store.
  */
 export const supabase: SupabaseClient | null = isSupabaseConfigured
-  ? createClient(supabaseUrl, supabaseAnonKey)
+  ? createClient(supabaseUrl, supabaseAnonKey, {
+      // PKCE returns the sign-in code as ?code=, which does not collide with Haraya's #/ hash routes
+      auth: { flowType: 'pkce', detectSessionInUrl: true, persistSession: true, autoRefreshToken: true },
+    })
   : null;

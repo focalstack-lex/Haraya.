@@ -3,6 +3,7 @@ import { catalogService } from '../services/catalogService';
 import { userPrefsService } from '../services/userPrefsService';
 import { communityService } from '../services/communityService';
 import { authService } from '../services/authService';
+import { spotService } from '../services/spotService';
 
 /**
  * Subscriber-version hooks: each service exposes a monotonically increasing
@@ -24,4 +25,8 @@ export function useCommunityVersion(): number {
 
 export function useAuthVersion(): number {
   return useSyncExternalStore(authService.subscribe, authService.getVersion);
+}
+
+export function useSpotVersion(): number {
+  return useSyncExternalStore(spotService.subscribe, spotService.getVersion);
 }

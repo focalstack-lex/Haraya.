@@ -39,7 +39,8 @@ The tokens live in `src/index.css`; this file is the contract behind them.
   #FFC183, ink #1D1203). No outlines, gradients or mouth. One pose per surface so she reads as a character, not a
   sticker: `welcome` (WelcomeModal, first tour step), `mood` (Discover mood card, where she rises out of the
   card's top edge, and Mood Finder idle), `empty` (cafe, bean, saved, visited and mood
-  no-match empty states), `drops` (Roast Drops title). Idle motion (bob, blink, steam, wave) rests under reduced
+  no-match empty states, Add a Spot title), `welcome` again on the live navigation arrival card; `drops` belongs to the
+  hidden Roast Drops view. Idle motion (bob, blink, steam, wave) rests under reduced
   motion. Beside text that already carries the message, pass `alt=""` so she stays decorative.
 - Numbers (prices, counts, timers) use tabular figures (`font-mono` maps to the UI face with
   `tabular-nums`). No monospace costume.

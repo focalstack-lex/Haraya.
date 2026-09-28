@@ -1,7 +1,7 @@
 import React from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { X, LogOut, ShieldCheck, UserRound, Check, ChevronRight, ChevronsUpDown, MapPin } from 'lucide-react';
-import { NAV_TABS, PORTAL_TAB_ID, PORTAL_LABELS, PortalIcon } from './NavigationHeader';
+import { NAV_TABS } from './NavigationHeader';
 import { BrandLogo } from '../common/BrandLogo';
 import { DAVAO_CITIES } from '../../types/coffee';
 import type { PortalRole } from '../../types/auth';
@@ -120,7 +120,6 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
                     ) : undefined,
                   ),
                 )}
-                {navRow(PORTAL_TAB_ID, PORTAL_LABELS[portalRole].long, <PortalIcon role={portalRole} className="w-4.5 h-4.5" />)}
               </div>
 
               <div className="ios-group">

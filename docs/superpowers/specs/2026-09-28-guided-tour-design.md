@@ -63,3 +63,9 @@ No unit test runner exists in the project, so the tour is proven by a Playwright
 start from a fresh profile, tap Get started, walk all six steps (tapping the real bookmark on step 4), confirm the
 saved count rises, the flag is stored, the tour does not reappear on reload, Skip works, and no page or console
 errors occur. Plus `tsc -b`, `oxlint`, `vite build`, `impeccable detect`.
+
+## Update 2026-09-29: discovery pivot
+
+The tour now has 8 steps. Copy follows the new vocabulary (spots, Saved Spots, study shortcuts), the save step uses
+Aya's `holding-cup` pose, the map step mentions in-app directions, and a final step targets the Add a Spot tab
+(`data-tour="tab-submit"`) with Aya waving goodbye.

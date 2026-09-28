@@ -143,7 +143,13 @@ export function minutesUntilClose(hours: WeeklyHours, now: Date = new Date()): n
 }
 
 /** Human "closes 10:00 PM" style summary for the open-now pill. */
+/** False when no day has both an open and a close time, as with community spots added without hours. */
+export function hasListedHours(hours: WeeklyHours): boolean {
+  return Object.values(hours).some((day) => Boolean(day.open && day.close));
+}
+
 export function hoursTodayLabel(hours: WeeklyHours, now: Date = new Date()): string {
+  if (!hasListedHours(hours)) return 'Hours not listed';
   const today = hours[WEEKDAYS[now.getDay()]];
   if (!today.open || !today.close) return 'Closed today';
   return `Open ${today.open} to ${today.close}`;

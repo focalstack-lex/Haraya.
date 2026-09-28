@@ -18,7 +18,7 @@ interface VibeFilterBarProps {
 }
 
 const CAFE_VIBES: { id: AmenityKey | 'heritage' | 'roastery'; label: string }[] = [
-  { id: 'roastery', label: 'Roasteries' },
+  { id: 'roastery', label: 'Brews In-House' },
   { id: 'quietFocus', label: 'Quiet Focus' },
   { id: 'workFriendly', label: 'Work-Friendly' },
   { id: 'outdoor', label: 'Outdoor Garden' },

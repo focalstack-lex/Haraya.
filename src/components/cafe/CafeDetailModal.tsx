@@ -23,8 +23,7 @@ import {
 import type { Cafe, AmenityKey, Bean } from '../../types/coffee';
 import { AMENITY_LABELS } from '../../types/coffee';
 import { Modal, ModalHeader } from '../common/FormControls';
-import { isOpenNow, hoursTodayLabel } from '../../utils/calendar';
-import { directionsUrl } from '../../utils/geo';
+import { isOpenNow, hoursTodayLabel, hasListedHours } from '../../utils/calendar';
 import { catalogService } from '../../services/catalogService';
 import { useCatalogVersion } from '../../hooks/useServiceVersions';
 import { AddToListSheet } from '../common/AddToListSheet';
@@ -62,7 +61,7 @@ export const AmenityBadges: React.FC<{ amenities: AmenityKey[]; wifiMbps: number
           <span className="truncate">
             {amenity === 'fastWifi' ? 'Fast WiFi' : AMENITY_LABELS[amenity]}
           </span>
-          {amenity === 'fastWifi' && (
+          {amenity === 'fastWifi' && wifiMbps > 0 && (
             <span className="ml-auto shrink-0 font-mono text-[13px] text-[#594C3D]">{wifiMbps} Mbps</span>
           )}
         </div>
@@ -104,8 +103,11 @@ interface CafeDetailModalProps {
   onClose: () => void;
   saved: boolean;
   onToggleSave: (cafe: Cafe) => void;
-  onSelectRoastery: (cafeId: string) => void;
-  onViewBean: (beanId: string) => void;
+  /** Opens the directions picker (Haraya live navigation or a maps app). */
+  onDirections: (cafe: Cafe) => void;
+  /** Retired roaster features: rendered only when a caller passes them. */
+  onSelectRoastery?: (cafeId: string) => void;
+  onViewBean?: (beanId: string) => void;
   onRateCafe?: (cafe: Cafe) => void;
 }
 
@@ -118,6 +120,7 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
   onClose,
   saved,
   onToggleSave,
+  onDirections,
   onSelectRoastery,
   onViewBean,
   onRateCafe,
@@ -139,6 +142,7 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
   if (!cafe) return null;
 
   const openNow = isOpenNow(cafe.hours);
+  const hoursKnown = hasListedHours(cafe.hours);
   const roasterBeans: Bean[] = cafe.isRoastery ? catalogService.getBeansByRoaster(cafe.id) : [];
 
   return (
@@ -187,10 +191,10 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] font-sans">
               <span className={`font-semibold inline-flex items-center gap-1.5 ${
-                openNow ? 'text-[#3E5C48]' : 'text-[#8C3A2E]'
+                !hoursKnown ? 'text-[#594C3D]' : openNow ? 'text-[#3E5C48]' : 'text-[#8C3A2E]'
               }`}>
-                <span className={`h-2 w-2 rounded-full ${openNow ? 'bg-[#3E5C48]' : 'bg-[#8C3A2E]'}`} />
-                {openNow ? 'Open now' : 'Closed'}
+                {hoursKnown && <span className={`h-2 w-2 rounded-full ${openNow ? 'bg-[#3E5C48]' : 'bg-[#8C3A2E]'}`} />}
+                {!hoursKnown ? 'Hours not listed' : openNow ? 'Open now' : 'Closed'}
               </span>
               {cafe.verified && (
                 <span className="inline-flex items-center gap-1 text-[#594C3D]">
@@ -201,26 +205,35 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
               {cafe.isRoastery && (
                 <span className="inline-flex items-center gap-1 text-[#7D5C3D] font-medium">
                   <Flame className="w-4 h-4 text-[#906D4B]" />
-                  Roastery
+                  Brews in-house
+                </span>
+              )}
+              {cafe.community && (
+                <span className={`font-medium ${cafe.community.status === 'pending' ? 'text-[#7D5C3D]' : 'text-[#3E5C48]'}`}>
+                  {cafe.community.status === 'pending' ? 'Pending review, only you can see it' : 'Community gem'}
                 </span>
               )}
             </div>
-            <p className="text-[15px] font-sans text-[#13191F]/85 leading-relaxed">{cafe.description}</p>
+            {cafe.description && <p className="text-[15px] font-sans text-[#13191F]/85 leading-relaxed">{cafe.description}</p>}
+            {cafe.community?.tip && (
+              <p className="rounded-[14px] bg-[#FAF5EB] px-3.5 py-2.5 text-[15px] text-[#13191F]">
+                <span className="font-semibold">Local tip: </span>
+                {cafe.community.tip}
+              </p>
+            )}
           </div>
 
           {/* Actions */}
           <div className="space-y-2">
             {/* One primary action; save and list ride beside it as icon buttons */}
             <div className="flex items-center gap-2">
-              <a
-                href={directionsUrl([{ lat: cafe.lat, lng: cafe.lng }])}
-                target="_blank"
-                rel="noreferrer"
+              <button
+                onClick={() => onDirections(cafe)}
                 className="h-11 flex-1 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[15px] font-semibold font-sans inline-flex items-center justify-center gap-2 hover:bg-[#7D5C3D] ios-press"
               >
                 <Navigation className="w-4 h-4" />
                 Directions
-              </a>
+              </button>
               <button
                 onClick={() => onToggleSave(cafe)}
                 aria-pressed={saved}
@@ -245,13 +258,13 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
               {onRateCafe && (
                 <button
                   onClick={() => onRateCafe(cafe)}
-                  className={`${SECONDARY_ACTION} ${cafe.isRoastery ? '' : 'col-span-2'}`}
+                  className={`${SECONDARY_ACTION} ${cafe.isRoastery && onSelectRoastery ? '' : 'col-span-2'}`}
                 >
                   <Star className="w-4 h-4" />
                   Rate
                 </button>
               )}
-              {cafe.isRoastery && (
+              {cafe.isRoastery && onSelectRoastery && (
                 <button
                   onClick={() => onSelectRoastery(cafe.id)}
                   className={`${SECONDARY_ACTION} ${onRateCafe ? '' : 'col-span-2'}`}
@@ -303,7 +316,7 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
             </section>
           )}
 
-          {roasterBeans.length > 0 && (
+          {onViewBean && roasterBeans.length > 0 && (
             <section className="space-y-1.5">
               <h3 className={SECTION_LABEL}>Roasted here</h3>
               <div className={GROUP}>

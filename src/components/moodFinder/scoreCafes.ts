@@ -48,7 +48,10 @@ interface Trait {
   reason: string;
 }
 
-const hasWifi = (cafe: Cafe) => cafe.wifiMbps >= WIFI_MIN_MBPS;
+/** Listed speed when known; community spots report fast Wi-Fi without a measured speed. */
+const hasWifi = (cafe: Cafe) =>
+  cafe.wifiMbps >= WIFI_MIN_MBPS || (cafe.wifiMbps === 0 && cafe.amenities.includes('fastWifi'));
+const wifiReason = (cafe: Cafe) => (cafe.wifiMbps > 0 ? `${cafe.wifiMbps} Mbps Wi-Fi` : 'Fast Wi-Fi');
 const isHeritage = (cafe: Cafe) =>
   cafe.vibeTags.some((tag) => /heritage|ancestral/i.test(tag));
 
@@ -69,7 +72,7 @@ const mustHaveReason = (id: MustHaveId, cafe: Cafe, closesAt: string | null): st
     case 'pets':
       return 'Pet-friendly';
     case 'wifi':
-      return `${cafe.wifiMbps} Mbps Wi-Fi`;
+      return wifiReason(cafe);
     case 'quiet':
       return 'Quiet focus';
     case 'plugs':
@@ -94,7 +97,7 @@ const moodTraits = (mood: MoodId, cafe: Cafe, km: number, now: Date, recentIds: 
         { has: cafe.amenities.includes('quietFocus'), reason: 'Quiet focus' },
         { has: cafe.amenities.includes('workFriendly'), reason: 'Work-friendly' },
         { has: cafe.amenities.includes('plugs'), reason: 'Plugs at seats' },
-        { has: hasWifi(cafe), reason: `${cafe.wifiMbps} Mbps Wi-Fi` },
+        { has: hasWifi(cafe), reason: wifiReason(cafe) },
       ];
     case 'cozy':
       return [
@@ -112,7 +115,7 @@ const moodTraits = (mood: MoodId, cafe: Cafe, km: number, now: Date, recentIds: 
       return [
         { has: cafe.priceLevel === 3, reason: 'Premium bar' },
         { has: cafe.amenities.includes('pourOverBar'), reason: 'Pour-over bar' },
-        { has: cafe.isRoastery && cafe.verified, reason: 'Verified roastery' },
+        { has: cafe.isRoastery && cafe.verified, reason: 'Verified, brews in-house' },
       ];
     case 'quick':
       return [
@@ -122,7 +125,7 @@ const moodTraits = (mood: MoodId, cafe: Cafe, km: number, now: Date, recentIds: 
       ];
     case 'explore':
       return [
-        { has: cafe.isRoastery, reason: 'Micro-roastery' },
+        { has: cafe.isRoastery, reason: 'Brews in-house' },
         { has: cafe.verified, reason: 'Verified' },
         { has: !recentIds.includes(cafe.id), reason: 'New to you' },
       ];

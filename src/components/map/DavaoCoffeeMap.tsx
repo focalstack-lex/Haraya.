@@ -1,10 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import L from 'leaflet';
-import { ChevronRight, LocateFixed, Minus, Navigation, Plus, X } from 'lucide-react';
+import { ChevronRight, Crosshair, LocateFixed, Minus, Navigation, Plus, X } from 'lucide-react';
 import type { Cafe, Trail } from '../../types/coffee';
 import { curatedTrails } from '../../data/trails';
-import { distanceKm, directionsUrl, formatKm, trailLengthKm, walkMinutes, type GeoPoint } from '../../utils/geo';
-import { isOpenNow } from '../../utils/calendar';
+import { distanceKm, directionsUrl, formatKm, trailLengthKm, walkMinutes } from '../../utils/geo';
+import { useLiveNavigation } from './useLiveNavigation';
+import { formatRemaining } from './liveNavMath';
+import { externalMapLinks } from './DirectionsActionSheet';
+import { AyaMascot } from '../common/AyaMascot';
+import { isOpenNow, hasListedHours } from '../../utils/calendar';
 import { LargeTitle } from '../common/LargeTitle';
 
 const DAVAO_CENTER: [number, number] = [7.19, 125.55];
@@ -29,10 +33,9 @@ interface DavaoCoffeeMapProps {
   cafes: Cafe[];
   onSelectCafe: (cafeId: string) => void;
   selectedCity: string;
-  /** Mood finder hand-off: the cafe to route to, and the visitor's position when shared. */
-  routeCafe?: Cafe | null;
-  origin?: GeoPoint | null;
-  onClearRoute?: () => void;
+  /** Destination of live walking navigation started from the directions sheet, or null. */
+  navTarget?: Cafe | null;
+  onEndNavigation?: () => void;
 }
 
 /**
@@ -40,10 +43,14 @@ interface DavaoCoffeeMapProps {
  * and hop-by-hop distance. Leaflet is imported imperatively so the map canvas
  * only mounts on this view.
  */
-export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectCafe, selectedCity, routeCafe = null, origin = null, onClearRoute }) => {
+export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectCafe, selectedCity, navTarget = null, onEndNavigation }) => {
   const mapRef = useRef<L.Map | null>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
   const [activeTrail, setActiveTrail] = useState<Trail | null>(null);
+  const nav = useLiveNavigation();
+  const [followMe, setFollowMe] = useState(true);
+  const navLayers = useRef<{ you: L.Marker; accuracy: L.Circle; line: L.Polyline } | null>(null);
+  const framedFirstFix = useRef(false);
 
   const trailsWithCafes = useMemo(
     () =>
@@ -154,14 +161,21 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
     };
   }, [activeTrail, trailsWithCafes]);
 
-  // Route from the mood finder: a "You" dot, a dashed straight line, and the cafe pin, framed together.
-  // Declared after the trail effect so its framing wins on first render.
+  // Live navigation: start or stop the GPS watch when the destination changes
+  const { start: startNav, stop: stopNav } = nav;
+  useEffect(() => {
+    framedFirstFix.current = false;
+    setFollowMe(true);
+    if (navTarget) startNav({ lat: navTarget.lat, lng: navTarget.lng });
+    else stopNav();
+  }, [navTarget, startNav, stopNav]);
+
+  // Destination pin while navigating. Declared after the trail effect so its framing wins.
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !routeCafe) return;
+    if (!map || !navTarget) return;
     const layer = L.layerGroup().addTo(map);
-    const target: [number, number] = [routeCafe.lat, routeCafe.lng];
-
+    const target: [number, number] = [navTarget.lat, navTarget.lng];
     L.marker(target, {
       icon: L.divIcon({
         className: 'haraya-map-pin-container',
@@ -171,34 +185,67 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
       }),
       zIndexOffset: 1000,
     })
-      .bindTooltip(`<strong>${escapeHtml(routeCafe.name)}</strong>`, { direction: 'top', offset: [0, -28], permanent: true })
+      .bindTooltip(`<strong>${escapeHtml(navTarget.name)}</strong>`, { direction: 'top', offset: [0, -28], permanent: true })
       .addTo(layer);
+    map.setView(target, 16);
 
-    if (origin) {
-      const start: [number, number] = [origin.lat, origin.lng];
-      L.polyline([start, target], { color: '#906D4B', weight: 4, dashArray: '2 10', lineCap: 'round', opacity: 0.95 }).addTo(layer);
-      L.marker(start, {
-        icon: L.divIcon({
-          className: 'haraya-map-pin-container',
-          html: '<div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="width:18px;height:18px;border-radius:50%;background:#2F6FDB;border:3px solid #FFFDF9;box-shadow:0 0 0 6px rgba(47,111,219,.18),0 2px 6px rgba(19,25,31,.3);"></div></div>',
-          iconSize: [18, 18],
-          iconAnchor: [9, 9],
-        }),
-        keyboard: false,
-      })
-        .bindTooltip('You', { direction: 'bottom', offset: [0, 10], permanent: true })
-        .addTo(layer);
-      map.fitBounds(L.latLngBounds([start, target]).pad(0.3), { maxZoom: 16 });
+    // Panning the map by hand pauses Follow me until the visitor recenters
+    const pauseFollow = () => setFollowMe(false);
+    map.on('dragstart', pauseFollow);
+    return () => {
+      map.off('dragstart', pauseFollow);
+      layer.remove();
+      navLayers.current?.you.remove();
+      navLayers.current?.accuracy.remove();
+      navLayers.current?.line.remove();
+      navLayers.current = null;
+    };
+  }, [navTarget]);
+
+  // The visitor: pulsing dot with a heading cone, accuracy ring, and the dashed line to the destination
+  useEffect(() => {
+    const map = mapRef.current;
+    const here = nav.position;
+    if (!map || !navTarget || !here) return;
+    const latLng: [number, number] = [here.lat, here.lng];
+    const target: [number, number] = [navTarget.lat, navTarget.lng];
+    const cone =
+      here.heading === null
+        ? ''
+        : `<div class="haraya-you-cone" style="transform:rotate(${Math.round(here.heading)}deg)"></div>`;
+    const icon = L.divIcon({
+      className: 'haraya-you-container',
+      html: `<div class="haraya-you">${cone}<div class="haraya-you-pulse"></div><div class="haraya-you-dot"></div></div>`,
+      iconSize: [22, 22],
+      iconAnchor: [11, 11],
+    });
+
+    if (!navLayers.current) {
+      navLayers.current = {
+        accuracy: L.circle(latLng, { radius: here.accuracy, color: '#2F6FDB', weight: 1, opacity: 0.35, fillOpacity: 0.08 }).addTo(map),
+        line: L.polyline([latLng, target], { color: '#906D4B', weight: 4, dashArray: '2 10', lineCap: 'round', opacity: 0.95 }).addTo(map),
+        you: L.marker(latLng, { icon, keyboard: false, zIndexOffset: 1100 }).addTo(map),
+      };
     } else {
-      map.setView(target, 15);
+      navLayers.current.accuracy.setLatLng(latLng).setRadius(here.accuracy);
+      navLayers.current.line.setLatLngs([latLng, target]);
+      navLayers.current.you.setLatLng(latLng).setIcon(icon);
     }
 
-    return () => {
-      layer.remove();
-    };
-  }, [routeCafe, origin]);
+    if (!framedFirstFix.current) {
+      framedFirstFix.current = true;
+      map.fitBounds(L.latLngBounds([latLng, target]).pad(0.35), { maxZoom: 17 });
+    } else if (followMe) {
+      map.panTo(latLng, { animate: true });
+    }
+  }, [nav.position, navTarget, followMe]);
 
-  const routeKm = routeCafe && origin ? distanceKm(origin, routeCafe) : null;
+  const recenterOnMe = () => {
+    const map = mapRef.current;
+    setFollowMe(true);
+    if (map && nav.position) map.setView([nav.position.lat, nav.position.lng], Math.max(map.getZoom(), 16));
+  };
+
 
   const stopDistance = (trail: Trail, index: number): number | null => {
     const stops = trailsWithCafes.find((entry) => entry.trail.id === trail.id)?.stops ?? [];
@@ -227,7 +274,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-1 pb-6 sm:pt-4 space-y-4">
-      <LargeTitle title="Coffee Map" subtitle={`Showing ${selectedCity}`} />
+      <LargeTitle title="Map & Spots" subtitle={navTarget ? `Walking to ${navTarget.name}` : `Showing ${selectedCity}`} />
 
       <div className="grid lg:grid-cols-3 gap-4 lg:gap-6">
         {/* Map canvas */}
@@ -237,8 +284,20 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
               ref={canvasRef}
               className="h-[380px] sm:h-[460px] lg:h-[520px] z-0"
               role="application"
-              aria-label="Interactive map of Davao specialty cafes"
+              aria-label="Interactive map of Davao cafes and study spots"
             />
+            {/* Navigation banner: destination, distance and time left */}
+            {navTarget && nav.remainingKm !== null && nav.status !== 'arrived' && (
+              <div className="absolute top-2.5 left-2.5 right-14 z-[500] rounded-[14px] ios-material-bar shadow-[0_4px_16px_-6px_rgba(19,25,31,0.35)] px-3.5 py-2.5" aria-live="polite">
+                <p className="ios-footnote text-[#594C3D] truncate">To {navTarget.name}</p>
+                <p className="text-[17px] font-semibold text-[#13191F]">
+                  <span className="font-mono">{formatRemaining(nav.remainingKm)}</span>
+                  <span className="text-[#594C3D] font-normal"> left, about </span>
+                  <span className="font-mono">{nav.minutesLeft}</span>
+                  <span className="text-[#594C3D] font-normal"> min walk</span>
+                </p>
+              </div>
+            )}
             {/* Floating controls, Apple Maps style */}
             <div className="absolute top-1.5 right-1.5 z-[500] flex flex-col">
               <MapControl label="Zoom in" onClick={() => zoomBy(1)}>
@@ -247,53 +306,102 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
               <MapControl label="Zoom out" onClick={() => zoomBy(-1)}>
                 <Minus className="w-4.5 h-4.5" strokeWidth={2.25} />
               </MapControl>
-              <MapControl label={activeTrail ? 'Fit trail in view' : 'Recenter on Davao Region'} onClick={recenter}>
-                <LocateFixed className="w-4.5 h-4.5" strokeWidth={2} />
-              </MapControl>
+              {navTarget && nav.position ? (
+                <MapControl label={followMe ? 'Following you' : 'Recenter on me'} onClick={recenterOnMe}>
+                  <Crosshair className={`w-4.5 h-4.5 ${followMe ? 'text-[#2F6FDB]' : ''}`} strokeWidth={2} />
+                </MapControl>
+              ) : (
+                <MapControl label={activeTrail ? 'Fit trail in view' : 'Recenter on Davao Region'} onClick={recenter}>
+                  <LocateFixed className="w-4.5 h-4.5" strokeWidth={2} />
+                </MapControl>
+              )}
             </div>
           </div>
 
-          {routeCafe && (
+          {navTarget && (
             <div className="ios-group ios-card-shadow" aria-live="polite">
-              <div className="flex items-start justify-between gap-3 pl-4 pr-1 pt-2 pb-1">
-                <div className="min-w-0 py-1.5">
-                  <h3 className="ios-headline text-[#13191F] truncate">Route to {routeCafe.name}</h3>
-                  <p className="ios-footnote text-[#594C3D] mt-0.5">
-                    {routeKm !== null ? (
-                      <>
-                        About <span className="font-mono">{walkMinutes(routeKm * 1.3)}</span> min walk,{' '}
-                        <span className="font-mono">{formatKm(routeKm)}</span> (straight-line estimate)
-                      </>
-                    ) : (
-                      'Turn on Near me in the mood finder to draw a route from you.'
-                    )}
-                  </p>
+              {nav.status === 'arrived' ? (
+                <div className="flex items-center gap-3 px-4 py-3.5">
+                  <AyaMascot pose="welcome" size={76} alt="" className="-my-1" />
+                  <div className="min-w-0 flex-1">
+                    <h3 className="ios-headline text-[#13191F]">You're here</h3>
+                    <p className="ios-footnote text-[#594C3D] truncate">{navTarget.name}, {navTarget.address}</p>
+                    <div className="flex gap-2 pt-2">
+                      <button
+                        onClick={() => onSelectCafe(navTarget.id)}
+                        className="h-9 px-4 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[14px] font-semibold hover:bg-[#7D5C3D] ios-press"
+                      >
+                        View spot
+                      </button>
+                      <button onClick={onEndNavigation} className="h-9 px-4 rounded-full ios-fill text-[14px] font-semibold text-[#7D5C3D] ios-press">
+                        Done
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                {onClearRoute && (
-                  <button onClick={onClearRoute} aria-label="End route" className="h-11 w-11 shrink-0 flex items-center justify-center ios-press">
-                    <span className="h-7.5 w-7.5 rounded-full bg-[#766046]/15 flex items-center justify-center text-[#594C3D]">
-                      <X className="w-4 h-4" strokeWidth={2.5} />
-                    </span>
-                  </button>
-                )}
-              </div>
-              <div className="flex gap-2 px-4 pb-3.5 pt-1">
-                <a
-                  href={directionsUrl([{ lat: routeCafe.lat, lng: routeCafe.lng }])}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 h-10 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[14px] font-semibold inline-flex items-center justify-center gap-1.5 hover:bg-[#7D5C3D] ios-press"
-                >
-                  <Navigation className="w-4 h-4" />
-                  Open in Google Maps
-                </a>
-                <button
-                  onClick={() => onSelectCafe(routeCafe.id)}
-                  className="h-10 px-4 rounded-full ios-fill text-[14px] font-semibold text-[#7D5C3D] hover:bg-[#766046]/20 ios-press"
-                >
-                  Details
-                </button>
-              </div>
+              ) : nav.status === 'denied' || nav.status === 'unavailable' ? (
+                <div className="px-4 py-3.5 space-y-2.5">
+                  <h3 className="ios-headline text-[#13191F]">
+                    {nav.status === 'denied' ? 'Location is off for Haraya' : 'Your location is unavailable'}
+                  </h3>
+                  <p className="ios-footnote text-[#594C3D]">
+                    {nav.status === 'denied'
+                      ? 'Allow location for this site in your browser settings to walk with Haraya, or open a maps app.'
+                      : 'Haraya could not get a GPS fix. Try again outdoors, or open a maps app.'}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {externalMapLinks(navTarget).map((link) => (
+                      <a
+                        key={link.id}
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="h-9 px-3.5 rounded-full ios-fill text-[14px] font-semibold text-[#7D5C3D] inline-flex items-center ios-press"
+                      >
+                        {link.label}
+                      </a>
+                    ))}
+                    <button onClick={onEndNavigation} className="h-9 px-3.5 text-[14px] font-medium text-[#594C3D] ios-press">
+                      End
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="px-4 pt-3 pb-3.5 space-y-2.5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <h3 className="ios-headline text-[#13191F] truncate">{navTarget.name}</h3>
+                      <p className="ios-footnote text-[#594C3D] truncate">{navTarget.address}</p>
+                    </div>
+                    <button
+                      onClick={onEndNavigation}
+                      className="h-9 px-3.5 shrink-0 rounded-full ios-fill text-[14px] font-semibold text-[#8C3A2E] ios-press"
+                    >
+                      End
+                    </button>
+                  </div>
+                  {nav.status === 'locating' ? (
+                    <p className="ios-footnote text-[#594C3D]">Finding your location</p>
+                  ) : (
+                    <>
+                      <div
+                        className="h-2 rounded-full bg-[#766046]/15 overflow-hidden"
+                        role="progressbar"
+                        aria-label="Walk progress"
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-valuenow={Math.round(nav.progress * 100)}
+                      >
+                        <div className="h-full rounded-full bg-[#906D4B] transition-[width] duration-500" style={{ width: `${Math.round(nav.progress * 100)}%` }} />
+                      </div>
+                      <p className="ios-footnote text-[#594C3D]">
+                        <span className="font-mono">{Math.round(nav.progress * 100)}%</span> of the walk done. Straight-line guide, so
+                        follow the streets you know.
+                      </p>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
@@ -402,6 +510,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
               <ul className="ios-group ios-card-shadow">
                 {cafes.map((cafe) => {
                   const openNow = isOpenNow(cafe.hours);
+                  const hoursKnown = hasListedHours(cafe.hours);
                   return (
                     <li key={cafe.id}>
                       <button onClick={() => onSelectCafe(cafe.id)} className="ios-group-row !px-3">
@@ -415,8 +524,8 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
                           <span className="block ios-headline text-[#13191F] truncate">{cafe.name}</span>
                           <span className="block ios-footnote text-[#594C3D] truncate">
                             {cafe.district}, {cafe.city}
-                            <span className={`ml-1.5 font-medium ${openNow ? 'text-[#3E5C48]' : 'text-[#8C3A2E]'}`}>
-                              {openNow ? 'Open' : 'Closed'}
+                            <span className={`ml-1.5 font-medium ${!hoursKnown ? 'text-[#594C3D]' : openNow ? 'text-[#3E5C48]' : 'text-[#8C3A2E]'}`}>
+                              {!hoursKnown ? 'Hours not listed' : openNow ? 'Open' : 'Closed'}
                             </span>
                           </span>
                         </span>

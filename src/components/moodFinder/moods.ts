@@ -21,7 +21,7 @@ export const MOODS: { id: MoodId; label: string; hint: string }[] = [
   { id: 'social', label: 'Social', hint: 'Outdoor tables and late nights' },
   { id: 'treat', label: 'Treat myself', hint: 'Premium bars and pour-over' },
   { id: 'quick', label: 'Quick cup', hint: 'Nearest, open now, easy on the wallet' },
-  { id: 'explore', label: 'Explore', hint: 'Roasteries you have not visited' },
+  { id: 'explore', label: 'Explore', hint: 'Spots you have not been to yet' },
 ];
 
 export const MUST_HAVES: { id: MustHaveId; label: string }[] = [

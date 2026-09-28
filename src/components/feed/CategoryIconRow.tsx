@@ -1,10 +1,11 @@
 import React from 'react';
-import { Laptop, Moon, Trees } from 'lucide-react';
-import { CoffeeBagIcon, RoasterDrumIcon, V60DripperIcon } from '../common/CustomIcons';
+import { PawPrint, Plug, Snowflake, Trees, Wifi } from 'lucide-react';
+import { V60DripperIcon } from '../common/CustomIcons';
+import type { AmenityKey } from '../../types/coffee';
 import type { VibeFilterId } from './VibeFilterBar';
 
-/** Shortcut categories: 'beans' switches the catalog to the bean vault, the rest toggle a cafe filter. */
-export type MainCategoryId = 'roastery' | 'beans' | 'pourOverBar' | 'workFriendly' | 'lateNight' | 'outdoor';
+/** Amenity shortcuts: each toggles the matching amenity filter on the spot list. */
+export type MainCategoryId = Extract<AmenityKey, 'plugs' | 'fastWifi' | 'aircon' | 'outdoor' | 'petFriendly' | 'pourOverBar'>;
 
 export interface CategoryItem {
   id: MainCategoryId;
@@ -13,26 +14,25 @@ export interface CategoryItem {
 }
 
 export const MAIN_CATEGORIES: CategoryItem[] = [
-  { id: 'roastery', label: 'Roasteries', icon: RoasterDrumIcon },
-  { id: 'beans', label: 'Beans', icon: CoffeeBagIcon },
-  { id: 'pourOverBar', label: 'Pour-Over', icon: V60DripperIcon },
-  { id: 'workFriendly', label: 'Work', icon: Laptop },
-  { id: 'lateNight', label: 'Late Night', icon: Moon },
+  { id: 'plugs', label: 'Plugs', icon: Plug },
+  { id: 'fastWifi', label: 'Fast Wi-Fi', icon: Wifi },
+  { id: 'aircon', label: 'Air-con', icon: Snowflake },
   { id: 'outdoor', label: 'Outdoor', icon: Trees },
+  { id: 'petFriendly', label: 'Pet-Friendly', icon: PawPrint },
+  { id: 'pourOverBar', label: 'Pour-Over', icon: V60DripperIcon },
 ];
 
 interface CategoryIconRowProps {
-  showingBeans: boolean;
   activeFilters: Set<VibeFilterId>;
   onSelectCategory: (id: MainCategoryId) => void;
 }
 
-export const CategoryIconRow: React.FC<CategoryIconRowProps> = ({ showingBeans, activeFilters, onSelectCategory }) => {
+export const CategoryIconRow: React.FC<CategoryIconRowProps> = ({ activeFilters, onSelectCategory }) => {
   return (
-    <section aria-label="Browse by category" data-tour="categories" className="-mx-4 sm:mx-0">
+    <section aria-label="Filter by amenity" data-tour="categories" className="-mx-4 sm:mx-0">
       <div className="ios-shelf gap-2 px-4 sm:px-0 sm:grid sm:grid-cols-6 sm:gap-3">
         {MAIN_CATEGORIES.map((cat) => {
-          const isActive = cat.id === 'beans' ? showingBeans : !showingBeans && activeFilters.has(cat.id);
+          const isActive = activeFilters.has(cat.id);
           const Icon = cat.icon;
           return (
             <button

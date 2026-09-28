@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { MapPin, X } from 'lucide-react';
+import { BookOpen, MapPin, Sparkles, X } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { CoffeeBagIcon, RoasterDrumIcon } from './CustomIcons';
 import { BrandLogo } from './BrandLogo';
 import { AyaMascot } from './AyaMascot';
 
@@ -19,18 +18,18 @@ const PHONE_QUERY = '(max-width: 639px)';
 const FEATURES = [
   {
     icon: MapPin,
-    title: 'Cafe discovery',
-    body: 'By vibe, amenities and open now.',
+    title: 'Great coffee',
+    body: 'Cafes near you, and which are open now.',
   },
   {
-    icon: RoasterDrumIcon,
-    title: 'Local micro-roasteries',
-    body: 'Who roasts nearby, and what is on the shelf.',
+    icon: BookOpen,
+    title: 'Study spots',
+    body: 'Plugs, Wi-Fi and quiet tables.',
   },
   {
-    icon: CoffeeBagIcon,
-    title: 'Single-origin bean drops',
-    body: 'Reserve small batches from the roaster.',
+    icon: Sparkles,
+    title: 'Hidden gems',
+    body: 'Quiet corners locals add, reviewed first.',
   },
 ];
 
@@ -116,7 +115,7 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
               <AyaMascot pose="welcome" size={88} alt="Aya, the Haraya mascot, waving hello" className="-mb-1" />
             </div>
             <h1 id="welcome-title" className="ios-large-title">
-              Specialty coffee from the Davao Region
+              Coffee and study spots in Davao
             </h1>
           </div>
 
