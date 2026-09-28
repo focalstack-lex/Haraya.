@@ -46,8 +46,8 @@ export const ApplicationStatusView: React.FC<ApplicationStatusViewProps> = ({ ac
             </p>
             <p className="text-[14px] leading-[1.45] text-[#594C3D]">
               {rejected
-                ? account.reviewNote || 'The Control Room could not verify the documents. Review the note and apply again.'
-                : `${account.businessName} is queued for Control Room verification. This is a browser demo, so ask the operator to sign in as admin@haraya.ph and approve it.`}
+                ? account.reviewNote || 'Haraya could not verify the permit number. Review the note and apply again.'
+                : `${account.businessName} is waiting for verification. Haraya checks the permit number before a listing goes live.`}
             </p>
           </div>
         </div>
@@ -67,12 +67,6 @@ export const ApplicationStatusView: React.FC<ApplicationStatusViewProps> = ({ ac
             <DetailRow label="Permit">
               <span className="font-mono">{application.permitNumber || 'Not provided'}</span>
             </DetailRow>
-            <DetailRow label="ID document">
-              <span className={application.idDoc ? 'text-[#3E5C48] font-medium' : 'text-[#8C3A2E] font-medium'}>
-                {application.idDoc ? 'Attached' : 'Missing'}
-              </span>
-            </DetailRow>
-            <DetailRow label="Permit photo">{application.permitDoc ? 'Attached' : 'Not provided'}</DetailRow>
           </dl>
         </section>
       )}

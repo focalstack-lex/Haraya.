@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-28 : commit b164ef3 : fingerprint c07e1916de262023
+Generated 2026-09-28 : commit 48a8744 : fingerprint 81ba2c947812bc74
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -12,24 +12,24 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `index.html` (31 lines) : . module: index.html
 - `scripts/generate-code-map.mjs` (212 lines) : One-line purpose per file, inferred from its path and leading doc comment.
 - `scripts/seed-supabase.ts` (130 lines) : scripts module: seed-supabase
-- `src/App.tsx` (779 lines) : Storage can throw in private windows or with blocked site data; the welcome sheet is a convenience.
-  - L53 : SharedList
-  - L79 : App
+- `src/App.tsx` (786 lines) : Storage can throw in private windows or with blocked site data; the welcome sheet is a convenience.
+  - L54 : SharedList
+  - L80 : App
 - `src/index.css` (643 lines) : src entry point
 - `src/main.tsx` (11 lines) : src entry point
 - `vite.config.ts` (15 lines) : . module: vite.config
 
 ## src/components/admin/
 
-- `src/components/admin/AdminDashboard.tsx` (249 lines) : Control Room: verification queue, venue verification toggles, catalog pulse.
+- `src/components/admin/AdminDashboard.tsx` (243 lines) : Control Room: verification queue, venue verification toggles, catalog pulse.
 
 ## src/components/auth/
 
-- `src/components/auth/ApplicationStatusView.tsx` (91 lines) : One label and value row inside the grouped application list.
-- `src/components/auth/AuthView.tsx` (337 lines) : Roaster Suite entry: sign in, or a three-step verified roaster registration.
-  - L13 : AuthMode
-  - L15 : AuthViewProps
-  - L25 : AuthView
+- `src/components/auth/ApplicationStatusView.tsx` (85 lines) : One label and value row inside the grouped application list.
+- `src/components/auth/AuthView.tsx` (335 lines) : Roaster Suite entry: sign in, or a three-step verified roaster registration.
+  - L12 : AuthMode
+  - L14 : AuthViewProps
+  - L24 : AuthView
 
 ## src/components/cafe/
 
@@ -62,7 +62,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 ## src/components/drops/
 
 - `src/components/drops/BeanDropCard.tsx` (159 lines) : Vault card for one roast batch: one primary action (reserve), one Remind me disclosure that holds
-- `src/components/drops/BeanReservationModal.tsx` (132 lines) : Direct reservation: pre-order whole bean bags or drip packs from the roaster.
+- `src/components/drops/BeanReservationModal.tsx` (139 lines) : Direct reservation: pre-order whole bean bags or drip packs from the roaster.
 - `src/components/drops/DropCalendarStrip.tsx` (79 lines) : 14-day horizontal calendar of roast batches. Each cell shows the weekday,
 - `src/components/drops/DropCountdownTimer.tsx` (52 lines) : Live countdown digits (DD:HH:MM:SS) that tick once per second. `onDark` swaps to cream text for photo overlays.
 - `src/components/drops/DropsView.tsx` (98 lines) : Bean Drops: 14-day roast calendar on top, micro-lot vault under it.
@@ -81,7 +81,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 ## src/components/layout/
 
 - `src/components/layout/BottomTabBar.tsx` (49 lines) : Persistent mobile bottom navigation (hidden while a detail modal is open).
-- `src/components/layout/FooterSection.tsx` (95 lines) : Global footer: light canvas with a hairline top, the city directory and roaster links.
+- `src/components/layout/FooterSection.tsx` (103 lines) : Global footer: light canvas with a hairline top, the city directory and roaster links.
 - `src/components/layout/NavigationDrawer.tsx` (184 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
 - `src/components/layout/NavigationHeader.tsx` (207 lines) : The portal tab is shared by the sign-in view, roaster dashboard, and admin panel.
 
@@ -138,7 +138,20 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/services/
 
-- `src/services/authService.ts` (260 lines) : Browser-mock account layer for the Roaster Suite. Accounts, applications, and
+- `src/services/authService.ts` (345 lines) : Browser account layer for the Roaster Suite. Accounts, applications, and the
+  - L25 : StoredApplication
+  - L32 : SignUpInput
+  - L40 : StoredCredential
+  - L45 : CredentialStore
+  - L54 : derive
+  - L60 : hashPassword
+  - L65 : verifyPassword
+  - L78 : readJson
+  - L87 : writeJson
+  - L91 : notify
+  - L96 : makeAccountId
+  - L105 : ensureSeedAdmin
+  - L126 : authService
 - `src/services/catalogService.ts` (339 lines) : Catalog layer over roaster-created and admin-moderated records kept in
   - L28 : CafeMetrics
   - L35 : MetricsStore
@@ -176,6 +189,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 ## src/views/
 
 - `src/views/CommunityView.tsx` (74 lines) : Cup Check community feed: one-to-three column masonry of today's brews.
+- `src/views/LegalView.tsx` (181 lines) : Privacy Notice and Terms. Statements of fact describe what the code does today; anything that needs a
 - `src/views/ProfileView.tsx` (435 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
   - L23 : ProfileSection
   - L25 : ProfileViewProps

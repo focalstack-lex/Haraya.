@@ -28,6 +28,7 @@ import { AdminDashboard } from './components/admin/AdminDashboard';
 import { CommunityView } from './views/CommunityView';
 import { ProfileView } from './views/ProfileView';
 import { SharedListView } from './views/SharedListView';
+import { LegalView } from './views/LegalView';
 import { RateCafeModal } from './components/cafe/RateCafeModal';
 import { WelcomeModal } from './components/common/WelcomeModal';
 import { LargeTitle, CityMenu } from './components/common/LargeTitle';
@@ -48,7 +49,7 @@ import { PRICE_RANGES } from './types/coffee';
 import type { Account } from './types/auth';
 import type { Bean, Cafe } from './types/coffee';
 
-const TAB_IDS = new Set(['feed', 'map', 'profile', 'saved', 'drops', 'community', PORTAL_TAB_ID]);
+const TAB_IDS = new Set(['feed', 'map', 'profile', 'saved', 'drops', 'community', 'privacy', 'terms', PORTAL_TAB_ID]);
 
 interface SharedList {
   name: string;
@@ -131,6 +132,10 @@ export const App: React.FC = () => {
     } catch (error) {
       console.warn('Haraya: could not clean up stale saved records', error);
     }
+    // Remove identity photos, the old seeded admin and any plain-text password earlier builds stored
+    authService.purgeSensitiveStorage().catch((error) => {
+      console.warn('Haraya: could not clean up sensitive browser storage', error);
+    });
   }, []);
 
   useEffect(() => {
@@ -692,6 +697,8 @@ export const App: React.FC = () => {
         )}
 
         {activeTab === PORTAL_TAB_ID && renderPortal()}
+
+        {(activeTab === 'privacy' || activeTab === 'terms') && <LegalView page={activeTab} />}
       </main>
 
       <MoodFinderSheet

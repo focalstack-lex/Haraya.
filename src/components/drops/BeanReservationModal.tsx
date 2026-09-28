@@ -75,7 +75,7 @@ export const BeanReservationModal: React.FC<BeanReservationModalProps> = ({ bean
               <Field label="Your name">
                 <TextInput value={name} onChange={setName} placeholder="Juan de la Cruz" />
               </Field>
-              <Field label="Contact" hint="Messenger, Viber, or mobile">
+              <Field label="Contact" hint={`Messenger, Viber, or mobile. Shared only with ${bean.roasterName} for this order.`}>
                 <TextInput value={contact} onChange={setContact} placeholder="0917 000 0000" />
               </Field>
             </div>
@@ -114,6 +114,13 @@ export const BeanReservationModal: React.FC<BeanReservationModalProps> = ({ bean
                 <span className="ml-auto font-mono text-[17px] font-semibold text-[#13191F]">₱{price * (Number(quantity) || 0)}</span>
               </div>
             </div>
+
+            <p className="ios-footnote text-[#594C3D]">
+              This is a request, not a purchase. {bean.roasterName} sells independently and confirms price, payment
+              and pickup with you directly. See the{' '}
+              <a href="#/tab/terms" className="font-semibold text-[#7D5C3D] underline underline-offset-2">Terms</a> and{' '}
+              <a href="#/tab/privacy" className="font-semibold text-[#7D5C3D] underline underline-offset-2">Privacy Notice</a>.
+            </p>
 
             {error && <ErrorNote message={error} />}
 

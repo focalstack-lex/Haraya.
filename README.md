@@ -43,7 +43,8 @@ are added).
 
 The header switcher links between Haraya (coffee) and Habi (fashion). The Habi target URL is
 a single constant in `src/config/ecosystem.ts`; update it there when Habi's production URL is
-final. No credentials or secrets exist in this project, so there is no `.env`.
+final. Supabase settings live in `.env.local` (gitignored; copy `.env.example`). Server-only
+secrets such as the Aya DeepSeek key belong in Vercel environment variables, never in `VITE_*`.
 
 ## Structure
 

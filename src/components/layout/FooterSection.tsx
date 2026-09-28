@@ -84,8 +84,16 @@ export const FooterSection: React.FC<FooterSectionProps> = ({ setActiveTab, setS
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="ios-hairline-t py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-1 ios-footnote text-[#6E6150]">
           <span>Haraya: Davao Specialty Coffee and Bean Archive</span>
-          <span>
-            Local Roasts. Your Cup. <span className="font-mono">2026</span>
+          <span className="flex flex-wrap items-center gap-x-4">
+            <button onClick={() => setActiveTab('privacy')} className="min-h-11 text-[#7D5C3D] font-medium ios-press">
+              Privacy Notice
+            </button>
+            <button onClick={() => setActiveTab('terms')} className="min-h-11 text-[#7D5C3D] font-medium ios-press">
+              Terms of Use
+            </button>
+            <span>
+              Local Roasts. Your Cup. <span className="font-mono">2026</span>
+            </span>
           </span>
         </div>
       </div>

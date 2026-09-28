@@ -7,7 +7,6 @@ import { DAVAO_CITIES, DAVAO_DISTRICTS } from '../../types/coffee';
 import { authService } from '../../services/authService';
 import { useAuthVersion } from '../../hooks/useServiceVersions';
 import { Field, TextInput, TextArea, SelectInput, PrimaryButton, SecondaryButton, ErrorNote } from '../common/FormControls';
-import { ImageUploadField } from '../common/ImageUploadField';
 import { LargeTitle } from '../common/LargeTitle';
 
 export type AuthMode = 'signin' | 'signup';
@@ -19,7 +18,7 @@ interface AuthViewProps {
   onBrowseFeed: () => void;
 }
 
-const STEP_LABELS = ['Business', 'Documents', 'Account'];
+const STEP_LABELS = ['Business', 'Permit', 'Account'];
 
 /** Roaster Suite entry: sign in, or a three-step verified roaster registration. */
 export const AuthView: React.FC<AuthViewProps> = ({ mode, onModeChange, onAuthenticated, onBrowseFeed }) => {
@@ -38,20 +37,24 @@ export const AuthView: React.FC<AuthViewProps> = ({ mode, onModeChange, onAuthen
   const [city, setCity] = useState<DavaoCity>('Davao City');
   const [district, setDistrict] = useState<District>('Poblacion');
   const [description, setDescription] = useState('');
-  // Step 1 documents
+  // Step 1 permit (no document uploads until a secure server-side intake exists)
   const [permitNumber, setPermitNumber] = useState('');
-  const [permitDoc, setPermitDoc] = useState<string | null>(null);
-  const [idDoc, setIdDoc] = useState<string | null>(null);
   // Step 2 account
   const [contactName, setContactName] = useState('');
 
-  const signIn = () => {
+  const [busy, setBusy] = useState(false);
+
+  const signIn = async () => {
+    if (busy) return;
+    setBusy(true);
     try {
-      const account = authService.signIn(email, password);
+      const account = await authService.signIn(email, password);
       setError('');
       onAuthenticated(account);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Sign in failed.');
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -66,24 +69,24 @@ export const AuthView: React.FC<AuthViewProps> = ({ mode, onModeChange, onAuthen
       return;
     }
     if (step === 1) {
-      if (!idDoc) {
-        setError('One government ID photo is required for verification.');
+      if (!permitNumber.trim()) {
+        setError('A DTI or Mayor permit number is required for verification.');
         return;
       }
       setStep(2);
       return;
     }
-    submit();
+    void submit();
   };
 
-  const submit = () => {
+  const submit = async () => {
+    if (busy) return;
+    setBusy(true);
     try {
-      const account = authService.signUpRoaster({
+      const account = await authService.signUpRoaster({
         email,
         password,
         contactName,
-        permitDoc,
-        idDoc,
         application: {
           businessName,
           handle: handle.trim(),
@@ -92,14 +95,16 @@ export const AuthView: React.FC<AuthViewProps> = ({ mode, onModeChange, onAuthen
           isRoastery: isRoastery === 'roastery',
           description,
           permitNumber,
-          permitDoc,
-          idDoc,
+          permitDoc: null,
+          idDoc: null,
         },
       });
       setError('');
       onAuthenticated(account);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Registration failed.');
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -188,12 +193,13 @@ export const AuthView: React.FC<AuthViewProps> = ({ mode, onModeChange, onAuthen
               <TextInput value={password} onChange={setPassword} type="password" placeholder="Your password" />
             </Field>
             {error && <ErrorNote message={error} />}
-            <PrimaryButton onClick={signIn} className="w-full sm:w-auto sm:min-w-40">
-              Sign In
+            <PrimaryButton onClick={() => void signIn()} disabled={busy} className="w-full sm:w-auto sm:min-w-40">
+              {busy ? 'Signing in' : 'Sign In'}
             </PrimaryButton>
           </div>
 
-          {/* Demo credentials as a grouped list */}
+          {/* Local development only: the seeded admin does not exist in production builds */}
+          {import.meta.env.DEV && (
           <section className="space-y-1.5" aria-labelledby="auth-demo-title">
             <h2 id="auth-demo-title" className="px-4 text-[13px] text-[#594C3D]">
               Demo access
@@ -210,6 +216,7 @@ export const AuthView: React.FC<AuthViewProps> = ({ mode, onModeChange, onAuthen
             </dl>
             <p className="px-4 ios-footnote text-[#594C3D]">Roasters can also apply for verification in three steps.</p>
           </section>
+          )}
         </>
       ) : (
         <div className="rounded-[20px] bg-[#FFFDF9] ios-card-shadow p-4 sm:p-5 space-y-4">
@@ -263,22 +270,12 @@ export const AuthView: React.FC<AuthViewProps> = ({ mode, onModeChange, onAuthen
 
           {step === 1 && (
             <div className="space-y-4">
-              <Field label="DTI or Mayor's permit number">
+              <Field
+                label="DTI or Mayor's permit number"
+                hint="We verify your business with this number. Haraya never asks for ID photos in this form."
+              >
                 <TextInput value={permitNumber} onChange={setPermitNumber} placeholder="e.g. DN-2026-1234567" />
               </Field>
-              <ImageUploadField
-                label="Permit document photo (optional)"
-                hint="Speeds up verification, but the permit number alone can be reviewed."
-                value={permitDoc}
-                onChange={setPermitDoc}
-                aspect="wide"
-              />
-              <ImageUploadField
-                label="One government ID (required)"
-                hint="Stored in this browser demo only. Production uses secure document intake."
-                value={idDoc}
-                onChange={setIdDoc}
-              />
             </div>
           )}
 
@@ -296,8 +293,9 @@ export const AuthView: React.FC<AuthViewProps> = ({ mode, onModeChange, onAuthen
               <div className="rounded-[14px] ios-fill px-3.5 py-3 flex gap-2.5">
                 <ShieldCheck className="w-4 h-4 text-[#906D4B] shrink-0 mt-0.5" />
                 <p className="ios-footnote text-[#594C3D]">
-                  Your application goes to the Haraya Control Room. Status stays pending until an admin verifies your
-                  permit and ID.
+                  Your application stays pending until Haraya verifies your permit. By applying you agree to the{' '}
+                  <a href="#/tab/terms" className="font-semibold text-[#7D5C3D] underline underline-offset-2">Terms</a> and{' '}
+                  <a href="#/tab/privacy" className="font-semibold text-[#7D5C3D] underline underline-offset-2">Privacy Notice</a>.
                 </p>
               </div>
             </div>
@@ -314,7 +312,7 @@ export const AuthView: React.FC<AuthViewProps> = ({ mode, onModeChange, onAuthen
                 </span>
               </SecondaryButton>
             )}
-            <PrimaryButton onClick={nextFromStep} className="flex-1">
+            <PrimaryButton onClick={nextFromStep} disabled={busy} className="flex-1">
               <span className="inline-flex items-center justify-center gap-0.5">
                 {step === 2 ? 'Submit Application' : 'Continue'}
                 {step < 2 && <ChevronRight className="w-4.5 h-4.5" strokeWidth={2.5} />}

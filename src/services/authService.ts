@@ -4,10 +4,12 @@ import { DAVAO_CITIES, DAVAO_DISTRICTS } from '../types/coffee';
 import { catalogService } from './catalogService';
 
 /**
- * Browser-mock account layer for the Roaster Suite. Accounts, applications, and
- * the active session live in localStorage. Password checks are plain compares by
- * design: this is a front-end demo boundary, and a real deployment must replace
- * it with server-side auth (Security-First Deployment Gate, checks 3 and 4).
+ * Browser account layer for the Roaster Suite. Accounts, applications, and the
+ * active session live in localStorage until sign-in moves to Supabase Auth.
+ * Passwords are never stored in plain text: each is a salted PBKDF2-SHA256 hash.
+ * Identity documents are not collected here; they wait for a secure server-side
+ * intake. This is still not server-side auth (Security-First Deployment Gate,
+ * checks 3 and 4), so it must not guard anything beyond this browser.
  */
 
 /** Neutral placeholder until the roaster uploads real photos. */
@@ -32,8 +34,42 @@ export interface SignUpInput {
   password: string;
   contactName: string;
   application: RoasterApplication;
-  permitDoc: string | null;
-  idDoc: string | null;
+}
+
+/** Salted password hash. Legacy records from before hashing are plain strings and are upgraded on load. */
+interface StoredCredential {
+  salt: string;
+  hash: string;
+  iterations: number;
+}
+type CredentialStore = Record<string, StoredCredential | string>;
+
+const PBKDF2_ITERATIONS = 210_000;
+/** Id of the demo admin that older builds seeded into every browser. */
+const SEEDED_ADMIN_ID = 'acct-admin';
+
+const toBase64 = (bytes: Uint8Array) => btoa(String.fromCharCode(...bytes));
+const fromBase64 = (text: string) => Uint8Array.from(atob(text), (char) => char.charCodeAt(0));
+
+async function derive(password: string, salt: Uint8Array<ArrayBuffer>, iterations: number): Promise<string> {
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']);
+  const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt, iterations }, key, 256);
+  return toBase64(new Uint8Array(bits));
+}
+
+async function hashPassword(password: string): Promise<StoredCredential> {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  return { salt: toBase64(salt), hash: await derive(password, salt, PBKDF2_ITERATIONS), iterations: PBKDF2_ITERATIONS };
+}
+
+async function verifyPassword(password: string, stored: StoredCredential | string): Promise<boolean> {
+  if (typeof stored === 'string') return stored === password;
+  const candidate = await derive(password, fromBase64(stored.salt), stored.iterations);
+  // Constant-time compare so the check does not leak how many characters matched
+  if (candidate.length !== stored.hash.length) return false;
+  let diff = 0;
+  for (let i = 0; i < candidate.length; i++) diff |= candidate.charCodeAt(i) ^ stored.hash.charCodeAt(i);
+  return diff === 0;
 }
 
 const listeners = new Set<() => void>();
@@ -61,8 +97,13 @@ function makeAccountId(): string {
   return `acct-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
 }
 
-/** Seed demo admin so the Control Room is reachable on first run. */
+/**
+ * Local development only: seeds a demo admin so the Control Room can be exercised. Production builds
+ * compile this to an early return, so no admin credential ships in the public bundle. Real admin access
+ * comes from Supabase Auth roles.
+ */
 function ensureSeedAdmin(): void {
+  if (!import.meta.env.DEV) return;
   const accounts = readJson<Account[]>(KEYS.ACCOUNTS, []);
   if (accounts.some((account) => account.role === 'admin')) return;
   const admin: Account = {
@@ -77,7 +118,7 @@ function ensureSeedAdmin(): void {
     reviewNote: null,
   };
   writeJson(KEYS.ACCOUNTS, [...accounts, admin]);
-  const credentials = readJson<Record<string, string>>(KEYS.CREDENTIALS, {});
+  const credentials = readJson<CredentialStore>(KEYS.CREDENTIALS, {});
   credentials[admin.email] = 'haraya-admin';
   writeJson(KEYS.CREDENTIALS, credentials);
 }
@@ -97,15 +138,20 @@ export const authService = {
     return readJson<Account | null>(KEYS.CURRENT, null);
   },
 
-  signIn(email: string, password: string): Account {
+  async signIn(email: string, password: string): Promise<Account> {
     ensureSeedAdmin();
     const normalized = email.trim().toLowerCase();
     if (!normalized || !password) throw new Error('Email and password are required.');
     const accounts = readJson<Account[]>(KEYS.ACCOUNTS, []);
     const account = accounts.find((candidate) => candidate.email === normalized);
     if (!account) throw new Error('No account found for that email. Sign up as a roaster first.');
-    const credentials = readJson<Record<string, string>>(KEYS.CREDENTIALS, {});
-    if (credentials[normalized] !== password) throw new Error('Incorrect password.');
+    const credentials = readJson<CredentialStore>(KEYS.CREDENTIALS, {});
+    const stored = credentials[normalized];
+    if (!stored || !(await verifyPassword(password, stored))) throw new Error('Incorrect password.');
+    if (typeof stored === 'string') {
+      credentials[normalized] = await hashPassword(password);
+      writeJson(KEYS.CREDENTIALS, credentials);
+    }
     writeJson(KEYS.CURRENT, account);
     notify();
     return account;
@@ -117,7 +163,7 @@ export const authService = {
   },
 
   /** Multi-step roaster registration: creates a pending account plus application. */
-  signUpRoaster(input: SignUpInput): Account {
+  async signUpRoaster(input: SignUpInput): Promise<Account> {
     ensureSeedAdmin();
     const email = input.email.trim().toLowerCase();
     if (!email.includes('@')) throw new Error('Enter a valid email address.');
@@ -127,7 +173,6 @@ export const authService = {
     if (!input.application.permitNumber.trim()) {
       throw new Error('A DTI or Mayor permit number is required for verification.');
     }
-    if (!input.idDoc) throw new Error('One government ID photo is required for verification.');
     if (input.application.handle && !/^[a-z0-9-]+$/.test(input.application.handle)) {
       throw new Error('Handles use lowercase letters, numbers, and hyphens only.');
     }
@@ -151,15 +196,15 @@ export const authService = {
     accounts.push(account);
     writeJson(KEYS.ACCOUNTS, accounts);
 
-    const credentials = readJson<Record<string, string>>(KEYS.CREDENTIALS, {});
-    credentials[email] = input.password;
+    const credentials = readJson<CredentialStore>(KEYS.CREDENTIALS, {});
+    credentials[email] = await hashPassword(input.password);
     writeJson(KEYS.CREDENTIALS, credentials);
 
     const applications = readJson<StoredApplication[]>(KEYS.APPLICATIONS, []);
     applications.push({
       ...input.application,
-      permitDoc: input.permitDoc,
-      idDoc: input.idDoc,
+      permitDoc: null,
+      idDoc: null,
       accountId: account.id,
       email,
       contactName: account.name,
@@ -170,6 +215,46 @@ export const authService = {
     writeJson(KEYS.CURRENT, account);
     notify();
     return account;
+  },
+
+  /**
+   * Runs once per load. Removes what earlier builds left in this browser: identity and permit photos
+   * inside applications, the seeded demo admin (outside development), and any plain-text password,
+   * which is re-stored as a salted hash.
+   */
+  async purgeSensitiveStorage(): Promise<void> {
+    let changed = false;
+
+    const applications = readJson<StoredApplication[]>(KEYS.APPLICATIONS, []);
+    if (applications.some((application) => application.idDoc || application.permitDoc)) {
+      writeJson(
+        KEYS.APPLICATIONS,
+        applications.map((application) => ({ ...application, idDoc: null, permitDoc: null }))
+      );
+      changed = true;
+    }
+
+    const credentials = readJson<CredentialStore>(KEYS.CREDENTIALS, {});
+    if (!import.meta.env.DEV) {
+      const accounts = readJson<Account[]>(KEYS.ACCOUNTS, []);
+      const seeded = accounts.find((account) => account.id === SEEDED_ADMIN_ID);
+      if (seeded) {
+        writeJson(KEYS.ACCOUNTS, accounts.filter((account) => account.id !== SEEDED_ADMIN_ID));
+        delete credentials[seeded.email];
+        if (readJson<Account | null>(KEYS.CURRENT, null)?.id === SEEDED_ADMIN_ID) writeJson(KEYS.CURRENT, null);
+        changed = true;
+      }
+    }
+
+    let rehashed = false;
+    for (const [email, stored] of Object.entries(credentials)) {
+      if (typeof stored === 'string') {
+        credentials[email] = await hashPassword(stored);
+        rehashed = true;
+      }
+    }
+    if (changed || rehashed) writeJson(KEYS.CREDENTIALS, credentials);
+    if (changed) notify();
   },
 
   // Admin review queue ---------------------------------------------------------

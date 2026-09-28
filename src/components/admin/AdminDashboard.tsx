@@ -127,13 +127,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ admin, onSignOut
                         {application ? ` : permit ${application.permitNumber}` : ''}
                       </p>
                     </div>
-                    {application?.idDoc && (
-                      <img
-                        src={application.idDoc}
-                        alt={`${account.businessName} ID document`}
-                        className="h-16 w-16 rounded-xl object-cover border border-[#E4D9C8]"
-                      />
-                    )}
                   </div>
                   {application?.description && (
                     <p className="text-xs font-sans text-[#13191F]/85 line-clamp-2">{application.description}</p>
@@ -142,6 +135,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ admin, onSignOut
                     value={note}
                     onChange={(event) => setNote(event.target.value)}
                     placeholder="Rejection note (used only when rejecting)"
+                    aria-label="Rejection note"
                     className="w-full h-9 bg-[#F2EAE0] border border-[#E4D9C8] rounded-xl px-3 text-xs font-sans text-[#13191F] placeholder:text-[#594C3D] focus:outline-none focus:border-[#594C3D]"
                   />
                   <div className="flex gap-2">
