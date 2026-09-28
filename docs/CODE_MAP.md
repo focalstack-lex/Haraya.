@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-28 : commit 8976ad7 : fingerprint cfbbb6edf5ab0f30
+Generated 2026-09-28 : commit 1b825b1 : fingerprint b52fc63ee1ea4eae
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -9,14 +9,13 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## root/
 
-- `index.html` (31 lines) : . module: index.html
+- `index.html` (30 lines) : . module: index.html
 - `scripts/generate-code-map.mjs` (212 lines) : One-line purpose per file, inferred from its path and leading doc comment.
-- `scripts/seed-supabase.ts` (130 lines) : scripts module: seed-supabase
-- `src/App.tsx` (659 lines) : Storage can throw in private windows or with blocked site data; the welcome sheet is a convenience.
-  - L54 : SharedList
-  - L80 : App
+- `src/App.tsx` (649 lines) : Storage can throw in private windows or with blocked site data; the welcome sheet is a convenience.
+  - L53 : SharedList
+  - L79 : App
 - `src/index.css` (693 lines) : src entry point
-- `src/main.tsx` (11 lines) : src entry point
+- `src/main.tsx` (13 lines) : src entry point
 - `vite.config.ts` (15 lines) : . module: vite.config
 
 ## src/components/admin/
@@ -72,7 +71,6 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 - `src/components/feed/BeanGrid.tsx` (113 lines) : src/components/feed module: BeanGrid
 - `src/components/feed/CafeGrid.tsx` (163 lines) : src/components/feed module: CafeGrid
-- `src/components/feed/CategoryIconRow.tsx` (61 lines) : Amenity shortcuts: each toggles the matching amenity filter on the spot list.
 - `src/components/feed/EditorialHero.tsx` (126 lines) : Spotlight shelf built only from real listings: the top study spots, then the newest hidden gems added
 - `src/components/feed/FeedControls.tsx` (146 lines) : src/components/feed module: FeedControls
 - `src/components/feed/FeedSearchBar.tsx` (38 lines) : iOS search field: filled, borderless, with the round clear button once text is entered.
@@ -127,7 +125,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 ## src/components/tour/
 
 - `src/components/tour/GuidedTour.tsx` (294 lines) : Space the sticky nav bar and the bottom tab bar cover, so targets are scrolled clear of them.
-- `src/components/tour/tourSteps.ts` (65 lines) : First-visit guided tour steps. Each step highlights the element tagged with the matching
+- `src/components/tour/tourSteps.ts` (59 lines) : First-visit guided tour steps. Each step highlights the element tagged with the matching
 - `src/components/tour/tourStorage.ts` (20 lines) : Remembers that the first-visit tour was finished or skipped. Storage can throw in private
 
 ## src/config/
