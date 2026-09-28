@@ -32,12 +32,6 @@ export const TOUR_STEPS: TourStep[] = [
     aya: 'mood',
   },
   {
-    target: 'categories',
-    text: 'Shortcuts. Plugs and Fast Wi-Fi find study spots, Air-con finds a cool place to sit.',
-    advance: 'next',
-    aya: 'holding-cup',
-  },
-  {
     target: 'save',
     text: 'Save a spot you would try. Tap the bookmark.',
     advance: 'action',

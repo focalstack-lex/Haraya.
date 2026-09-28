@@ -7,7 +7,6 @@ import { FooterSection } from './components/layout/FooterSection';
 import { EditorialHero } from './components/feed/EditorialHero';
 import { FeedControls, type FeedMode, type SortKey } from './components/feed/FeedControls';
 import { VibeFilterBar, type VibeFilterId } from './components/feed/VibeFilterBar';
-import { CategoryIconRow, type MainCategoryId } from './components/feed/CategoryIconRow';
 import { PopularPicksSection } from './components/feed/PopularPicksSection';
 import { FeedSearchBar } from './components/feed/FeedSearchBar';
 import { CafeGrid } from './components/feed/CafeGrid';
@@ -384,12 +383,6 @@ export const App: React.FC = () => {
     document.getElementById('full-catalog-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  // Amenity shortcuts drive the same filter state as the chip rail, so both always agree
-  const handleSelectCategory = (id: MainCategoryId) => {
-    toggleVibe(id);
-    scrollToCatalog();
-  };
-
   const resetFilters = () => {
     setSelectedCity('All Davao Region');
     setSearchQuery('');
@@ -473,9 +466,6 @@ export const App: React.FC = () => {
 
         {/* Most saved shelf: real cafes reach the first screen on phones */}
         <PopularPicksSection cafes={mostSavedCafes} onSelectCafe={openCafe} onViewAll={handleViewAllPicks} />
-
-        {/* Amenity shortcuts */}
-        <CategoryIconRow activeFilters={vibeFilters} onSelectCategory={handleSelectCategory} />
 
         {/* Every spot */}
         <section id="full-catalog-section" aria-labelledby="catalog-title" className="space-y-3 scroll-mt-20">

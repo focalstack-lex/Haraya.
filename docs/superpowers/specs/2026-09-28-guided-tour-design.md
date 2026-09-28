@@ -17,13 +17,15 @@ save a cafe. They finish with something in Profile.
 
 | # | Target (`data-tour`) | Callout | Advances by |
 | --- | --- | --- | --- |
-| 1 | `search` | Search anything: a cafe, a bean, an origin like Mt. Apo, or a note like chocolate. | Next |
+| 1 | `search` | Hi, I'm Aya. Let me show you around. Search for a cafe, an area like Poblacion, or something like quiet or Wi-Fi. | Next |
 | 2 | `city` | Pick your city. Discover, the map and Most saved all follow it. | Next |
-| 3 | `mood` (mood finder card, added with the mood finder) | Not sure where to go? Tap how you feel and Haraya suggests a cafe that fits, near you. | Next |
-| 4 | `categories` | Shortcuts. Work finds laptop-friendly cafes, Pour-Over finds hand-brew bars. | Next |
-| 5 | `save` (first cafe card bookmark) | Save a cafe you would try. Tap the bookmark. | Tapping the real bookmark |
-| 6 | `tab-profile` | Everything you save lives in Profile. | Next |
-| 7 | `tab-map` | See every cafe on the map, plus walking trails between them. | Done |
+| 3 | `mood` (mood finder card) | Not sure where to go? Tap how you feel and Haraya suggests a cafe that fits, near you. | Next |
+| 4 | `save` (first cafe card bookmark) | Save a spot you would try. Tap the bookmark. | Tapping the real bookmark |
+| 5 | `tab-profile` | Everything you save lives in Saved Spots. | Next |
+| 6 | `tab-map` | See every spot on the map. Tap Directions on any spot and Haraya can walk you there. | Next |
+| 7 | `tab-submit` | Know a quiet corner that is not on Google Maps? Add it here. Enjoy your next cup. | Done |
+
+The `categories` step was removed on 2026-09-29 together with the amenity shortcut row on Discover.
 
 When several elements share a `data-tour` value (the bottom tab bar on phones, the top bar tabs on desktop), the
 tour uses the one that is rendered and visible. A step whose target is missing is skipped.
@@ -49,7 +51,7 @@ tour uses the one that is rendered and visible. A step whose target is missing i
 - `src/components/tour/tourSteps.ts`: step list (target, text, advance mode).
 - `src/components/tour/tourStorage.ts`: guarded read and write of the done flag.
 - `src/components/tour/GuidedTour.tsx`: overlay, cutout, blockers, arrow, callout; props `isOpen`, `onFinish`.
-- Tags: `data-tour` on FeedSearchBar, CityMenu, CategoryIconRow, the first CafeGrid bookmark, and tab buttons in
+- Tags: `data-tour` on FeedSearchBar, CityMenu, MoodCard, the first CafeGrid bookmark, and tab buttons in
   BottomTabBar and NavigationHeader.
 - App: `isTourOpen` state, started from welcome Get started, from Profile's replay row, and on the first
   sign-in on a device when the done flag is not yet set (`handleAuthenticated`).
@@ -60,7 +62,7 @@ tour uses the one that is rendered and visible. A step whose target is missing i
 ## Verification
 
 No unit test runner exists in the project, so the tour is proven by a Playwright drive at 375px and 1440px:
-start from a fresh profile, tap Get started, walk all six steps (tapping the real bookmark on step 4), confirm the
+start from a fresh profile, tap Get started, walk all seven steps (tapping the real bookmark on step 4), confirm the
 saved count rises, the flag is stored, the tour does not reappear on reload, Skip works, and no page or console
 errors occur. Plus `tsc -b`, `oxlint`, `vite build`, `impeccable detect`.
 
