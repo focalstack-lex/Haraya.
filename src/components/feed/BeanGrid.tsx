@@ -29,6 +29,7 @@ const BeanCard: React.FC<{
       />
       <button
         onClick={() => onToggleSave(bean)}
+        aria-pressed={saved}
         aria-label={saved ? `Remove ${bean.name} from saved` : `Save ${bean.name}`}
         className={`absolute top-1 right-1 h-11 w-11 flex items-center justify-center ios-press active:scale-90 before:absolute before:inset-[5px] before:rounded-full before:transition-colors ${
           saved

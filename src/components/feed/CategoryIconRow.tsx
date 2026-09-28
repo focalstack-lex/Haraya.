@@ -29,7 +29,7 @@ interface CategoryIconRowProps {
 
 export const CategoryIconRow: React.FC<CategoryIconRowProps> = ({ showingBeans, activeFilters, onSelectCategory }) => {
   return (
-    <section aria-label="Browse by category" className="-mx-4 sm:mx-0">
+    <section aria-label="Browse by category" data-tour="categories" className="-mx-4 sm:mx-0">
       <div className="ios-shelf gap-2 px-4 sm:px-0 sm:grid sm:grid-cols-6 sm:gap-3">
         {MAIN_CATEGORIES.map((cat) => {
           const isActive = cat.id === 'beans' ? showingBeans : !showingBeans && activeFilters.has(cat.id);

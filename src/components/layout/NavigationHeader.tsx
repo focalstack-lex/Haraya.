@@ -51,6 +51,7 @@ interface TabButtonProps {
 const TabButton: React.FC<TabButtonProps> = ({ id, label, count, active, onSelect }) => (
   <button
     onClick={() => onSelect(id)}
+    data-tour={`tab-${id}`}
     aria-current={active ? 'page' : undefined}
     className={`h-8 px-4 rounded-full text-[13px] font-semibold font-sans ios-press flex items-center gap-1.5 ${
       active ? 'bg-[#FFFDF9] text-[#13191F] shadow-[0_1px_3px_rgba(19,25,31,0.12)]' : 'text-[#594C3D] hover:text-[#13191F]'

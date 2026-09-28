@@ -26,7 +26,7 @@ export const LargeTitle: React.FC<LargeTitleProps> = ({ title, subtitle, trailin
 
 /** Pull-down city menu styled as a tinted pill; uses the native picker on touch devices. */
 export const CityMenu: React.FC<{ value: string; onChange: (city: string) => void }> = ({ value, onChange }) => (
-  <label className="relative inline-flex items-center gap-1 h-9 pl-3.5 pr-2.5 rounded-full ios-fill text-[14px] font-semibold text-[#7D5C3D] ios-press">
+  <label data-tour="city" className="relative inline-flex items-center gap-1 h-9 pl-3.5 pr-2.5 rounded-full ios-fill text-[14px] font-semibold text-[#7D5C3D] ios-press">
     <span className="max-w-[9.5rem] truncate">{value === 'All Davao Region' ? 'All Davao' : value}</span>
     <ChevronDown className="w-4 h-4" strokeWidth={2.5} />
     <select

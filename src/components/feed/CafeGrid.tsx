@@ -24,7 +24,9 @@ const CafeCard: React.FC<{
   onSelectCafe: (cafeId: string) => void;
   onSelectRoastery: (cafeId: string) => void;
   onRateCafe?: (cafe: Cafe) => void;
-}> = ({ cafe, saved, onToggleSave, onSelectCafe, onSelectRoastery, onRateCafe }) => {
+  /** Marks this card's bookmark as the guided tour's save step. */
+  isTourTarget?: boolean;
+}> = ({ cafe, saved, onToggleSave, onSelectCafe, onSelectRoastery, onRateCafe, isTourTarget }) => {
   const openNow = isOpenNow(cafe.hours);
   const rating = userPrefsService.getRating(cafe.id);
 
@@ -41,6 +43,8 @@ const CafeCard: React.FC<{
         />
         <button
           onClick={() => onToggleSave(cafe)}
+          data-tour={isTourTarget ? 'save' : undefined}
+          aria-pressed={saved}
           aria-label={saved ? `Remove ${cafe.name} from saved` : `Save ${cafe.name}`}
           className={`absolute top-1 right-1 h-11 w-11 flex items-center justify-center ios-press active:scale-90 before:absolute before:inset-[5px] before:rounded-full before:transition-colors ${
             saved
@@ -150,9 +154,10 @@ export const CafeGrid: React.FC<CafeGridProps> = ({
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-      {cafes.map((cafe) => (
+      {cafes.map((cafe, index) => (
         <CafeCard
           key={cafe.id}
+          isTourTarget={index === 0}
           cafe={cafe}
           saved={savedCafeIds.includes(cafe.id)}
           onToggleSave={onToggleSave}

@@ -24,6 +24,7 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({ activeTab, setActive
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
+              data-tour={`tab-${tab.id}`}
               aria-current={active ? 'page' : undefined}
               className={`relative flex-1 h-[52px] pt-1.5 flex flex-col items-center justify-start gap-0.5 ios-press ${
                 active ? 'text-[#7D5C3D]' : 'text-[#6E6150]'

@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Star, Navigation, Edit3, ChevronRight, LogOut } from 'lucide-react';
+import { Star, Navigation, Edit3, ChevronRight, LogOut, Compass } from 'lucide-react';
 import {
   WaxStampSealIcon,
   CuppingSpoonIcon,
@@ -28,6 +28,8 @@ interface ProfileViewProps {
   onExploreFeed: () => void;
   onOpenMap?: () => void;
   onOpenAuth?: () => void;
+  /** Replays the first-visit guided tour on Discover. */
+  onStartTour?: () => void;
 }
 
 /** Leading icon of a grouped row: a 30px tinted rounded square. */
@@ -67,6 +69,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   onExploreFeed,
   onOpenMap,
   onOpenAuth,
+  onStartTour,
 }) => {
   useCatalogVersion();
   usePrefsVersion();
@@ -246,6 +249,19 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 </span>
                 <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]/60" strokeWidth={2.5} />
               </button>
+
+              {onStartTour && (
+                <button onClick={onStartTour} className="ios-group-row ios-press">
+                  <RowIcon>
+                    <Compass className="w-4 h-4" strokeWidth={2} />
+                  </RowIcon>
+                  <span className="flex-1 min-w-0">
+                    <span className="block text-[15px] text-[#13191F]">Take the tour again</span>
+                    <span className="block ios-footnote text-[#594C3D] truncate">A quick walk through Discover</span>
+                  </span>
+                  <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]/60" strokeWidth={2.5} />
+                </button>
+              )}
             </div>
           </section>
 

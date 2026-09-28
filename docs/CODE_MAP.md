@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-28 : commit bb0c9c3 : fingerprint 3e7f9d661a480898
+Generated 2026-09-28 : commit aa8ac17 : fingerprint 36135dda16ca205a
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -11,9 +11,9 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 - `index.html` (31 lines) : . module: index.html
 - `scripts/generate-code-map.mjs` (212 lines) : One-line purpose per file, inferred from its path and leading doc comment.
-- `src/App.tsx` (700 lines) : Storage can throw in private windows or with blocked site data; the welcome sheet is a convenience.
-  - L47 : SharedList
-  - L73 : App
+- `src/App.tsx` (720 lines) : Storage can throw in private windows or with blocked site data; the welcome sheet is a convenience.
+  - L49 : SharedList
+  - L75 : App
 - `src/index.css` (577 lines) : src entry point
 - `src/main.tsx` (11 lines) : src entry point
 - `vite.config.ts` (15 lines) : . module: vite.config
@@ -67,8 +67,8 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/feed/
 
-- `src/components/feed/BeanGrid.tsx` (110 lines) : src/components/feed module: BeanGrid
-- `src/components/feed/CafeGrid.tsx` (167 lines) : src/components/feed module: CafeGrid
+- `src/components/feed/BeanGrid.tsx` (111 lines) : src/components/feed module: BeanGrid
+- `src/components/feed/CafeGrid.tsx` (172 lines) : src/components/feed module: CafeGrid
 - `src/components/feed/CategoryIconRow.tsx` (61 lines) : Shortcut categories: 'beans' switches the catalog to the bean vault, the rest toggle a cafe filter.
 - `src/components/feed/EditorialHero.tsx` (136 lines) : Featured shelf built from the live catalog: the next open roast drops first, then verified
 - `src/components/feed/FeedControls.tsx` (151 lines) : src/components/feed module: FeedControls
@@ -78,10 +78,10 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/layout/
 
-- `src/components/layout/BottomTabBar.tsx` (48 lines) : Persistent mobile bottom navigation (hidden while a detail modal is open).
+- `src/components/layout/BottomTabBar.tsx` (49 lines) : Persistent mobile bottom navigation (hidden while a detail modal is open).
 - `src/components/layout/FooterSection.tsx` (95 lines) : Global footer: light canvas with a hairline top, the city directory and roaster links.
 - `src/components/layout/NavigationDrawer.tsx` (184 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
-- `src/components/layout/NavigationHeader.tsx` (206 lines) : The portal tab is shared by the sign-in view, roaster dashboard, and admin panel.
+- `src/components/layout/NavigationHeader.tsx` (207 lines) : The portal tab is shared by the sign-in view, roaster dashboard, and admin panel.
 
 ## src/components/map/
 
@@ -98,6 +98,12 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L23 : RoasterDashboard
 - `src/components/roaster/RoasteryStorefront.tsx` (194 lines) : Public roastery storefront: brand header, bean shelf, drop schedule, menu, hours.
 - `src/components/roaster/RoastScheduleTab.tsx` (199 lines) : Roast scheduling: create batches, watch countdowns, mark sold out.
+
+## src/components/tour/
+
+- `src/components/tour/GuidedTour.tsx` (290 lines) : Space the sticky nav bar and the bottom tab bar cover, so targets are scrolled clear of them.
+- `src/components/tour/tourSteps.ts` (43 lines) : First-visit guided tour steps. Each step highlights the element tagged with the matching
+- `src/components/tour/tourStorage.ts` (20 lines) : Remembers that the first-visit tour was finished or skipped. Storage can throw in private
 
 ## src/config/
 
@@ -159,10 +165,10 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 ## src/views/
 
 - `src/views/CommunityView.tsx` (74 lines) : Cup Check community feed: one-to-three column masonry of today's brews.
-- `src/views/ProfileView.tsx` (417 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
+- `src/views/ProfileView.tsx` (433 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
   - L23 : ProfileSection
   - L25 : ProfileViewProps
-  - L64 : ProfileView
+  - L66 : ProfileView
 - `src/views/SavedView.tsx` (320 lines) : Tasting journal: bookmarked cafes and beans, drop alerts, custom shareable lists.
   - L13 : SavedTab
   - L15 : SavedViewProps

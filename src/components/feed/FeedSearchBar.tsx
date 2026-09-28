@@ -9,7 +9,7 @@ interface FeedSearchBarProps {
 /** iOS search field: filled, borderless, with the round clear button once text is entered. */
 export const FeedSearchBar: React.FC<FeedSearchBarProps> = ({ searchQuery, setSearchQuery }) => {
   return (
-    <div role="search" className="flex items-center ios-fill rounded-[12px] h-10 px-2.5 focus-within:shadow-[0_0_0_1.5px_rgba(144,109,75,0.6)] transition-shadow">
+    <div role="search" data-tour="search" className="flex items-center ios-fill rounded-[12px] h-10 px-2.5 focus-within:shadow-[0_0_0_1.5px_rgba(144,109,75,0.6)] transition-shadow">
       <Search className="w-[18px] h-[18px] text-[#6E6150] shrink-0 mr-1.5" strokeWidth={2.2} />
       <input
         type="search"

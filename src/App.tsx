@@ -31,6 +31,8 @@ import { SharedListView } from './views/SharedListView';
 import { RateCafeModal } from './components/cafe/RateCafeModal';
 import { WelcomeModal } from './components/common/WelcomeModal';
 import { LargeTitle, CityMenu } from './components/common/LargeTitle';
+import { GuidedTour } from './components/tour/GuidedTour';
+import { isTourDone, markTourDone } from './components/tour/tourStorage';
 
 import { catalogService } from './services/catalogService';
 import { userPrefsService } from './services/userPrefsService';
@@ -100,6 +102,7 @@ export const App: React.FC = () => {
   const [isWelcomeOpen, setIsWelcomeOpen] = useState<boolean>(() => !readWelcomed());
 
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [isTourOpen, setIsTourOpen] = useState(false);
 
   // Auth state
   const [account, setAccount] = useState<Account | null>(() => authService.getCurrentAccount());
@@ -270,6 +273,19 @@ export const App: React.FC = () => {
     setAccount(null);
     setAuthMode('signin');
     setActiveTab('feed');
+  };
+
+  // Guided tour runs on Discover's cafe catalog; wait for the tab switch and scroll-to-top to settle
+  const startTour = () => {
+    setSharedList(null);
+    setFeedMode('cafes');
+    setActiveTab('feed');
+    window.setTimeout(() => setIsTourOpen(true), 500);
+  };
+
+  const finishTour = () => {
+    setIsTourOpen(false);
+    markTourDone();
   };
 
   const handleJoinRoaster = () => {
@@ -615,6 +631,7 @@ export const App: React.FC = () => {
               if (!account) setAuthMode('signin');
               setActiveTab(PORTAL_TAB_ID);
             }}
+            onStartTour={startTour}
           />
         )}
 
@@ -672,7 +689,8 @@ export const App: React.FC = () => {
         onGetStarted={() => {
           setIsWelcomeOpen(false);
           markWelcomed();
-          setActiveTab('feed');
+          if (isTourDone()) setActiveTab('feed');
+          else startTour();
         }}
         onLogIn={() => {
           setIsWelcomeOpen(false);
@@ -681,6 +699,8 @@ export const App: React.FC = () => {
           setActiveTab(PORTAL_TAB_ID);
         }}
       />
+
+      <GuidedTour isOpen={isTourOpen} onFinish={finishTour} />
 
       <FooterSection setActiveTab={setActiveTab} setSelectedCity={setSelectedCity} onJoinRoaster={handleJoinRoaster} />
 
