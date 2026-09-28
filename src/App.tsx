@@ -7,6 +7,9 @@ import { FooterSection } from './components/layout/FooterSection';
 import { EditorialHero } from './components/feed/EditorialHero';
 import { FeedControls, type FeedMode, type SortKey } from './components/feed/FeedControls';
 import { VibeFilterBar, type VibeFilterId } from './components/feed/VibeFilterBar';
+import { CategoryIconRow, type MainCategoryId } from './components/feed/CategoryIconRow';
+import { PopularPicksSection } from './components/feed/PopularPicksSection';
+import { FeedSearchBar } from './components/feed/FeedSearchBar';
 import { CafeGrid } from './components/feed/CafeGrid';
 import { BeanGrid } from './components/feed/BeanGrid';
 
@@ -23,8 +26,11 @@ import { RoasterDashboard } from './components/roaster/RoasterDashboard';
 import { AdminDashboard } from './components/admin/AdminDashboard';
 
 import { CommunityView } from './views/CommunityView';
-import { SavedView, type SavedTab } from './views/SavedView';
+import { ProfileView } from './views/ProfileView';
 import { SharedListView } from './views/SharedListView';
+import { RateCafeModal } from './components/cafe/RateCafeModal';
+import { WelcomeModal } from './components/common/WelcomeModal';
+import { LargeTitle, CityMenu } from './components/common/LargeTitle';
 
 import { catalogService } from './services/catalogService';
 import { userPrefsService } from './services/userPrefsService';
@@ -36,7 +42,7 @@ import { PRICE_RANGES } from './types/coffee';
 import type { Account } from './types/auth';
 import type { Bean, Cafe } from './types/coffee';
 
-const TAB_IDS = new Set(['feed', 'drops', 'map', 'community', 'saved', PORTAL_TAB_ID]);
+const TAB_IDS = new Set(['feed', 'map', 'profile', 'saved', 'drops', 'community', PORTAL_TAB_ID]);
 
 interface SharedList {
   name: string;
@@ -45,6 +51,24 @@ interface SharedList {
 }
 
 const DAVAO_CENTER = { lat: 7.07, lng: 125.61 };
+const WELCOMED_KEY = 'haraya_welcomed';
+
+/** Storage can throw in private windows or with blocked site data; the welcome sheet is a convenience. */
+const readWelcomed = () => {
+  try {
+    return localStorage.getItem(WELCOMED_KEY) === 'true';
+  } catch {
+    return false;
+  }
+};
+
+const markWelcomed = () => {
+  try {
+    localStorage.setItem(WELCOMED_KEY, 'true');
+  } catch (error) {
+    console.warn('Haraya: could not persist the welcome flag', error);
+  }
+};
 
 export const App: React.FC = () => {
   const catalogVersion = useCatalogVersion();
@@ -58,7 +82,7 @@ export const App: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [roasteryId, setRoasteryId] = useState<string | null>(null);
-  const [savedInitialTab] = useState<SavedTab>('cafes');  const [sharedList, setSharedList] = useState<SharedList | null>(null);
+  const [sharedList, setSharedList] = useState<SharedList | null>(null);
 
   // Feed filter state
   const [feedMode, setFeedMode] = useState<FeedMode>('cafes');
@@ -70,6 +94,12 @@ export const App: React.FC = () => {
   const [selectedCafeId, setSelectedCafeId] = useState<string | null>(null);
   const [selectedBeanId, setSelectedBeanId] = useState<string | null>(null);
   const [reserveBeanId, setReserveBeanId] = useState<string | null>(null);
+  const [ratingCafe, setRatingCafe] = useState<Cafe | null>(null);
+
+  // Welcome modal state for new visitors
+  const [isWelcomeOpen, setIsWelcomeOpen] = useState<boolean>(() => !readWelcomed());
+
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   // Auth state
   const [account, setAccount] = useState<Account | null>(() => authService.getCurrentAccount());
@@ -283,7 +313,9 @@ export const App: React.FC = () => {
       );
     }
     for (const filter of vibeFilters) {
-      if (filter === 'heritage') {
+      if (filter === 'roastery') {
+        list = list.filter((cafe) => cafe.isRoastery);
+      } else if (filter === 'heritage') {
         list = list.filter((cafe) =>
           cafe.vibeTags.some((tag) => tag.toLowerCase().includes('heritage') || tag.toLowerCase().includes('ancestral'))
         );
@@ -343,14 +375,46 @@ export const App: React.FC = () => {
     [allCafes]
   );
 
+  // "Most saved" shelf: real save counts within the chosen city
+  const mostSavedCafes = useMemo(() => {
+    const scoped = selectedCity === 'All Davao Region' ? allCafes : allCafes.filter((cafe) => cafe.city === selectedCity);
+    return [...scoped].sort((a, b) => b.saveCount - a.saveCount).slice(0, 6);
+  }, [allCafes, selectedCity]);
+
   const hasActiveFilters =
     vibeFilters.size > 0 || Boolean(searchQuery) || priceRangeId !== 'any' || selectedCity !== 'All Davao Region';
+
+  const scrollToCatalog = () => {
+    document.getElementById('full-catalog-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  // Category shortcuts drive the same filter state as the chip rail, so both always agree
+  const handleSelectCategory = (id: MainCategoryId) => {
+    if (id === 'beans') {
+      setFeedMode(feedMode === 'beans' ? 'cafes' : 'beans');
+      setVibeFilters(new Set());
+    } else {
+      if (feedMode === 'beans') {
+        setFeedMode('cafes');
+        setVibeFilters(new Set([id]));
+      } else {
+        toggleVibe(id);
+      }
+    }
+    scrollToCatalog();
+  };
 
   const resetFilters = () => {
     setSelectedCity('All Davao Region');
     setSearchQuery('');
     setPriceRangeId('any');
     setVibeFilters(new Set());
+  };
+
+  const handleViewAllPicks = () => {
+    setFeedMode('cafes');
+    setSortKey('mostSaved');
+    scrollToCatalog();
   };
 
   const savedCount = savedCafeIds.length + savedBeanIds.length;
@@ -379,11 +443,11 @@ export const App: React.FC = () => {
     } catch {
       return (
         <div className="max-w-xl mx-auto px-4 py-12 text-center space-y-3">
-          <h2 className="font-cooper text-xl font-bold text-[#1A2225]">Roastery profile missing</h2>
-          <p className="text-sm font-sans text-[#55615D]">
+          <h2 className="font-cooper text-xl font-bold text-[#13191F]">Roastery profile missing</h2>
+          <p className="text-sm font-sans text-[#594C3D]">
             The approved account has no cafe record in this browser. Ask an admin to re-approve the application.
           </p>
-          <button onClick={handleSignOut} className="h-10 px-5 rounded-full bg-[#1A2225] text-[#FFF9E9] text-xs font-bold font-sans">
+          <button onClick={handleSignOut} className="h-10 px-5 rounded-full bg-[#13191F] text-[#FFFDF9] text-xs font-bold font-sans">
             Sign Out
           </button>
         </div>
@@ -422,64 +486,93 @@ export const App: React.FC = () => {
     }
 
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 sm:py-4">
-        <EditorialHero cafes={featuredRoasteries} onSelectCafe={openCafe} />
-
-        <FeedControls
-          mode={feedMode}
-          onModeChange={setFeedMode}
-          followingCount={following.length}
-          sortKey={sortKey}
-          onSortChange={setSortKey}
-          priceRange={priceRangeId}
-          onPriceRangeChange={setPriceRangeId}
-        />
-
-        <VibeFilterBar mode={feedMode === 'beans' ? 'beans' : 'cafes'} active={vibeFilters} onToggle={toggleVibe} />
-
-        <div className="flex items-center justify-between gap-3 py-2 text-xs font-sans text-[#55615D]">
-          <span className="font-semibold">{feedMode === 'beans' ? `${beans.length} bean lots` : `${cafes.length} venues`}</span>
-          {hasActiveFilters && (
-            <button onClick={resetFilters} className="font-bold text-[#1A2225] underline hover:opacity-80 shrink-0">
-              Clear filters
-            </button>
-          )}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-1 pb-6 sm:pt-4 space-y-6 sm:space-y-8">
+        <div className="space-y-3">
+          <LargeTitle title="Discover" trailing={<CityMenu value={selectedCity} onChange={setSelectedCity} />} />
+          <FeedSearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
         </div>
 
-        {feedMode === 'following' && following.length === 0 ? (
-          <div className="py-16 text-center space-y-3">
-            <h3 className="font-cooper text-xl font-bold text-[#1A2225]">Not following any roasters yet</h3>
-            <p className="text-sm font-sans text-[#55615D] max-w-sm mx-auto">
-              Follow a micro-roastery from its storefront and their fresh lots surface here.
-            </p>
-            <button onClick={() => setFeedMode('cafes')} className="h-10 px-5 rounded-full bg-[#1A2225] text-[#FFF9E9] text-xs font-bold font-sans">
-              Explore Cafes
-            </button>
-          </div>
-        ) : feedMode === 'beans' ? (
-          <BeanGrid beans={beans} savedBeanIds={savedBeanIds} onToggleSave={toggleSaveBean} onSelectBean={openBean} />
-        ) : (
-          <CafeGrid
-            cafes={cafes}
-            savedCafeIds={savedCafeIds}
-            onToggleSave={toggleSaveCafe}
-            onSelectCafe={openCafe}
-            onSelectRoastery={openRoastery}
-            emptyTitle={feedMode === 'following' ? 'Nothing new from your roasters' : 'No cafes match this pour'}
-            emptyBody={
-              feedMode === 'following'
-                ? 'Your followed roasteries have no venues in this city yet. Widen the city filter.'
-                : 'Try clearing a vibe filter or widening the city.'
-            }
-            emptyAction={hasActiveFilters ? { label: 'Clear Filters', onClick: resetFilters } : undefined}
+        {/* Featured: next roast drops and verified roasteries from the catalog */}
+        <EditorialHero
+          cafes={featuredRoasteries}
+          drops={drops}
+          onSelectCafe={openCafe}
+          onSelectRoastery={openRoastery}
+          onInspectBean={openBean}
+        />
+
+        {/* Category shortcuts */}
+        <CategoryIconRow showingBeans={feedMode === 'beans'} activeFilters={vibeFilters} onSelectCategory={handleSelectCategory} />
+
+        {/* Most saved shelf */}
+        <PopularPicksSection cafes={mostSavedCafes} onSelectCafe={openCafe} onViewAll={handleViewAllPicks} />
+
+        {/* Full catalog */}
+        <section id="full-catalog-section" aria-labelledby="catalog-title" className="space-y-3 scroll-mt-20">
+          <h2 id="catalog-title" className="ios-title">
+            {feedMode === 'beans' ? 'Bean vault' : feedMode === 'following' ? 'Following' : 'All spots'}
+          </h2>
+          <FeedControls
+            mode={feedMode}
+            onModeChange={setFeedMode}
+            followingCount={following.length}
+            sortKey={sortKey}
+            onSortChange={setSortKey}
+            priceRange={priceRangeId}
+            onPriceRangeChange={setPriceRangeId}
+            itemCount={feedMode === 'beans' ? beans.length : cafes.length}
+            isFiltersOpen={isFiltersOpen}
+            onToggleFilters={() => setIsFiltersOpen(!isFiltersOpen)}
+            activeFilterCount={vibeFilters.size}
+            onClearFilters={hasActiveFilters ? resetFilters : undefined}
           />
-        )}
+
+          <VibeFilterBar
+            mode={feedMode === 'beans' ? 'beans' : 'cafes'}
+            active={vibeFilters}
+            onToggle={toggleVibe}
+            isOpen={isFiltersOpen}
+          />
+
+          {feedMode === 'following' && following.length === 0 ? (
+            <div className="py-16 text-center space-y-2">
+              <h3 className="ios-title text-[19px]">Not following any roasters yet</h3>
+              <p className="text-[14px] font-sans text-[#594C3D] max-w-xs mx-auto">
+                Follow a micro-roastery from its storefront and their fresh lots surface here.
+              </p>
+              <button
+                onClick={() => setFeedMode('cafes')}
+                className="mt-2 h-11 px-5 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[15px] font-semibold font-sans ios-press"
+              >
+                Explore Cafes
+              </button>
+            </div>
+          ) : feedMode === 'beans' ? (
+            <BeanGrid beans={beans} savedBeanIds={savedBeanIds} onToggleSave={toggleSaveBean} onSelectBean={openBean} />
+          ) : (
+            <CafeGrid
+              cafes={cafes}
+              savedCafeIds={savedCafeIds}
+              onToggleSave={toggleSaveCafe}
+              onSelectCafe={openCafe}
+              onSelectRoastery={openRoastery}
+              onRateCafe={setRatingCafe}
+              emptyTitle={feedMode === 'following' ? 'Nothing new from your roasters' : 'No cafes match this pour'}
+              emptyBody={
+                feedMode === 'following'
+                  ? 'Your followed roasteries have no venues in this city yet. Widen the city filter.'
+                  : 'Try clearing a vibe filter or widening the city.'
+              }
+              emptyAction={hasActiveFilters ? { label: 'Clear Filters', onClick: resetFilters } : undefined}
+            />
+          )}
+        </section>
       </div>
     );
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FBF4E4] text-[#1A2225] font-sans">
+    <div className="min-h-screen flex flex-col bg-[#FAF5EB] text-[#13191F] font-sans">
       <NavigationHeader
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -491,6 +584,7 @@ export const App: React.FC = () => {
         isDrawerOpen={isDrawerOpen}
         setIsDrawerOpen={setIsDrawerOpen}
         portalRole={portalRole}
+        onOpenWelcome={() => setIsWelcomeOpen(true)}
       />
 
       <NavigationDrawer
@@ -509,9 +603,22 @@ export const App: React.FC = () => {
       <main className="flex-1 pb-28 sm:pb-32">
         {activeTab === 'feed' && renderFeed()}
 
-        {activeTab === 'drops' && <DropsView drops={drops} onInspectBean={openBean} />}
-
         {activeTab === 'map' && <DavaoCoffeeMap cafes={cafes} onSelectCafe={openCafe} selectedCity={selectedCity} />}
+
+        {(activeTab === 'profile' || activeTab === 'saved') && (
+          <ProfileView
+            onSelectCafe={openCafe}
+            onSelectRoastery={openRoastery}
+            onExploreFeed={() => setActiveTab('feed')}
+            onOpenMap={() => setActiveTab('map')}
+            onOpenAuth={() => {
+              if (!account) setAuthMode('signin');
+              setActiveTab(PORTAL_TAB_ID);
+            }}
+          />
+        )}
+
+        {activeTab === 'drops' && <DropsView drops={drops} onInspectBean={openBean} />}
 
         {activeTab === 'community' && (
           <CommunityView
@@ -519,18 +626,6 @@ export const App: React.FC = () => {
             authorName="You"
             authorHandle="davaocupper"
             onOpenCafe={openCafe}
-          />
-        )}
-
-        {activeTab === 'saved' && (
-          <SavedView
-            key={savedInitialTab}
-            initialTab={savedInitialTab}
-            onSelectCafe={openCafe}
-            onSelectBean={openBean}
-            onSelectRoastery={openRoastery}
-            onExploreDrops={() => setActiveTab('drops')}
-            onExploreFeed={() => setActiveTab('feed')}
           />
         )}
 
@@ -544,6 +639,7 @@ export const App: React.FC = () => {
         onToggleSave={toggleSaveCafe}
         onSelectRoastery={openRoastery}
         onViewBean={openBean}
+        onRateCafe={setRatingCafe}
       />
 
       <BeanDetailModal
@@ -561,6 +657,31 @@ export const App: React.FC = () => {
         onReserved={() => setReserveBeanId(null)}
       />
 
+      <RateCafeModal
+        cafe={ratingCafe}
+        isOpen={Boolean(ratingCafe)}
+        onClose={() => setRatingCafe(null)}
+      />
+
+      <WelcomeModal
+        isOpen={isWelcomeOpen}
+        onClose={() => {
+          setIsWelcomeOpen(false);
+          markWelcomed();
+        }}
+        onGetStarted={() => {
+          setIsWelcomeOpen(false);
+          markWelcomed();
+          setActiveTab('feed');
+        }}
+        onLogIn={() => {
+          setIsWelcomeOpen(false);
+          markWelcomed();
+          setAuthMode('signin');
+          setActiveTab(PORTAL_TAB_ID);
+        }}
+      />
+
       <FooterSection setActiveTab={setActiveTab} setSelectedCity={setSelectedCity} onJoinRoaster={handleJoinRoaster} />
 
       <div className="h-16 lg:hidden" aria-hidden="true" />
@@ -569,7 +690,7 @@ export const App: React.FC = () => {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         savedCount={savedCount}
-        isHidden={Boolean(selectedCafe || selectedBean)}
+        isHidden={Boolean(selectedCafe || selectedBean || reserveBean || ratingCafe || isWelcomeOpen)}
       />
     </div>
   );

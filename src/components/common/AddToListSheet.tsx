@@ -44,48 +44,60 @@ export const AddToListSheet: React.FC<AddToListSheetProps> = ({ isOpen, onClose,
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} maxWidth="sm:max-w-md" labelledBy="add-to-list-title">
-      <ModalHeader title="Add to List" subtitle="Build collections like Work Cafes or Weekend Pour-Overs" onClose={onClose} />
-      <div className="px-4 sm:px-6 py-4 space-y-4">
+      <ModalHeader title="Add to list" subtitle="Build collections like Work Cafes or Weekend Pour-Overs" onClose={onClose} />
+      <div className="px-4 sm:px-6 py-4 space-y-6">
         {lists.length === 0 && (
-          <p className="text-xs font-sans text-[#55615D]">
+          <p className="px-1 text-[15px] font-sans text-[#594C3D] leading-relaxed">
             No lists yet. Name your first one below: a list keeps cafes and beans together and can be shared with one link.
           </p>
         )}
 
-        <div className="space-y-2">
-          {lists.map((list) => {
-            const has = containsItem(list.id);
-            return (
-              <button
-                key={list.id}
-                onClick={() => addToList(list.id)}
-                disabled={has}
-                className={`w-full h-11 px-3 rounded-xl border flex items-center justify-between text-sm font-semibold font-sans transition-colors ${
-                  has
-                    ? 'bg-[#F3ECD8] border-[#E6DCC0] text-[#55615D] cursor-default'
-                    : 'bg-[#FFF9E9] border-[#E6DCC0] text-[#1A2225] hover:bg-[#F3ECD8]'
-                }`}
-              >
-                <span className="truncate">{list.name}</span>
-                <span className="text-[10px] text-[#55615D] flex items-center gap-1.5">
-                  {list.cafeIds.length + list.beanIds.length} items
-                  {has && <Check className="w-3.5 h-3.5 text-[#3E5C48]" />}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+        {lists.length > 0 && (
+          <section className="space-y-1.5">
+            <h3 className="px-4 text-[13px] text-[#594C3D] font-sans">Your lists</h3>
+            <div className="ios-group bg-[#FAF5EB]">
+              {lists.map((list) => {
+                const has = containsItem(list.id);
+                const count = list.cafeIds.length + list.beanIds.length;
+                return (
+                  <button
+                    key={list.id}
+                    onClick={() => addToList(list.id)}
+                    disabled={has}
+                    className={`ios-group-row font-sans ${has ? 'cursor-default' : 'ios-press'}`}
+                  >
+                    <span className={`min-w-0 flex-1 truncate text-[15px] ${has ? 'text-[#594C3D]' : 'text-[#13191F]'}`}>
+                      {list.name}
+                    </span>
+                    <span className="shrink-0 font-mono text-[13px] text-[#594C3D]">
+                      {count} {count === 1 ? 'item' : 'items'}
+                    </span>
+                    {has ? (
+                      <>
+                        <Check className="w-4.5 h-4.5 text-[#3E5C48] shrink-0" strokeWidth={2.5} aria-hidden="true" />
+                        <span className="sr-only">Already in this list</span>
+                      </>
+                    ) : (
+                      <Plus className="w-4.5 h-4.5 text-[#906D4B] shrink-0" strokeWidth={2.5} aria-hidden="true" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
-        <div className="space-y-2 pt-2 border-t border-[#E6DCC0]">
-          <span className="block text-[10px] font-bold uppercase tracking-widest text-[#55615D] font-sans">New List</span>
+        <section className="space-y-1.5">
+          <h3 className="px-4 text-[13px] text-[#594C3D] font-sans">New list</h3>
           <div className="flex gap-2">
             <TextInput value={newListName} onChange={setNewListName} placeholder="e.g. Work Cafes with Good WiFi" />
-            <PrimaryButton onClick={createAndAdd} disabled={!newListName.trim()} className="shrink-0">
-              <Plus className="w-4 h-4" />
+            <PrimaryButton onClick={createAndAdd} disabled={!newListName.trim()} className="shrink-0 w-11 px-0 flex items-center justify-center">
+              <Plus className="w-5 h-5" strokeWidth={2.5} aria-hidden="true" />
+              <span className="sr-only">Create list and add</span>
             </PrimaryButton>
           </div>
           {error && <ErrorNote message={error} />}
-        </div>
+        </section>
       </div>
     </Modal>
   );

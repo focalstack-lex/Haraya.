@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Flame } from 'lucide-react';
+import { Timer } from 'lucide-react';
 
 /** Live countdown digits (DD:HH:MM:SS) that tick once per second. */
 export const DropCountdownTimer: React.FC<{ dropAt: string; compact?: boolean }> = ({ dropAt, compact = false }) => {
@@ -14,9 +14,10 @@ export const DropCountdownTimer: React.FC<{ dropAt: string; compact?: boolean }>
   const remaining = Math.max(0, target - now);
 
   if (target <= now) {
+    // Live: a small semantic dot plus text, like an iOS status row
     return (
-      <span className={`inline-flex items-center gap-1.5 ${compact ? 'text-[10px]' : 'text-xs'} font-bold font-sans text-[#C86428]`}>
-        <Flame className={compact ? 'w-3 h-3' : 'w-3.5 h-3.5'} />
+      <span className={`inline-flex items-center gap-1.5 ${compact ? 'text-[11px]' : 'text-[12px]'} font-medium font-sans text-[#3E5C48]`}>
+        <span className="h-1.5 w-1.5 rounded-full bg-[#3E5C48] animate-status-pulse" aria-hidden="true" />
         Batch is live on the shelf
       </span>
     );
@@ -32,10 +33,10 @@ export const DropCountdownTimer: React.FC<{ dropAt: string; compact?: boolean }>
 
   return (
     <span
-      className={`tabular-countdown inline-flex items-center gap-1.5 ${compact ? 'text-[10px]' : 'text-xs'} font-bold font-mono text-[#C86428]`}
+      className={`tabular-countdown inline-flex items-center gap-1 ${compact ? 'text-[11px]' : 'text-[13px]'} font-semibold font-mono text-[#7D5C3D]`}
       aria-label={`Drops in ${days} days, ${hours} hours, ${minutes} minutes`}
     >
-      <Flame className={compact ? 'w-3 h-3' : 'w-3.5 h-3.5'} />
+      <Timer className={compact ? 'w-3 h-3' : 'w-3.5 h-3.5'} aria-hidden="true" />
       {text}
     </span>
   );

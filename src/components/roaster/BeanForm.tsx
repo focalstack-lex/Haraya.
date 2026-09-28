@@ -200,12 +200,12 @@ export const BeanForm: React.FC<BeanFormProps> = ({ isOpen, roaster, bean, onClo
         </div>
 
         <div className="flex gap-5">
-          <label className="inline-flex items-center gap-2 text-xs font-sans font-semibold text-[#1A2225]">
-            <input type="checkbox" checked={isLimited} onChange={(event) => setIsLimited(event.target.checked)} className="accent-[#C86428] h-4 w-4" />
+          <label className="inline-flex items-center gap-2 text-xs font-sans font-semibold text-[#13191F]">
+            <input type="checkbox" checked={isLimited} onChange={(event) => setIsLimited(event.target.checked)} className="accent-[#906D4B] h-4 w-4" />
             Limited micro-lot
           </label>
-          <label className="inline-flex items-center gap-2 text-xs font-sans font-semibold text-[#1A2225]">
-            <input type="checkbox" checked={singleOrigin} onChange={(event) => setSingleOrigin(event.target.checked)} className="accent-[#C86428] h-4 w-4" />
+          <label className="inline-flex items-center gap-2 text-xs font-sans font-semibold text-[#13191F]">
+            <input type="checkbox" checked={singleOrigin} onChange={(event) => setSingleOrigin(event.target.checked)} className="accent-[#906D4B] h-4 w-4" />
             Single origin
           </label>
         </div>
@@ -228,7 +228,7 @@ export const BeanForm: React.FC<BeanFormProps> = ({ isOpen, roaster, bean, onClo
           {bean ? 'Save Changes' : 'Publish to Bean Shelf'}
         </PrimaryButton>
 
-        <p className="text-[10px] font-sans text-[#55615D] leading-relaxed">
+        <p className="text-[10px] font-sans text-[#594C3D] leading-relaxed">
           Published lots appear instantly in Fresh Beans, the roastery storefront, and the drop calendar.
         </p>
       </div>

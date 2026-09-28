@@ -28,29 +28,40 @@ export const DropCalendarStrip: React.FC<DropCalendarStripProps> = ({ drops, sel
     });
   }, [drops]);
 
+  const todayKey = localDayKey(new Date());
+
+  // iOS Calendar week strip: weekday above, date in a circle, batch dots below
   const cell = (day: (typeof days)[number]) => {
     const selected = selectedDay === day.key;
-    const isToday = day.key === localDayKey(new Date());
+    const isToday = day.key === todayKey;
+    const count = day.drops.length;
     return (
       <button
         key={day.key}
         onClick={() => onSelectDay(selected ? null : day.key)}
         aria-pressed={selected}
-        className={`h-20 sm:h-24 shrink-0 w-16 sm:w-20 rounded-2xl border flex flex-col items-center justify-center gap-1 transition-colors ${
-          selected
-            ? 'bg-[#1A2225] border-[#1A2225] text-[#FFF9E9]'
-            : 'bg-[#FFF9E9] border-[#E6DCC0] text-[#1A2225] hover:border-[#1A2225]/40'
+        aria-label={`${day.date.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}, ${count} ${
+          count === 1 ? 'batch' : 'batches'
         }`}
+        className="shrink-0 w-11 sm:w-12 py-1.5 flex flex-col items-center gap-1 rounded-[12px] ios-press"
       >
-        <span className={`text-[9px] font-bold uppercase tracking-widest font-sans ${selected ? 'text-[#FFF9E9]/70' : 'text-[#55615D]'}`}>
-          {day.date.toLocaleDateString(undefined, { weekday: 'short' })}
+        <span className={`text-[11px] font-medium font-sans ${isToday ? 'text-[#7D5C3D]' : 'text-[#594C3D]'}`}>
+          {day.date.toLocaleDateString(undefined, { weekday: 'narrow' })}
         </span>
-        <span className={`font-cooper text-lg sm:text-xl font-bold ${isToday && !selected ? 'text-[#C86428]' : ''}`}>
+        <span
+          className={`h-9 w-9 rounded-full flex items-center justify-center text-[17px] font-mono transition-colors ${
+            selected
+              ? 'bg-[#906D4B] text-[#FFFDF9] font-semibold'
+              : isToday
+                ? 'text-[#7D5C3D] font-semibold'
+                : 'text-[#13191F] hover:bg-[#766046]/12'
+          }`}
+        >
           {day.date.getDate()}
         </span>
-        <span className="flex gap-1 h-1.5">
+        <span className="flex gap-0.5 h-1.5" aria-hidden="true">
           {day.drops.slice(0, 3).map((drop) => (
-            <span key={drop.id} className={`h-1.5 w-1.5 rounded-full ${selected ? 'bg-[#C86428]' : 'bg-[#1A2225]'}`} />
+            <span key={drop.id} className="h-1.5 w-1.5 rounded-full bg-[#906D4B]" />
           ))}
         </span>
       </button>
@@ -58,8 +69,10 @@ export const DropCalendarStrip: React.FC<DropCalendarStripProps> = ({ drops, sel
   };
 
   return (
-    <div className="flex gap-2 overflow-x-auto scrollbar-none py-1 -mx-4 px-4 sm:mx-0 sm:px-0" role="group" aria-label="14 day roast calendar">
-      {days.map(cell)}
+    <div className="rounded-[20px] bg-[#FFFDF9] ios-card-shadow px-1.5 sm:px-3 py-1.5">
+      <div className="ios-shelf gap-0.5 sm:gap-1 sm:justify-between" role="group" aria-label="14 day roast calendar">
+        {days.map(cell)}
+      </div>
     </div>
   );
 };

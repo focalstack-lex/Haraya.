@@ -1,141 +1,135 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { MapPin, ArrowUpRight, Flame } from 'lucide-react';
-import type { Cafe } from '../../types/coffee';
-import { isOpenNow } from '../../utils/calendar';
-
-const ROTATE_MS = 6000;
-const TICK_MS = 100;
+import React, { useMemo, useRef, useState } from 'react';
+import { ChevronRight } from 'lucide-react';
+import type { Cafe, RoastDrop } from '../../types/coffee';
+import { catalogService } from '../../services/catalogService';
 
 interface EditorialHeroProps {
-  /** Featured Davao roasteries; the hero cycles one every 6 seconds. */
   cafes: Cafe[];
+  drops: RoastDrop[];
   onSelectCafe: (cafeId: string) => void;
+  onSelectRoastery: (cafeId: string) => void;
+  onInspectBean: (beanId: string) => void;
 }
 
+interface HeroSlide {
+  id: string;
+  image: string;
+  title: string;
+  meta: string;
+  body: string;
+  cta: string;
+  onOpen: () => void;
+}
+
+const dropDay = new Intl.DateTimeFormat(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+
 /**
- * Editorial hero banner: full-bleed photography of the featured roaster with a
- * 6-second auto-advancing progress rail. Pauses while the pointer is over it.
+ * Featured shelf built from the live catalog: the next open roast drops first, then verified
+ * micro-roasteries. Swipes with native scroll snapping; the page dots follow the scroll position.
  */
-export const EditorialHero: React.FC<EditorialHeroProps> = ({ cafes, onSelectCafe }) => {
+export const EditorialHero: React.FC<EditorialHeroProps> = ({ cafes, drops, onSelectCafe, onSelectRoastery, onInspectBean }) => {
+  const trackRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
-  const [progress, setProgress] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const elapsedRef = useRef(0);
 
-  const count = cafes.length;
+  const slides = useMemo<HeroSlide[]>(() => {
+    const dropSlides = drops
+      .map((drop) => ({ drop, status: catalogService.getDropStatus(drop) }))
+      .filter(({ status }) => status !== 'soldOut')
+      .slice(0, 2)
+      .map(({ drop, status }) => ({
+        id: drop.id,
+        image: drop.coverImage,
+        title: drop.title,
+        meta:
+          status === 'live'
+            ? `Roast drop, live now from ${drop.roasterName}`
+            : `Roast drop, ${dropDay.format(new Date(drop.dropAt))} from ${drop.roasterName}`,
+        body: `${drop.batchBags} bags at ₱${drop.price} each.`,
+        cta: 'View lot',
+        onOpen: () => onInspectBean(drop.beanId),
+      }));
 
-  useEffect(() => {
-    if (paused || count <= 1) return;
-    const timer = window.setInterval(() => {
-      elapsedRef.current += TICK_MS;
-      if (elapsedRef.current >= ROTATE_MS) {
-        elapsedRef.current = 0;
-        setIndex((current) => (current + 1) % count);
-        setProgress(0);
-      } else {
-        setProgress(elapsedRef.current / ROTATE_MS);
-      }
-    }, TICK_MS);
-    return () => window.clearInterval(timer);
-  }, [paused, count]);
+    const cafeSlides = cafes.slice(0, 2).map((cafe) => ({
+      id: cafe.id,
+      image: cafe.images[0],
+      title: cafe.name,
+      meta: `${cafe.isRoastery ? 'Micro-roastery' : 'Cafe'} in ${cafe.district}, ${cafe.city}`,
+      body: `Known for the ${cafe.signature}.`,
+      cta: cafe.isRoastery ? 'Open roastery' : 'View cafe',
+      onOpen: () => (cafe.isRoastery ? onSelectRoastery(cafe.id) : onSelectCafe(cafe.id)),
+    }));
 
-  if (count === 0) return null;
+    return [...dropSlides, ...cafeSlides];
+  }, [cafes, drops, onInspectBean, onSelectCafe, onSelectRoastery]);
 
-  const featured = cafes[index % count];
-  const openNow = isOpenNow(featured.hours);
+  if (slides.length === 0) return null;
+
+  const handleScroll = () => {
+    const track = trackRef.current;
+    if (!track) return;
+    const next = Math.round(track.scrollLeft / track.clientWidth);
+    if (next !== index) setIndex(next);
+  };
+
+  const goTo = (i: number) => {
+    const track = trackRef.current;
+    if (!track) return;
+    track.scrollTo({ left: i * track.clientWidth, behavior: 'smooth' });
+  };
 
   return (
-    <section
-      aria-label="Featured Davao roasters"
-      className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-[#1A2225] text-[#FFF9E9] shadow-xl"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-    >
-      <div className="grid md:grid-cols-2">
-        {/* Photography side */}
-        <div className="relative h-56 sm:h-72 md:h-80 lg:h-96 overflow-hidden">
-          {cafes.map((cafe, cafeIndex) => (
-            <img
-              key={cafe.id}
-              src={cafe.images[0]}
-              alt={`${cafe.name}, ${cafe.district}, ${cafe.city}`}
-              loading={cafeIndex === 0 ? 'eager' : 'lazy'}
-              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
-                cafeIndex === index % count ? 'opacity-100' : 'opacity-0'
-              }`}
-            />
-          ))}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent md:bg-gradient-to-r" />
-        </div>
-
-        {/* Editorial side */}
-        <div className="relative p-5 sm:p-8 lg:p-10 flex flex-col justify-center gap-3 sm:gap-4">
-          {/* 6-second progress rail */}
-          <div className="flex gap-1.5" role="tablist" aria-label="Featured roasters">
-            {cafes.map((cafe, cafeIndex) => (
-              <button
-                key={cafe.id}
-                role="tab"
-                aria-selected={cafeIndex === index % count}
-                aria-label={`Show ${cafe.name}`}
-                onClick={() => {
-                  setIndex(cafes.indexOf(cafe));
-                  elapsedRef.current = 0;
-                  setProgress(0);
-                }}
-                className="hero-progress-segment h-1 flex-1 max-w-16 min-w-6"
-              >
-                <span
-                  style={{
-                    width: cafeIndex === index % count ? `${Math.round(progress * 100)}%` : cafeIndex < index % count ? '100%' : '0%',
-                    transition: cafeIndex === index % count ? 'width 100ms linear' : 'none',
-                  }}
-                />
-              </button>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-2 text-[10px] font-bold font-sans tracking-widest uppercase text-[#FFF9E9]/80">
-            <MapPin className="w-3.5 h-3.5 text-[#C86428]" />
-            {featured.district}, {featured.city}
-            {featured.isRoastery && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#C86428]/20 border border-[#C86428]/50 px-2 py-0.5 text-[9px] tracking-widest text-[#FFB477]">
-                <Flame className="w-3 h-3" />
-                Roastery
-              </span>
-            )}
-          </div>
-
-          <h1 className="font-cooper text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight tracking-tight">
-            {featured.name}
-          </h1>
-
-          <p className="text-xs sm:text-sm font-sans text-[#FFF9E9]/80 leading-relaxed line-clamp-2">
-            Signature pour: <span className="font-bold text-[#FFF9E9]">{featured.signature}</span>. {featured.description}
-          </p>
-
-          <div className="flex items-center gap-3 text-[11px] font-sans text-[#FFF9E9]/75">
-            <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 border ${
-              openNow ? 'border-[#FFF9E9]/25 bg-[#FFF9E9]/10' : 'border-[#FFF9E9]/15'
-            }`}>
-              <span className={`h-1.5 w-1.5 rounded-full ${openNow ? 'bg-[#7FB77E]' : 'bg-[#C86428]'}`} />
-              {openNow ? 'Open Now' : 'Closed'}
-            </span>
-            <span>{'P'.repeat(featured.priceLevel)}</span>
-            <span>{featured.saveCount.toLocaleString()} saves</span>
-          </div>
-
-          <div className="pt-1">
+    <section aria-label="Featured drops and roasteries" aria-roledescription="carousel" className="-mx-4 sm:mx-0">
+      <div ref={trackRef} onScroll={handleScroll} style={{ scrollPaddingInline: 0 }} className="ios-shelf sm:rounded-[20px] sm:overflow-hidden">
+        {slides.map((slide, i) => (
+          <div key={slide.id} className="w-full shrink-0 px-4 sm:px-0" aria-roledescription="slide" aria-label={`${i + 1} of ${slides.length}`}>
             <button
-              onClick={() => onSelectCafe(featured.id)}
-              className="h-10 px-5 rounded-full bg-[#FFF9E9] text-[#1A2225] text-xs font-bold font-sans inline-flex items-center gap-2 hover:bg-white transition-colors"
+              type="button"
+              onClick={slide.onOpen}
+              className="group relative block w-full aspect-[4/3] sm:aspect-[21/9] rounded-[20px] sm:rounded-none overflow-hidden bg-[#13191F] text-left ios-press active:scale-[0.985]"
             >
-              Inspect Roastery
-              <ArrowUpRight className="w-3.5 h-3.5" />
+              <img
+                src={slide.image}
+                alt=""
+                loading={i === 0 ? 'eager' : 'lazy'}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <span className="absolute inset-0 bg-gradient-to-t from-[#13191F]/90 via-[#13191F]/25 to-transparent sm:bg-gradient-to-r sm:from-[#13191F]/85 sm:via-[#13191F]/35" />
+              <span className="absolute inset-x-0 bottom-0 p-5 sm:p-8 sm:max-w-lg sm:top-0 sm:flex sm:flex-col sm:justify-end">
+                <span className="block font-cooper text-[26px] sm:text-4xl font-bold leading-[1.08] text-[#FFFDF9] text-balance">
+                  {slide.title}
+                </span>
+                <span className="block mt-1.5 text-[13px] sm:text-sm font-medium text-[#FFFDF9]/85">{slide.meta}</span>
+                <span className="block mt-0.5 text-[13px] sm:text-sm text-[#FFFDF9]/70 line-clamp-1">{slide.body}</span>
+                <span className="mt-4 self-start w-fit inline-flex items-center gap-1 h-9 pl-4 pr-3 rounded-full ios-material-dark text-[#FFFDF9] text-[14px] font-semibold">
+                  {slide.cta}
+                  <ChevronRight className="w-4 h-4" strokeWidth={2.5} />
+                </span>
+              </span>
             </button>
           </div>
-        </div>
+        ))}
       </div>
+
+      {slides.length > 1 && (
+        <div className="flex items-center justify-center gap-2 pt-3" role="tablist" aria-label="Featured slides">
+          {slides.map((slide, i) => (
+            <button
+              key={slide.id}
+              role="tab"
+              aria-selected={index === i}
+              aria-label={`Show slide ${i + 1}`}
+              onClick={() => goTo(i)}
+              className="h-6 w-4 flex items-center justify-center"
+            >
+              <span
+                className={`block h-[7px] w-[7px] rounded-full transition-colors duration-300 ${
+                  index === i ? 'bg-[#13191F]' : 'bg-[#13191F]/20'
+                }`}
+              />
+            </button>
+          ))}
+        </div>
+      )}
     </section>
   );
 };

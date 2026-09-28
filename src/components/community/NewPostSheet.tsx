@@ -77,17 +77,35 @@ export const NewPostSheet: React.FC<NewPostSheetProps> = ({ isOpen, onClose, caf
 
   return (
     <Modal isOpen={isOpen} onClose={close} maxWidth="sm:max-w-lg" labelledBy="new-post-title">
-      <ModalHeader title="New Cup Check" subtitle="Post today's brew and pin what it tastes like" onClose={close} />
+      <ModalHeader title="New Cup Check" subtitle="Pin what today's brew tastes like" onClose={close} />
 
       <div className="px-4 sm:px-6 py-4 space-y-4">
         <input ref={fileRef} type="file" accept="image/*" onChange={pickImage} className="hidden" />
 
+        {/* Photo picker: a large fill tile before a photo exists, a compact button after */}
         <button
+          type="button"
           onClick={() => fileRef.current?.click()}
-          className="w-full h-11 rounded-xl bg-[#F3ECD8] border border-[#E6DCC0] text-xs font-bold font-sans text-[#1A2225] inline-flex items-center justify-center gap-2 hover:bg-[#E6DCC0] transition-colors"
+          className={`w-full ios-fill hover:bg-[#766046]/20 text-[#7D5C3D] font-sans ios-press ${
+            imageData
+              ? 'h-11 rounded-full text-[15px] font-semibold inline-flex items-center justify-center gap-2'
+              : 'h-36 rounded-[20px] flex flex-col items-center justify-center gap-2'
+          }`}
         >
-          <ImagePlus className="w-4 h-4" />
-          {imageData ? 'Replace Cup Photo' : 'Attach Cup Photo'}
+          {imageData ? (
+            <>
+              <ImagePlus className="w-4.5 h-4.5" />
+              Replace photo
+            </>
+          ) : (
+            <>
+              <span className="h-11 w-11 rounded-full bg-[#906D4B] text-[#FFFDF9] flex items-center justify-center">
+                <ImagePlus className="w-5 h-5" />
+              </span>
+              <span className="text-[15px] font-semibold">Attach cup photo</span>
+              <span className="ios-footnote text-[#594C3D]">JPG or PNG, under 2.5 MB</span>
+            </>
+          )}
         </button>
 
         <FlavorPinPlacer image={imageData} pins={pins} onChange={setPins} />
@@ -96,7 +114,7 @@ export const NewPostSheet: React.FC<NewPostSheetProps> = ({ isOpen, onClose, caf
           <TextArea value={caption} onChange={setCaption} rows={3} maxLength={280} placeholder="Cup Check: what are you drinking and where?" />
         </Field>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-3">
           <Field label="Cafe (optional)">
             <SelectInput
               value={cafeId}
@@ -104,7 +122,7 @@ export const NewPostSheet: React.FC<NewPostSheetProps> = ({ isOpen, onClose, caf
               options={[{ value: '', label: 'Home brew' }, ...cafes.map((cafe) => ({ value: cafe.id, label: cafe.name }))]}
             />
           </Field>
-          <Field label="Brew Method (optional)">
+          <Field label="Brew method (optional)">
             <SelectInput
               value={brewMethod}
               onChange={setBrewMethod}

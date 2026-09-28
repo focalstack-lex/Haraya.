@@ -39,34 +39,42 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({ label, hint,
 
   return (
     <div className="space-y-1.5">
-      <span className="block text-[11px] font-semibold uppercase tracking-wider text-[#55615D] font-sans">{label}</span>
+      <span className="block px-1 text-[13px] font-medium text-[#594C3D] font-sans">{label}</span>
       <input ref={inputRef} type="file" accept="image/*" onChange={pick} className="hidden" />
 
       {value ? (
-        <div className={`relative rounded-xl overflow-hidden border border-[#E6DCC0] ${aspect === 'square' ? 'aspect-square w-32' : 'aspect-video w-full'}`}>
+        <div className={`relative rounded-[14px] overflow-hidden bg-[#13191F] ${aspect === 'square' ? 'aspect-square w-32' : 'aspect-video w-full'}`}>
           <img src={value} alt={`${label} preview`} className="w-full h-full object-cover" />
           <button
             type="button"
             onClick={() => onChange(null)}
             aria-label={`Remove ${label}`}
-            className="absolute top-1.5 right-1.5 h-7 w-7 rounded-full bg-[#1A2225]/80 text-[#FFF9E9] flex items-center justify-center"
+            className="absolute top-0 right-0 h-11 w-11 flex items-center justify-center ios-press"
           >
-            <X className="w-3.5 h-3.5" />
+            <span className="h-7.5 w-7.5 rounded-full ios-material-dark text-[#FFFDF9] flex items-center justify-center">
+              <X className="w-4 h-4" strokeWidth={2.5} />
+            </span>
           </button>
         </div>
       ) : (
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="w-full h-11 rounded-xl bg-[#F3ECD8] border border-dashed border-[#E6DCC0] text-xs font-bold font-sans text-[#1A2225] inline-flex items-center justify-center gap-2 hover:bg-[#E6DCC0] transition-colors"
+          className={`w-full rounded-[14px] ios-fill hover:bg-[#766046]/20 text-[#7D5C3D] font-sans flex flex-col items-center justify-center gap-1.5 ios-press ${
+            aspect === 'wide' ? 'h-28' : 'h-24'
+          }`}
         >
-          <ImagePlus className="w-4 h-4" />
-          Attach Photo
+          <ImagePlus className="w-5.5 h-5.5 text-[#906D4B]" />
+          <span className="text-[15px] font-semibold">Attach photo</span>
         </button>
       )}
 
-      {hint && !error && <span className="block text-[10px] font-sans text-[#55615D]">{hint}</span>}
-      {error && <span className="block text-[10px] font-sans text-[#8C3A2E]">{error}</span>}
+      {hint && !error && <span className="block px-1 ios-footnote text-[#594C3D]">{hint}</span>}
+      {error && (
+        <span role="alert" className="block px-1 ios-footnote text-[#8C3A2E]">
+          {error}
+        </span>
+      )}
     </div>
   );
 };

@@ -1,15 +1,24 @@
 import React from 'react';
-import { ArrowLeft, Clock, ShieldCheck, Store, XCircle } from 'lucide-react';
+import { Clock, XCircle } from 'lucide-react';
 import type { Account } from '../../types/auth';
 import { authService } from '../../services/authService';
 import { useAuthVersion } from '../../hooks/useServiceVersions';
-import { PrimaryButton } from '../common/FormControls';
+import { PrimaryButton, SecondaryButton } from '../common/FormControls';
+import { LargeTitle } from '../common/LargeTitle';
 
 interface ApplicationStatusViewProps {
   account: Account;
   onSignOut: () => void;
   onBrowseFeed: () => void;
 }
+
+/** One label and value row inside the grouped application list. */
+const DetailRow: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
+  <div className="ios-group-row justify-between">
+    <dt className="text-[15px] text-[#13191F] shrink-0">{label}</dt>
+    <dd className="text-[15px] text-[#594C3D] text-right min-w-0 truncate">{children}</dd>
+  </div>
+);
 
 /** Pending or rejected state shown between sign-up and admin approval. */
 export const ApplicationStatusView: React.FC<ApplicationStatusViewProps> = ({ account, onSignOut, onBrowseFeed }) => {
@@ -18,58 +27,63 @@ export const ApplicationStatusView: React.FC<ApplicationStatusViewProps> = ({ ac
   const rejected = account.status === 'rejected';
 
   return (
-    <div className="max-w-md mx-auto px-4 py-8 sm:py-12">
-      <div className="rounded-3xl bg-[#FFF9E9] border border-[#E6DCC0] p-6 sm:p-8 space-y-4 shadow-sm text-center">
-        <span
-          className={`mx-auto h-14 w-14 rounded-full flex items-center justify-center border ${
-            rejected ? 'bg-[#8C3A2E]/10 border-[#8C3A2E]/30' : 'bg-[#C86428]/10 border-[#C86428]/30'
-          }`}
-        >
-          {rejected ? <XCircle className="w-7 h-7 text-[#8C3A2E]" /> : <Clock className="w-7 h-7 text-[#C86428]" />}
-        </span>
+    <div className="max-w-md mx-auto px-4 pt-1 pb-8 sm:pt-4 space-y-5">
+      <LargeTitle title={rejected ? 'Needs changes' : 'Under review'} subtitle={account.businessName} />
 
-        <div className="space-y-1.5">
-          <h1 className="font-cooper text-xl font-bold text-[#1A2225]">
-            {rejected ? 'Application needs changes' : 'Verification in progress'}
-          </h1>
-          <p className="text-xs font-sans text-[#55615D] leading-relaxed">
-            {rejected
-              ? account.reviewNote || 'The Control Room could not verify the documents. Review the note and apply again.'
-              : `${account.businessName} is queued for Control Room verification. This is a browser demo, so ask the operator to sign in as admin@haraya.ph and approve it.`}
-          </p>
-        </div>
-
-        {application && (
-          <div className="rounded-2xl bg-[#F3ECD8] border border-[#E6DCC0] p-4 text-left space-y-1.5">
-            <span className="block text-[10px] font-bold uppercase tracking-widest text-[#55615D] font-sans">Application</span>
-            <p className="text-xs font-sans text-[#1A2225]">
-              <Store className="w-3.5 h-3.5 inline mr-1.5 -mt-0.5" />
-              {application.businessName} : {application.district}, {application.city}
+      {/* Status row: semantic color carries the state, the icon repeats it for non-color readers */}
+      <div className="ios-group ios-card-shadow">
+        <div className="ios-group-row items-start py-3">
+          <span
+            className={`h-8 w-8 shrink-0 rounded-full flex items-center justify-center ${
+              rejected ? 'bg-[#8C3A2E]/12 text-[#8C3A2E]' : 'bg-[#906D4B]/14 text-[#7D5C3D]'
+            }`}
+          >
+            {rejected ? <XCircle className="w-4.5 h-4.5" /> : <Clock className="w-4.5 h-4.5" />}
+          </span>
+          <div className="min-w-0 space-y-0.5">
+            <p className={`ios-headline ${rejected ? 'text-[#8C3A2E]' : 'text-[#7D5C3D]'}`}>
+              {rejected ? 'Application needs changes' : 'Verification in progress'}
             </p>
-            <p className="text-[11px] font-sans text-[#55615D]">
-              {application.isRoastery ? 'Micro-roastery' : 'Specialty cafe'} : permit {application.permitNumber}
-            </p>
-            <p className="text-[10px] font-sans text-[#55615D] inline-flex items-center gap-1.5">
-              <ShieldCheck className="w-3 h-3" />
-              ID document {application.idDoc ? 'attached' : 'missing'} : permit photo {application.permitDoc ? 'attached' : 'not provided'}
+            <p className="text-[14px] leading-[1.45] text-[#594C3D]">
+              {rejected
+                ? account.reviewNote || 'The Control Room could not verify the documents. Review the note and apply again.'
+                : `${account.businessName} is queued for Control Room verification. This is a browser demo, so ask the operator to sign in as admin@haraya.ph and approve it.`}
             </p>
           </div>
-        )}
-
-        <div className="flex flex-col sm:flex-row gap-2 justify-center">
-          <PrimaryButton onClick={onBrowseFeed}>
-            <span className="inline-flex items-center gap-1.5">
-              <ArrowLeft className="w-3.5 h-3.5" />
-              Browse the Feed
-            </span>
-          </PrimaryButton>
-          <button
-            onClick={onSignOut}
-            className="h-10 px-5 rounded-full bg-[#F3ECD8] border border-[#E6DCC0] text-xs font-bold font-sans text-[#1A2225] hover:bg-[#E6DCC0] transition-colors"
-          >
-            Sign Out
-          </button>
         </div>
+      </div>
+
+      {application && (
+        <section className="space-y-1.5" aria-labelledby="application-details-title">
+          <h2 id="application-details-title" className="px-4 text-[13px] text-[#594C3D]">
+            Application
+          </h2>
+          <dl className="ios-group ios-card-shadow">
+            <DetailRow label="Business">{application.businessName}</DetailRow>
+            <DetailRow label="Location">
+              {application.district}, {application.city}
+            </DetailRow>
+            <DetailRow label="Type">{application.isRoastery ? 'Micro-roastery' : 'Specialty cafe'}</DetailRow>
+            <DetailRow label="Permit">
+              <span className="font-mono">{application.permitNumber || 'Not provided'}</span>
+            </DetailRow>
+            <DetailRow label="ID document">
+              <span className={application.idDoc ? 'text-[#3E5C48] font-medium' : 'text-[#8C3A2E] font-medium'}>
+                {application.idDoc ? 'Attached' : 'Missing'}
+              </span>
+            </DetailRow>
+            <DetailRow label="Permit photo">{application.permitDoc ? 'Attached' : 'Not provided'}</DetailRow>
+          </dl>
+        </section>
+      )}
+
+      <div className="flex flex-col sm:flex-row gap-2">
+        <PrimaryButton onClick={onBrowseFeed} className="w-full sm:w-auto">
+          Browse the Feed
+        </PrimaryButton>
+        <SecondaryButton onClick={onSignOut} className="w-full sm:w-auto !text-[#8C3A2E]">
+          Sign Out
+        </SecondaryButton>
       </div>
     </div>
   );

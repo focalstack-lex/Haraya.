@@ -1,13 +1,29 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import L from 'leaflet';
-import { Navigation, Route as RouteIcon, X } from 'lucide-react';
+import { ChevronRight, LocateFixed, Minus, Navigation, Plus, X } from 'lucide-react';
 import type { Cafe, Trail } from '../../types/coffee';
 import { mockTrails } from '../../data/mockTrails';
 import { distanceKm, directionsUrl, formatKm, trailLengthKm, walkMinutes } from '../../utils/geo';
+import { isOpenNow } from '../../utils/calendar';
+import { LargeTitle } from '../common/LargeTitle';
 
 const DAVAO_CENTER: [number, number] = [7.19, 125.55];
 const REGION_ZOOM = 9;
 const CITY_ZOOM = 12;
+
+const HTML_ESCAPES: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+
+/** Escapes catalog text before it is placed into Leaflet tooltip HTML. */
+const escapeHtml = (value: string): string => value.replace(/[&<>"']/g, (char) => HTML_ESCAPES[char] ?? char);
+
+/** Floating map control: a round bar-material button inside a 44px hit area. */
+const MapControl: React.FC<{ label: string; onClick: () => void; children: React.ReactNode }> = ({ label, onClick, children }) => (
+  <button type="button" onClick={onClick} aria-label={label} className="h-11 w-11 flex items-center justify-center ios-press">
+    <span className="h-9 w-9 rounded-full ios-material-bar shadow-[0_1px_2px_rgba(19,25,31,0.12),0_4px_12px_-4px_rgba(19,25,31,0.25)] flex items-center justify-center text-[#7D5C3D]">
+      {children}
+    </span>
+  </button>
+);
 
 interface DavaoCoffeeMapProps {
   cafes: Cafe[];
@@ -45,6 +61,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
       center: DAVAO_CENTER,
       zoom: REGION_ZOOM,
       scrollWheelZoom: false,
+      zoomControl: false,
       attributionControl: true,
     });
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -81,14 +98,14 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
         icon: L.divIcon({
           className: 'haraya-map-pin-container',
           html: `<div style="display:flex;flex-direction:column;align-items:center;">
-            <div style="width:26px;height:26px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${isTrailStop ? '#C86428' : '#1A2225'};border:2px solid #FFF9E9;box-shadow:0 2px 6px rgba(26,34,37,.4);"></div>
+            <div style="width:26px;height:26px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:${isTrailStop ? '#906D4B' : '#13191F'};border:2.5px solid #FFFDF9;box-shadow:0 1px 2px rgba(19,25,31,.2),0 4px 10px rgba(19,25,31,.3);"></div>
           </div>`,
           iconSize: [26, 26],
           iconAnchor: [13, 26],
         }),
       }).addTo(layer);
       marker.bindTooltip(
-        `<strong>${cafe.name}</strong><br/>${cafe.district}, ${cafe.city}${cafe.isRoastery ? ' : Roastery' : ''}`,
+        `<strong>${escapeHtml(cafe.name)}</strong><br/>${escapeHtml(`${cafe.district}, ${cafe.city}`)}${cafe.isRoastery ? ', Roastery' : ''}`,
         { direction: 'top', offset: [0, -24] }
       );
       marker.on('click', () => onSelectCafe(cafe.id));
@@ -119,7 +136,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
       if (stops.length >= 2) {
         L.polyline(
           stops.map((cafe) => [cafe.lat, cafe.lng] as [number, number]),
-          { color: '#C86428', weight: 3, dashArray: '6 8', opacity: 0.85 }
+          { color: '#906D4B', weight: 3, dashArray: '6 8', opacity: 0.85 }
         ).addTo(layer);
         const bounds = L.latLngBounds(stops.map((cafe) => [cafe.lat, cafe.lng] as [number, number]));
         map.fitBounds(bounds.pad(0.25));
@@ -139,126 +156,182 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
     return distanceKm(stops[index - 1], stops[index]);
   };
 
-  return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4">
-      <div className="relative overflow-hidden bg-[#1A2225] text-[#FFF9E9] p-5 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl space-y-2">
-        <h1 className="font-cooper text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">Davao Coffee Map</h1>
-        <p className="text-xs sm:text-sm text-[#FFF9E9]/75 max-w-2xl font-sans leading-relaxed">
-          Specialty pins across Davao City, Tagum, Digos, Panabo, and Mati. Tap a pin for the venue, or walk a
-          curated trail hop by hop. Showing: {selectedCity}.
-        </p>
-      </div>
+  const zoomBy = (delta: number) => {
+    const map = mapRef.current;
+    if (!map) return;
+    if (delta > 0) map.zoomIn();
+    else map.zoomOut();
+  };
 
-      <div className="grid lg:grid-cols-3 gap-4">
+  // Recenter: back to the active trail's bounds, or the whole region
+  const recenter = () => {
+    const map = mapRef.current;
+    if (!map) return;
+    const stops = activeTrail ? trailsWithCafes.find((entry) => entry.trail.id === activeTrail.id)?.stops ?? [] : [];
+    if (stops.length >= 2) {
+      map.fitBounds(L.latLngBounds(stops.map((cafe) => [cafe.lat, cafe.lng] as [number, number])).pad(0.25));
+    } else {
+      map.setView(DAVAO_CENTER, REGION_ZOOM);
+    }
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-1 pb-6 sm:pt-4 space-y-4">
+      <LargeTitle title="Coffee Map" subtitle={`Specialty pins across the region. Showing ${selectedCity}.`} />
+
+      <div className="grid lg:grid-cols-3 gap-4 lg:gap-6">
         {/* Map canvas */}
         <div className="lg:col-span-2 space-y-3">
-          <div
-            ref={canvasRef}
-            className="h-[380px] sm:h-[460px] rounded-2xl overflow-hidden border border-[#E6DCC0] z-0"
-            role="application"
-            aria-label="Interactive map of Davao specialty cafes"
-          />
+          <div className="relative isolate rounded-[20px] overflow-hidden ios-card-shadow bg-[#FFFDF9]">
+            <div
+              ref={canvasRef}
+              className="h-[380px] sm:h-[460px] lg:h-[520px] z-0"
+              role="application"
+              aria-label="Interactive map of Davao specialty cafes"
+            />
+            {/* Floating controls, Apple Maps style */}
+            <div className="absolute top-1.5 right-1.5 z-[500] flex flex-col">
+              <MapControl label="Zoom in" onClick={() => zoomBy(1)}>
+                <Plus className="w-4.5 h-4.5" strokeWidth={2.25} />
+              </MapControl>
+              <MapControl label="Zoom out" onClick={() => zoomBy(-1)}>
+                <Minus className="w-4.5 h-4.5" strokeWidth={2.25} />
+              </MapControl>
+              <MapControl label={activeTrail ? 'Fit trail in view' : 'Recenter on Davao Region'} onClick={recenter}>
+                <LocateFixed className="w-4.5 h-4.5" strokeWidth={2} />
+              </MapControl>
+            </div>
+          </div>
+
           {activeTrail && (
-            <div className="rounded-2xl bg-[#FFF9E9] border border-[#E6DCC0] p-4 flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <h3 className="font-cooper text-base font-bold text-[#1A2225] truncate">{activeTrail.name}</h3>
-                <p className="text-[11px] font-sans text-[#55615D] line-clamp-2">{activeTrail.description}</p>
+            <div className="ios-group ios-card-shadow flex items-start justify-between gap-3 pl-4 pr-1 py-2">
+              <div className="min-w-0 py-1.5">
+                <h3 className="ios-headline text-[#13191F] truncate">{activeTrail.name}</h3>
+                <p className="ios-footnote text-[#594C3D] line-clamp-2 mt-0.5">{activeTrail.description}</p>
               </div>
               <button
                 onClick={() => {
                   setActiveTrail(null);
                 }}
                 aria-label="Clear trail"
-                className="h-9 w-9 shrink-0 rounded-full bg-[#F3ECD8] border border-[#E6DCC0] flex items-center justify-center"
+                className="h-11 w-11 shrink-0 flex items-center justify-center ios-press"
               >
-                <X className="w-4 h-4" />
+                <span className="h-7.5 w-7.5 rounded-full bg-[#766046]/15 flex items-center justify-center text-[#594C3D]">
+                  <X className="w-4 h-4" strokeWidth={2.5} />
+                </span>
               </button>
             </div>
           )}
         </div>
 
-        {/* Trail cards */}
-        <div className="space-y-3">
-          <h2 className="inline-flex items-center gap-2 font-cooper text-lg font-bold text-[#1A2225]">
-            <RouteIcon className="w-4.5 h-4.5 text-[#C86428]" />
-            Curated Trails
-          </h2>
-          {trailsWithCafes.map(({ trail, stops }) => {
-            const totalKm = trailLengthKm(stops);
-            const isActive = activeTrail?.id === trail.id;
-            return (
-              <article
-                key={trail.id}
-                className={`rounded-2xl border p-4 space-y-2 transition-colors ${
-                  isActive ? 'bg-[#1A2225] border-[#1A2225] text-[#FFF9E9]' : 'bg-[#FFF9E9] border-[#E6DCC0]'
-                }`}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className={`font-cooper text-base font-bold leading-snug ${isActive ? 'text-[#FFF9E9]' : 'text-[#1A2225]'}`}>
-                    {trail.name}
-                  </h3>
-                  <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full shrink-0 ${
-                    isActive ? 'bg-[#C86428] text-[#FFF9E9]' : 'bg-[#F3ECD8] text-[#55615D]'
-                  }`}>
-                    {stops.length} stops
-                  </span>
-                </div>
-                <p className={`text-[11px] font-sans leading-relaxed ${isActive ? 'text-[#FFF9E9]/75' : 'text-[#55615D]'}`}>
-                  {trail.description}
-                </p>
-                <p className={`text-[10px] font-sans font-semibold ${isActive ? 'text-[#FFB477]' : 'text-[#C86428]'}`}>
-                  {formatKm(totalKm)} total : about {walkMinutes(totalKm)} min walk
-                </p>
+        {/* Side column: curated trails, then every venue on the map */}
+        <div className="space-y-6 min-w-0">
+          <section className="space-y-3" aria-labelledby="map-trails-title">
+            <h2 id="map-trails-title" className="ios-title px-1">Curated trails</h2>
+            {trailsWithCafes.map(({ trail, stops }) => {
+              const totalKm = trailLengthKm(stops);
+              const isActive = activeTrail?.id === trail.id;
+              return (
+                <article
+                  key={trail.id}
+                  className={`rounded-[20px] bg-[#FFFDF9] p-4 space-y-2 ${
+                    isActive ? 'shadow-[0_0_0_2px_#906D4B,0_6px_20px_-6px_rgba(19,25,31,0.14)]' : 'ios-card-shadow'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="ios-headline text-[#13191F]">{trail.name}</h3>
+                    <span className="ios-footnote font-mono text-[#594C3D] shrink-0">{stops.length} stops</span>
+                  </div>
+                  <p className="text-[14px] leading-[1.45] text-[#594C3D]">{trail.description}</p>
+                  <p className="ios-footnote font-mono font-medium text-[#7D5C3D]">
+                    {formatKm(totalKm)} total, about {walkMinutes(totalKm)} min walk
+                  </p>
 
-                <ol className="space-y-1.5 pt-1">
-                  {stops.map((cafe, index) => {
-                    const hop = stopDistance(trail, index);
-                    return (
-                      <li key={cafe.id} className="text-[11px] font-sans">
-                        <button
-                          onClick={() => onSelectCafe(cafe.id)}
-                          className={`font-semibold hover:underline text-left ${isActive ? 'text-[#FFF9E9]' : 'text-[#1A2225]'}`}
-                        >
-                          {index + 1}. {cafe.name}
-                        </button>
-                        {hop !== null && (
-                          <span className={`ml-1.5 ${isActive ? 'text-[#FFF9E9]/60' : 'text-[#55615D]'}`}>{formatKm(hop)} hop</span>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ol>
+                  {/* Stops as an inset list on a fill, hop distance trailing */}
+                  <ol className="rounded-[14px] overflow-hidden bg-[#766046]/[0.07]">
+                    {stops.map((cafe, index) => {
+                      const hop = stopDistance(trail, index);
+                      return (
+                        <li key={cafe.id} className={index > 0 ? 'ios-hairline-t' : ''}>
+                          <button
+                            onClick={() => onSelectCafe(cafe.id)}
+                            className="w-full min-h-11 flex items-center gap-2.5 px-3 py-2 text-left ios-press"
+                          >
+                            <span className="h-5 w-5 shrink-0 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[11px] font-semibold font-mono flex items-center justify-center">
+                              {index + 1}
+                            </span>
+                            <span className="flex-1 min-w-0 truncate text-[14px] font-medium text-[#13191F]">{cafe.name}</span>
+                            {hop !== null && <span className="shrink-0 ios-footnote font-mono text-[#594C3D]">{formatKm(hop)}</span>}
+                            <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]/60" />
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ol>
 
-                <div className="flex gap-2 pt-1">
-                  <button
-                    onClick={() => {
-                      setActiveTrail(isActive ? null : trail);
-                    }}
-                    className={`h-9 px-4 rounded-full text-[11px] font-bold font-sans transition-colors ${
-                      isActive
-                        ? 'bg-[#FFF9E9] text-[#1A2225]'
-                        : 'bg-[#1A2225] text-[#FFF9E9] hover:bg-[#26302F]'
-                    }`}
-                  >
-                    {isActive ? 'Hide on Map' : 'Show on Map'}
-                  </button>
-                  <a
-                    href={directionsUrl(stops.map((cafe) => ({ lat: cafe.lat, lng: cafe.lng })))}
-                    target="_blank"
-                    rel="noreferrer"
-                    className={`h-9 px-4 rounded-full text-[11px] font-bold font-sans inline-flex items-center gap-1.5 border transition-colors ${
-                      isActive
-                        ? 'border-[#FFF9E9]/30 text-[#FFF9E9] hover:bg-[#FFF9E9]/10'
-                        : 'border-[#E6DCC0] text-[#1A2225] hover:bg-[#F3ECD8]'
-                    }`}
-                  >
-                    <Navigation className="w-3.5 h-3.5" />
-                    Directions
-                  </a>
-                </div>
-              </article>
-            );
-          })}
+                  <div className="flex gap-2 pt-1">
+                    <button
+                      onClick={() => {
+                        setActiveTrail(isActive ? null : trail);
+                      }}
+                      aria-pressed={isActive}
+                      className={`h-11 flex-1 px-4 rounded-full text-[15px] font-semibold ios-press ${
+                        isActive ? 'ios-fill text-[#7D5C3D] hover:bg-[#766046]/20' : 'bg-[#906D4B] text-[#FFFDF9] hover:bg-[#7D5C3D]'
+                      }`}
+                    >
+                      {isActive ? 'Hide on map' : 'Show on map'}
+                    </button>
+                    <a
+                      href={directionsUrl(stops.map((cafe) => ({ lat: cafe.lat, lng: cafe.lng })))}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="h-11 flex-1 px-4 rounded-full ios-fill text-[15px] font-semibold text-[#7D5C3D] hover:bg-[#766046]/20 inline-flex items-center justify-center gap-1.5 ios-press"
+                    >
+                      <Navigation className="w-4 h-4" />
+                      Directions
+                    </a>
+                  </div>
+                </article>
+              );
+            })}
+          </section>
+
+          <section className="space-y-2" aria-labelledby="map-venues-title">
+            <h2 id="map-venues-title" className="px-4 text-[13px] text-[#594C3D]">
+              On the map <span className="font-mono">({cafes.length})</span>
+            </h2>
+            {cafes.length === 0 ? (
+              <p className="ios-group px-4 py-3 text-[14px] text-[#594C3D]">No venues in this city yet.</p>
+            ) : (
+              <ul className="ios-group ios-card-shadow">
+                {cafes.map((cafe) => {
+                  const openNow = isOpenNow(cafe.hours);
+                  return (
+                    <li key={cafe.id}>
+                      <button onClick={() => onSelectCafe(cafe.id)} className="ios-group-row !px-3">
+                        <img
+                          src={cafe.images[0]}
+                          alt=""
+                          loading="lazy"
+                          className="h-11 w-11 shrink-0 rounded-[10px] object-cover bg-[#13191F]"
+                        />
+                        <span className="flex-1 min-w-0">
+                          <span className="block ios-headline text-[#13191F] truncate">{cafe.name}</span>
+                          <span className="block ios-footnote text-[#594C3D] truncate">
+                            {cafe.district}, {cafe.city}
+                            <span className={`ml-1.5 font-medium ${openNow ? 'text-[#3E5C48]' : 'text-[#8C3A2E]'}`}>
+                              {openNow ? 'Open' : 'Closed'}
+                            </span>
+                          </span>
+                        </span>
+                        <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]/60" />
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </section>
         </div>
       </div>
     </div>

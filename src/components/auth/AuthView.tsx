@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ArrowLeft, ArrowRight, Check, ShieldCheck, Store, Flame } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, ShieldCheck, Store } from 'lucide-react';
+import { motion } from 'framer-motion';
 import type { Account } from '../../types/auth';
 import type { DavaoCity, District } from '../../types/coffee';
 import { DAVAO_CITIES, DAVAO_DISTRICTS } from '../../types/coffee';
@@ -7,6 +8,7 @@ import { authService } from '../../services/authService';
 import { useAuthVersion } from '../../hooks/useServiceVersions';
 import { Field, TextInput, TextArea, SelectInput, PrimaryButton, SecondaryButton, ErrorNote } from '../common/FormControls';
 import { ImageUploadField } from '../common/ImageUploadField';
+import { LargeTitle } from '../common/LargeTitle';
 
 export type AuthMode = 'signin' | 'signup';
 
@@ -101,49 +103,84 @@ export const AuthView: React.FC<AuthViewProps> = ({ mode, onModeChange, onAuthen
     }
   };
 
+  const switchMode = (next: AuthMode) => {
+    if (next === mode) return;
+    setError('');
+    setStep(0);
+    onModeChange(next);
+  };
+
   const stepRail = (
-    <div className="flex items-center gap-2">
+    <ol className="flex items-center gap-2" aria-label="Application steps">
       {STEP_LABELS.map((label, index) => (
         <React.Fragment key={label}>
-          <span
-            className={`h-7 w-7 shrink-0 rounded-full flex items-center justify-center text-[10px] font-bold font-sans border ${
-              index < step
-                ? 'bg-[#3E5C48] border-[#3E5C48] text-[#FFF9E9]'
-                : index === step
-                  ? 'bg-[#1A2225] border-[#1A2225] text-[#FFF9E9]'
-                  : 'bg-[#F3ECD8] border-[#E6DCC0] text-[#55615D]'
-            }`}
-          >
-            {index < step ? <Check className="w-3.5 h-3.5" /> : index + 1}
-          </span>
-          <span className={`text-[10px] font-bold uppercase tracking-widest font-sans ${index === step ? 'text-[#1A2225]' : 'text-[#55615D]'}`}>
-            {label}
-          </span>
-          {index < STEP_LABELS.length - 1 && <span className="flex-1 h-px bg-[#E6DCC0]" />}
+          <li className="flex items-center gap-1.5 shrink-0" aria-current={index === step ? 'step' : undefined}>
+            <span
+              className={`h-6 w-6 shrink-0 rounded-full flex items-center justify-center text-[12px] font-semibold font-mono ${
+                index < step
+                  ? 'bg-[#3E5C48] text-[#FFFDF9]'
+                  : index === step
+                    ? 'bg-[#906D4B] text-[#FFFDF9]'
+                    : 'ios-fill text-[#594C3D]'
+              }`}
+            >
+              {index < step ? <Check className="w-3.5 h-3.5" strokeWidth={2.5} /> : index + 1}
+            </span>
+            {/* On narrow phones only the current step keeps its label */}
+            <span className={`text-[13px] ${index === step ? 'font-semibold text-[#13191F]' : 'hidden min-[400px]:inline text-[#594C3D]'}`}>
+              {label}
+            </span>
+          </li>
+          {index < STEP_LABELS.length - 1 && <span aria-hidden="true" className="flex-1 min-w-2 h-px ios-hairline-t" />}
         </React.Fragment>
       ))}
-    </div>
+    </ol>
   );
 
+  const modes: { id: AuthMode; label: string }[] = [
+    { id: 'signin', label: 'Sign In' },
+    { id: 'signup', label: 'Apply' },
+  ];
+
   return (
-    <div className="max-w-md mx-auto px-4 py-8 sm:py-12">
-      <div className="text-center space-y-2 mb-6">
-        <span className="mx-auto h-12 w-12 rounded-full bg-[#1A2225] flex items-center justify-center">
-          <Flame className="w-6 h-6 text-[#C86428]" />
-        </span>
-        <h1 className="font-cooper text-2xl font-bold text-[#1A2225]">
-          {mode === 'signin' ? 'Roaster Sign In' : 'Join Haraya as a Roaster'}
-        </h1>
-        <p className="text-xs font-sans text-[#55615D] leading-relaxed">
-          {mode === 'signin'
-            ? 'Access your Roaster Suite: inventory, roast schedule, menu, and the reservation inbox.'
-            : 'List your roastery or cafe, schedule bean drops, and reach Davao cuppers. Verification keeps the archive authentic.'}
-        </p>
+    <div className="max-w-md mx-auto px-4 pt-1 pb-8 sm:pt-4 space-y-5">
+      <LargeTitle
+        title={mode === 'signin' ? 'Roaster sign in' : 'Join as a roaster'}
+        subtitle={
+          mode === 'signin'
+            ? 'Inventory, roast schedule, menu and reservations.'
+            : 'List your roastery or cafe and schedule bean drops.'
+        }
+      />
+
+      {/* Segmented control: sign in or apply */}
+      <div className="flex p-0.5 rounded-[10px] ios-fill" role="tablist" aria-label="Roaster access">
+        {modes.map((entry) => {
+          const active = mode === entry.id;
+          return (
+            <button
+              key={entry.id}
+              role="tab"
+              aria-selected={active}
+              onClick={() => switchMode(entry.id)}
+              className="relative flex-1 h-8 px-4 rounded-[8px] text-[13px] font-semibold font-sans"
+            >
+              {active && (
+                <motion.span
+                  layoutId="auth-mode-thumb"
+                  transition={{ type: 'spring', stiffness: 500, damping: 38 }}
+                  className="absolute inset-0 rounded-[8px] bg-[#FFFDF9] shadow-[0_1px_4px_rgba(19,25,31,0.14),0_0_0_0.5px_rgba(19,25,31,0.04)]"
+                />
+              )}
+              <span className={`relative ${active ? 'text-[#13191F]' : 'text-[#594C3D]'}`}>{entry.label}</span>
+            </button>
+          );
+        })}
       </div>
 
-      <div className="rounded-3xl bg-[#FFF9E9] border border-[#E6DCC0] p-5 sm:p-6 space-y-4 shadow-sm">
-        {mode === 'signin' ? (
-          <>
+      {mode === 'signin' ? (
+        <>
+          <div className="rounded-[20px] bg-[#FFFDF9] ios-card-shadow p-4 sm:p-5 space-y-3">
             <Field label="Email">
               <TextInput value={email} onChange={setEmail} type="email" placeholder="you@roastery.ph" />
             </Field>
@@ -151,147 +188,149 @@ export const AuthView: React.FC<AuthViewProps> = ({ mode, onModeChange, onAuthen
               <TextInput value={password} onChange={setPassword} type="password" placeholder="Your password" />
             </Field>
             {error && <ErrorNote message={error} />}
-            <PrimaryButton onClick={signIn} className="w-full">
+            <PrimaryButton onClick={signIn} className="w-full sm:w-auto sm:min-w-40">
               Sign In
             </PrimaryButton>
-            <div className="rounded-xl bg-[#F3ECD8] border border-[#E6DCC0] px-3 py-2.5 text-[10px] font-sans text-[#55615D] leading-relaxed">
-              Demo access: admin@haraya.ph : haraya-admin. Roaster accounts are created through the three-step
-              sign-up and approved in the Control Room.
-            </div>
-          </>
-        ) : (
-          <>
-            {stepRail}
+          </div>
 
-            {step === 0 && (
-              <div className="space-y-3">
-                <Field label="Business Name">
-                  <TextInput value={businessName} onChange={setBusinessName} placeholder="e.g. Matina Micro Roasters" />
-                </Field>
-                <Field label="Handle" hint="Your storefront link: haraya.ph/#/roastery/your-handle">
-                  <TextInput value={handle} onChange={setHandle} placeholder="matinacroasters" />
-                </Field>
-                <Field label="Venue Type">
+          {/* Demo credentials as a grouped list */}
+          <section className="space-y-1.5" aria-labelledby="auth-demo-title">
+            <h2 id="auth-demo-title" className="px-4 text-[13px] text-[#594C3D]">
+              Demo access
+            </h2>
+            <dl className="ios-group ios-card-shadow">
+              <div className="ios-group-row justify-between">
+                <dt className="text-[15px] text-[#13191F]">Email</dt>
+                <dd className="font-mono text-[15px] text-[#594C3D] truncate">admin@haraya.ph</dd>
+              </div>
+              <div className="ios-group-row justify-between">
+                <dt className="text-[15px] text-[#13191F]">Password</dt>
+                <dd className="font-mono text-[15px] text-[#594C3D] truncate">haraya-admin</dd>
+              </div>
+            </dl>
+            <p className="px-4 ios-footnote text-[#594C3D]">Roasters can also apply for verification in three steps.</p>
+          </section>
+        </>
+      ) : (
+        <div className="rounded-[20px] bg-[#FFFDF9] ios-card-shadow p-4 sm:p-5 space-y-4">
+          {stepRail}
+
+          {step === 0 && (
+            <div className="space-y-3">
+              <Field label="Business name">
+                <TextInput value={businessName} onChange={setBusinessName} placeholder="e.g. Matina Micro Roasters" />
+              </Field>
+              <Field label="Handle" hint="Your storefront link: haraya.ph/#/roastery/your-handle">
+                <TextInput value={handle} onChange={setHandle} placeholder="matinacroasters" />
+              </Field>
+              <Field label="Venue type">
+                <SelectInput
+                  value={isRoastery}
+                  onChange={(value) => setIsRoastery(value as 'roastery' | 'cafe')}
+                  options={[
+                    { value: 'roastery', label: 'Micro-Roastery (roasts own beans)' },
+                    { value: 'cafe', label: 'Specialty Cafe' },
+                  ]}
+                />
+              </Field>
+              <div className="grid grid-cols-1 min-[360px]:grid-cols-2 gap-3">
+                <Field label="City">
                   <SelectInput
-                    value={isRoastery}
-                    onChange={(value) => setIsRoastery(value as 'roastery' | 'cafe')}
-                    options={[
-                      { value: 'roastery', label: 'Micro-Roastery (roasts own beans)' },
-                      { value: 'cafe', label: 'Specialty Cafe' },
-                    ]}
+                    value={city}
+                    onChange={(value) => setCity(value as DavaoCity)}
+                    options={DAVAO_CITIES.filter((entry) => entry !== 'All Davao Region').map((entry) => ({ value: entry, label: entry }))}
                   />
                 </Field>
-                <div className="grid grid-cols-2 gap-3">
-                  <Field label="City">
-                    <SelectInput
-                      value={city}
-                      onChange={(value) => setCity(value as DavaoCity)}
-                      options={DAVAO_CITIES.filter((entry) => entry !== 'All Davao Region').map((entry) => ({ value: entry, label: entry }))}
-                    />
-                  </Field>
-                  <Field label="District">
-                    <SelectInput
-                      value={district}
-                      onChange={(value) => setDistrict(value as District)}
-                      options={DAVAO_DISTRICTS.map((entry) => ({ value: entry, label: entry }))}
-                    />
-                  </Field>
-                </div>
-                <Field label="Short Description">
-                  <TextArea
-                    value={description}
-                    onChange={setDescription}
-                    rows={3}
-                    maxLength={300}
-                    placeholder="What do you roast, and what makes your bar worth the trip?"
+                <Field label="District">
+                  <SelectInput
+                    value={district}
+                    onChange={(value) => setDistrict(value as District)}
+                    options={DAVAO_DISTRICTS.map((entry) => ({ value: entry, label: entry }))}
                   />
                 </Field>
               </div>
-            )}
-
-            {step === 1 && (
-              <div className="space-y-4">
-                <Field label="DTI or Mayor's Permit Number">
-                  <TextInput value={permitNumber} onChange={setPermitNumber} placeholder="e.g. DN-2026-1234567" />
-                </Field>
-                <ImageUploadField
-                  label="Permit Document Photo (optional)"
-                  hint="Speeds up verification, but the permit number alone can be reviewed."
-                  value={permitDoc}
-                  onChange={setPermitDoc}
-                  aspect="wide"
+              <Field label="Short description">
+                <TextArea
+                  value={description}
+                  onChange={setDescription}
+                  rows={3}
+                  maxLength={300}
+                  placeholder="What do you roast, and what makes your bar worth the trip?"
                 />
-                <ImageUploadField
-                  label="One Government ID (required)"
-                  hint="Stored in this browser demo only. Production uses secure document intake."
-                  value={idDoc}
-                  onChange={setIdDoc}
-                />
-              </div>
-            )}
-
-            {step === 2 && (
-              <div className="space-y-3">
-                <Field label="Contact Person">
-                  <TextInput value={contactName} onChange={setContactName} placeholder="Your name" />
-                </Field>
-                <Field label="Email">
-                  <TextInput value={email} onChange={setEmail} type="email" placeholder="you@roastery.ph" />
-                </Field>
-                <Field label="Password" hint="At least 8 characters">
-                  <TextInput value={password} onChange={setPassword} type="password" placeholder="Create a password" />
-                </Field>
-                <div className="rounded-xl bg-[#C86428]/10 border border-[#C86428]/30 px-3 py-2.5 flex gap-2">
-                  <ShieldCheck className="w-4 h-4 text-[#A34F1E] shrink-0 mt-0.5" />
-                  <p className="text-[10px] font-sans text-[#A34F1E] leading-relaxed">
-                    Your application goes to the Haraya Control Room. Status stays pending until an admin verifies
-                    your permit and ID.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {error && <ErrorNote message={error} />}
-
-            <div className="flex gap-2">
-              {step > 0 && (
-                <SecondaryButton onClick={() => setStep(step - 1)} className="shrink-0">
-                  <span className="inline-flex items-center gap-1.5">
-                    <ArrowLeft className="w-3.5 h-3.5" />
-                    Back
-                  </span>
-                </SecondaryButton>
-              )}
-              <PrimaryButton onClick={nextFromStep} className="flex-1">
-                <span className="inline-flex items-center justify-center gap-1.5">
-                  {step === 2 ? 'Submit Application' : 'Continue'}
-                  {step < 2 && <ArrowRight className="w-3.5 h-3.5" />}
-                </span>
-              </PrimaryButton>
+              </Field>
             </div>
-          </>
-        )}
+          )}
 
-        <div className="pt-3 border-t border-[#E6DCC0] text-center space-y-2">
-          <button
-            onClick={() => {
-              setError('');
-              setStep(0);
-              onModeChange(mode === 'signin' ? 'signup' : 'signin');
-            }}
-            className="text-xs font-bold font-sans text-[#C86428] hover:underline"
-          >
-            {mode === 'signin' ? 'New roastery? Apply for verification' : 'Already verified? Sign in'}
-          </button>
-          <button
-            onClick={onBrowseFeed}
-            className="flex items-center justify-center gap-1.5 mx-auto text-[11px] font-sans text-[#55615D] hover:text-[#1A2225] transition-colors"
-          >
-            <Store className="w-3 h-3" />
-            Keep browsing the feed instead
-          </button>
+          {step === 1 && (
+            <div className="space-y-4">
+              <Field label="DTI or Mayor's permit number">
+                <TextInput value={permitNumber} onChange={setPermitNumber} placeholder="e.g. DN-2026-1234567" />
+              </Field>
+              <ImageUploadField
+                label="Permit document photo (optional)"
+                hint="Speeds up verification, but the permit number alone can be reviewed."
+                value={permitDoc}
+                onChange={setPermitDoc}
+                aspect="wide"
+              />
+              <ImageUploadField
+                label="One government ID (required)"
+                hint="Stored in this browser demo only. Production uses secure document intake."
+                value={idDoc}
+                onChange={setIdDoc}
+              />
+            </div>
+          )}
+
+          {step === 2 && (
+            <div className="space-y-3">
+              <Field label="Contact person">
+                <TextInput value={contactName} onChange={setContactName} placeholder="Your name" />
+              </Field>
+              <Field label="Email">
+                <TextInput value={email} onChange={setEmail} type="email" placeholder="you@roastery.ph" />
+              </Field>
+              <Field label="Password" hint="At least 8 characters">
+                <TextInput value={password} onChange={setPassword} type="password" placeholder="Create a password" />
+              </Field>
+              <div className="rounded-[14px] ios-fill px-3.5 py-3 flex gap-2.5">
+                <ShieldCheck className="w-4 h-4 text-[#906D4B] shrink-0 mt-0.5" />
+                <p className="ios-footnote text-[#594C3D]">
+                  Your application goes to the Haraya Control Room. Status stays pending until an admin verifies your
+                  permit and ID.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {error && <ErrorNote message={error} />}
+
+          <div className="flex gap-2">
+            {step > 0 && (
+              <SecondaryButton onClick={() => setStep(step - 1)} className="shrink-0 !pl-3.5">
+                <span className="inline-flex items-center gap-0.5">
+                  <ChevronLeft className="w-4.5 h-4.5" strokeWidth={2.5} />
+                  Back
+                </span>
+              </SecondaryButton>
+            )}
+            <PrimaryButton onClick={nextFromStep} className="flex-1">
+              <span className="inline-flex items-center justify-center gap-0.5">
+                {step === 2 ? 'Submit Application' : 'Continue'}
+                {step < 2 && <ChevronRight className="w-4.5 h-4.5" strokeWidth={2.5} />}
+              </span>
+            </PrimaryButton>
+          </div>
         </div>
-      </div>
+      )}
+
+      <button
+        onClick={onBrowseFeed}
+        className="h-11 flex items-center justify-center gap-1.5 mx-auto px-3 text-[15px] font-medium font-sans text-[#7D5C3D] ios-press"
+      >
+        <Store className="w-4 h-4" />
+        Keep browsing the feed
+      </button>
     </div>
   );
 };

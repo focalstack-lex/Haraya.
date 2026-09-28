@@ -14,10 +14,11 @@ import {
   VolumeX,
   LaptopMinimal,
   Milk,
-  FlaskConical,
   BadgeCheck,
   Flame,
   Clock,
+  Star,
+  ChevronRight,
 } from 'lucide-react';
 import type { Cafe, AmenityKey, Bean } from '../../types/coffee';
 import { AMENITY_LABELS } from '../../types/coffee';
@@ -27,6 +28,7 @@ import { directionsUrl } from '../../utils/geo';
 import { catalogService } from '../../services/catalogService';
 import { useCatalogVersion } from '../../hooks/useServiceVersions';
 import { AddToListSheet } from '../common/AddToListSheet';
+import { V60DripperIcon } from '../common/CustomIcons';
 
 const AMENITY_ICONS: Record<AmenityKey, React.ComponentType<{ className?: string }>> = {
   fastWifi: Wifi,
@@ -37,23 +39,32 @@ const AMENITY_ICONS: Record<AmenityKey, React.ComponentType<{ className?: string
   lateNight: MoonStar,
   quietFocus: VolumeX,
   workFriendly: LaptopMinimal,
-  pourOverBar: FlaskConical,
+  pourOverBar: V60DripperIcon,
   oatMilk: Milk,
 };
 
+/** Grouped list on the white sheet: the linen canvas tone lets the inset group read as a group. */
+const GROUP = 'ios-group bg-[#FAF5EB]';
+const SECTION_LABEL = 'px-4 text-[13px] text-[#594C3D] font-sans';
+const SECONDARY_ACTION =
+  'h-11 px-3 rounded-full ios-fill text-[#7D5C3D] text-[15px] font-semibold font-sans inline-flex items-center justify-center gap-2 hover:bg-[#766046]/20 ios-press';
+
 export const AmenityBadges: React.FC<{ amenities: AmenityKey[]; wifiMbps: number }> = ({ amenities, wifiMbps }) => (
-  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+  <div className={GROUP}>
     {amenities.map((amenity) => {
       const Icon = AMENITY_ICONS[amenity];
       return (
         <div
           key={amenity}
-          className="flex items-center gap-2 h-9 px-3 rounded-xl bg-[#F3ECD8] border border-[#E6DCC0] text-[11px] font-semibold font-sans text-[#1A2225]"
+          className="ios-group-row min-h-11 py-2 text-[15px] font-sans text-[#13191F]"
         >
-          <Icon className="w-3.5 h-3.5 text-[#55615D] shrink-0" />
+          <Icon className="w-4.5 h-4.5 text-[#906D4B] shrink-0" />
           <span className="truncate">
-            {amenity === 'fastWifi' ? `Fast WiFi ${wifiMbps} Mbps` : AMENITY_LABELS[amenity]}
+            {amenity === 'fastWifi' ? 'Fast WiFi' : AMENITY_LABELS[amenity]}
           </span>
+          {amenity === 'fastWifi' && (
+            <span className="ml-auto shrink-0 font-mono text-[13px] text-[#594C3D]">{wifiMbps} Mbps</span>
+          )}
         </div>
       );
     })}
@@ -69,16 +80,18 @@ export const MenuSheet: React.FC<{ menu: Cafe['menu'] }> = ({ menu }) => {
         if (items.length === 0) return null;
         return (
           <div key={category} className="space-y-1.5">
-            <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#55615D] font-sans">{category}</h4>
-            {items.map((item) => (
-              <div key={item.name} className="flex items-baseline justify-between gap-3 border-b border-dashed border-[#E6DCC0] pb-1.5">
-                <div className="min-w-0">
-                  <span className="text-sm font-sans font-semibold text-[#1A2225]">{item.name}</span>
-                  {item.description && <span className="block text-[11px] font-sans text-[#55615D]">{item.description}</span>}
+            <h4 className={SECTION_LABEL}>{category}</h4>
+            <div className={GROUP}>
+              {items.map((item) => (
+                <div key={item.name} className="ios-group-row min-h-11 justify-between items-baseline">
+                  <div className="min-w-0">
+                    <span className="block text-[15px] font-sans text-[#13191F]">{item.name}</span>
+                    {item.description && <span className="block ios-footnote text-[#594C3D] mt-0.5">{item.description}</span>}
+                  </div>
+                  <span className="text-[15px] font-mono font-medium text-[#13191F] shrink-0">₱{item.price}</span>
                 </div>
-                <span className="text-sm font-sans font-bold text-[#1A2225] shrink-0 tabular-nums">P{item.price}</span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         );
       })}
@@ -93,11 +106,12 @@ interface CafeDetailModalProps {
   onToggleSave: (cafe: Cafe) => void;
   onSelectRoastery: (cafeId: string) => void;
   onViewBean: (beanId: string) => void;
+  onRateCafe?: (cafe: Cafe) => void;
 }
 
 /**
- * Full cafe detail: snap gallery, live open status, amenity grid, menu sheet,
- * and actions (directions, save, add to list, roastery hop).
+ * Full cafe detail: snap gallery, live open status, actions (directions, save, rate,
+ * roastery hop), and grouped lists for visit details, amenities, menu and beans.
  */
 export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
   cafe,
@@ -106,6 +120,7 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
   onToggleSave,
   onSelectRoastery,
   onViewBean,
+  onRateCafe,
 }) => {
   const catalogVersion = useCatalogVersion();
   const [isListSheetOpen, setIsListSheetOpen] = useState(false);
@@ -131,7 +146,7 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
       <Modal isOpen={Boolean(cafe)} onClose={onClose} maxWidth="sm:max-w-2xl" labelledBy="cafe-detail-title">
         <ModalHeader title={cafe.name} subtitle={`${cafe.district}, ${cafe.city}`} onClose={onClose} />
 
-        <div className="px-4 sm:px-6 py-4 space-y-5">
+        <div className="px-4 sm:px-6 py-4 space-y-6">
           {/* Snap gallery */}
           <div className="relative">
             <div
@@ -140,137 +155,161 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
                 const el = event.currentTarget;
                 setActiveImage(Math.round(el.scrollLeft / Math.max(el.clientWidth, 1)));
               }}
-              className="snap-gallery flex overflow-x-auto scrollbar-none rounded-2xl border border-[#E6DCC0] aspect-[16/10] bg-[#1A2225]"
+              className="flex overflow-x-auto snap-x snap-mandatory overscroll-x-contain scrollbar-none rounded-[20px] aspect-[16/10] bg-[#13191F]"
             >
               {cafe.images.map((src, index) => (
                 <img
                   key={src + index}
                   src={src}
                   alt={`${cafe.name} photo ${index + 1}`}
-                  className="w-full h-full object-cover shrink-0 snap-center"
+                  className="w-full h-full object-cover shrink-0 snap-center snap-always"
                   loading={index === 0 ? 'eager' : 'lazy'}
                 />
               ))}
             </div>
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
-              {cafe.images.map((src, index) => (
-                <span
-                  key={src + index}
-                  className={`h-1.5 rounded-full transition-all ${index === activeImage ? 'w-5 bg-[#FFF9E9]' : 'w-1.5 bg-[#FFF9E9]/50'}`}
-                />
-              ))}
+            {cafe.images.length > 1 && (
+              <div
+                className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 h-5 px-2 rounded-full ios-material-dark"
+                role="img"
+                aria-label={`Photo ${activeImage + 1} of ${cafe.images.length}`}
+              >
+                {cafe.images.map((src, index) => (
+                  <span
+                    key={src + index}
+                    className={`h-1.5 w-1.5 rounded-full transition-colors ${index === activeImage ? 'bg-[#FFFDF9]' : 'bg-[#FFFDF9]/45'}`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Status line */}
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] font-sans">
+              <span className={`font-semibold inline-flex items-center gap-1.5 ${
+                openNow ? 'text-[#3E5C48]' : 'text-[#8C3A2E]'
+              }`}>
+                <span className={`h-2 w-2 rounded-full ${openNow ? 'bg-[#3E5C48]' : 'bg-[#8C3A2E]'}`} />
+                {openNow ? 'Open now' : 'Closed'}
+              </span>
+              {cafe.verified && (
+                <span className="inline-flex items-center gap-1 text-[#594C3D]">
+                  <BadgeCheck className="w-4 h-4 text-[#3E5C48]" />
+                  Verified
+                </span>
+              )}
+              {cafe.isRoastery && (
+                <span className="inline-flex items-center gap-1 text-[#7D5C3D] font-medium">
+                  <Flame className="w-4 h-4 text-[#906D4B]" />
+                  Roastery
+                </span>
+              )}
+            </div>
+            <p className="text-[15px] font-sans text-[#13191F]/85 leading-relaxed">{cafe.description}</p>
+          </div>
+
+          {/* Actions */}
+          <div className="space-y-2">
+            <a
+              href={directionsUrl([{ lat: cafe.lat, lng: cafe.lng }])}
+              target="_blank"
+              rel="noreferrer"
+              className="h-11 w-full rounded-full bg-[#906D4B] text-[#FFFDF9] text-[15px] font-semibold font-sans inline-flex items-center justify-center gap-2 hover:bg-[#7D5C3D] ios-press"
+            >
+              <Navigation className="w-4 h-4" />
+              Directions
+            </a>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => onToggleSave(cafe)}
+                aria-pressed={saved}
+                className={SECONDARY_ACTION}
+              >
+                {saved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+                {saved ? 'Saved' : 'Save'}
+              </button>
+              <SecondaryButton onClick={() => setIsListSheetOpen(true)} className="px-3">
+                <span className="inline-flex items-center justify-center gap-2">
+                  <ListPlus className="w-4 h-4" />
+                  Add to list
+                </span>
+              </SecondaryButton>
+              {onRateCafe && (
+                <button
+                  onClick={() => onRateCafe(cafe)}
+                  className={`${SECONDARY_ACTION} ${cafe.isRoastery ? '' : 'col-span-2'}`}
+                >
+                  <Star className="w-4 h-4" />
+                  Rate
+                </button>
+              )}
+              {cafe.isRoastery && (
+                <button
+                  onClick={() => onSelectRoastery(cafe.id)}
+                  className={`${SECONDARY_ACTION} ${onRateCafe ? '' : 'col-span-2'}`}
+                >
+                  <Flame className="w-4 h-4" />
+                  Roastery profile
+                </button>
+              )}
             </div>
           </div>
 
-          {/* Status row */}
-          <div className="flex flex-wrap items-center gap-2 text-[11px] font-sans">
-            <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 border font-bold ${
-              openNow
-                ? 'bg-[#3E5C48]/10 border-[#3E5C48]/30 text-[#3E5C48]'
-                : 'bg-[#C86428]/10 border-[#C86428]/30 text-[#A34F1E]'
-            }`}>
-              <span className={`h-1.5 w-1.5 rounded-full ${openNow ? 'bg-[#3E5C48]' : 'bg-[#C86428]'}`} />
-              {openNow ? 'Open Now' : 'Closed'}
-            </span>
-            <span className="inline-flex items-center gap-1.5 text-[#55615D]">
-              <Clock className="w-3.5 h-3.5" />
-              {hoursTodayLabel(cafe.hours)}
-            </span>
-            {cafe.verified && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#F3ECD8] border border-[#E6DCC0] px-2.5 py-1 font-bold text-[#1A2225]">
-                <BadgeCheck className="w-3.5 h-3.5 text-[#3E5C48]" />
-                Verified Venue
-              </span>
-            )}
-            {cafe.isRoastery && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#C86428] px-2.5 py-1 font-bold tracking-widest text-[#FFF9E9] text-[9px]">
-                <Flame className="w-3 h-3" />
-                MICRO-ROASTERY
-              </span>
-            )}
+          {/* Visit details */}
+          <div className={GROUP}>
+            <div className="ios-group-row">
+              <Clock className="w-4.5 h-4.5 text-[#906D4B] shrink-0" />
+              <span className="text-[15px] font-sans text-[#13191F]">Today</span>
+              <span className="ml-auto text-[15px] font-mono text-[#594C3D] text-right">{hoursTodayLabel(cafe.hours)}</span>
+            </div>
+            <div className="ios-group-row items-start">
+              <MapPin className="w-4.5 h-4.5 text-[#906D4B] shrink-0 mt-0.5" />
+              <span className="text-[15px] font-sans text-[#13191F] leading-snug">{cafe.address}</span>
+            </div>
           </div>
 
-          <p className="text-sm font-sans text-[#1A2225]/85 leading-relaxed">{cafe.description}</p>
-
-          <div className="flex items-start gap-2 text-xs font-sans text-[#55615D]">
-            <MapPin className="w-4 h-4 shrink-0 mt-0.5" />
-            <span>{cafe.address}</span>
-          </div>
-
-          <section className="space-y-2">
-            <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#55615D] font-sans">Amenities</h3>
+          <section className="space-y-1.5">
+            <h3 className={SECTION_LABEL}>Amenities</h3>
             <AmenityBadges amenities={cafe.amenities} wifiMbps={cafe.wifiMbps} />
           </section>
 
-          <section className="space-y-2">
-            <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#55615D] font-sans">Brew Methods</h3>
+          <section className="space-y-1.5">
+            <h3 className={SECTION_LABEL}>Brew methods</h3>
             <div className="flex flex-wrap gap-1.5">
               {cafe.brewMethods.map((method) => (
-                <span key={method} className="h-7 px-2.5 rounded-full bg-[#F3ECD8] border border-[#E6DCC0] text-[10px] font-bold font-sans text-[#1A2225] flex items-center">
+                <span key={method} className="h-8 inline-flex items-center px-3 rounded-full ios-fill text-[13px] font-medium font-sans text-[#13191F]">
                   {method}
                 </span>
               ))}
             </div>
           </section>
 
-          <section className="space-y-2">
-            <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#55615D] font-sans">Menu</h3>
+          <section className="space-y-1.5">
+            <h3 className={SECTION_LABEL}>Menu</h3>
             <MenuSheet menu={menu} />
           </section>
 
           {roasterBeans.length > 0 && (
-            <section className="space-y-2">
-              <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#55615D] font-sans">Roasted Here</h3>
-              <div className="flex flex-wrap gap-1.5">
+            <section className="space-y-1.5">
+              <h3 className={SECTION_LABEL}>Roasted here</h3>
+              <div className={GROUP}>
                 {roasterBeans.map((bean) => (
                   <button
                     key={bean.id}
                     onClick={() => onViewBean(bean.id)}
-                    className="h-8 px-3 rounded-full bg-[#C86428]/10 border border-[#C86428]/30 text-[10px] font-bold font-sans text-[#A34F1E] flex items-center gap-1.5 hover:bg-[#C86428]/20 transition-colors"
+                    className="ios-group-row ios-press"
                   >
-                    {bean.name}
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[15px] font-sans text-[#13191F] truncate">{bean.name}</span>
+                      <span className="block ios-footnote text-[#594C3D] truncate">{bean.origin}</span>
+                    </span>
+                    <span className="font-mono text-[15px] text-[#594C3D] shrink-0">₱{bean.price}</span>
+                    <ChevronRight className="w-4 h-4 text-[#6E6150]/60 shrink-0" strokeWidth={2.5} />
                   </button>
                 ))}
               </div>
             </section>
           )}
-
-          {/* Actions */}
-          <div className="flex flex-wrap gap-2 pt-2 border-t border-[#E6DCC0] sheet-safe">
-            <a
-              href={directionsUrl([{ lat: cafe.lat, lng: cafe.lng }])}
-              target="_blank"
-              rel="noreferrer"
-              className="h-10 px-5 rounded-full bg-[#1A2225] text-[#FFF9E9] text-xs font-bold font-sans inline-flex items-center gap-2 hover:bg-[#26302F] transition-colors"
-            >
-              <Navigation className="w-3.5 h-3.5" />
-              Directions
-            </a>
-            <button
-              onClick={() => onToggleSave(cafe)}
-              className={`h-10 px-5 rounded-full text-xs font-bold font-sans inline-flex items-center gap-2 border transition-colors ${
-                saved ? 'bg-[#C86428] border-[#C86428] text-[#FFF9E9]' : 'bg-[#F3ECD8] border-[#E6DCC0] text-[#1A2225] hover:bg-[#E6DCC0]'
-              }`}
-            >
-              {saved ? <BookmarkCheck className="w-3.5 h-3.5" /> : <Bookmark className="w-3.5 h-3.5" />}
-              {saved ? 'Saved' : 'Save Cafe'}
-            </button>
-            <SecondaryButton onClick={() => setIsListSheetOpen(true)}>
-              <span className="inline-flex items-center gap-2">
-                <ListPlus className="w-3.5 h-3.5" />
-                Add to List
-              </span>
-            </SecondaryButton>
-            {cafe.isRoastery && (
-              <button
-                onClick={() => onSelectRoastery(cafe.id)}
-                className="h-10 px-5 rounded-full bg-roast-soft border border-[#C86428]/40 text-[#A34F1E] text-xs font-bold font-sans inline-flex items-center gap-2 hover:bg-[#C86428]/20 transition-colors"
-              >
-                <Flame className="w-3.5 h-3.5" />
-                Roastery Profile
-              </button>
-            )}
-          </div>
         </div>
       </Modal>
 

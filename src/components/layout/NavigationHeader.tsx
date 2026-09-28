@@ -1,19 +1,17 @@
-import React from 'react';
-import { Menu, Search, ArrowLeftRight, ShieldCheck, UserRound } from 'lucide-react';
-import { FeedIcon, DropsIcon, MapIcon, CupCheckIcon, SavedIcon, RoasterIcon } from '../common/CustomIcons';
+import React, { useEffect, useState } from 'react';
+import { Menu, Search, ShieldCheck, UserRound, X } from 'lucide-react';
+import { FeedIcon, MapIcon, SavedIcon, RoasterIcon } from '../common/CustomIcons';
+import { BrandLogo } from '../common/BrandLogo';
 import { DAVAO_CITIES } from '../../types/coffee';
 import type { PortalRole } from '../../types/auth';
-import { SISTER_PLATFORM } from '../../config/ecosystem';
 
 /** The portal tab is shared by the sign-in view, roaster dashboard, and admin panel. */
 export const PORTAL_TAB_ID = 'roaster';
 
 export const NAV_TABS: { id: string; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: 'feed', label: 'Discover', icon: FeedIcon },
-  { id: 'drops', label: 'Bean Drops', icon: DropsIcon },
   { id: 'map', label: 'Coffee Map', icon: MapIcon },
-  { id: 'community', label: 'Cup Check', icon: CupCheckIcon },
-  { id: 'saved', label: 'Saved', icon: SavedIcon },
+  { id: 'profile', label: 'My Profile', icon: SavedIcon },
 ];
 
 export const PortalIcon: React.FC<{ role: PortalRole; className?: string }> = ({ role, className = 'w-4 h-4' }) => {
@@ -39,26 +37,31 @@ interface NavigationHeaderProps {
   isDrawerOpen: boolean;
   setIsDrawerOpen: (open: boolean) => void;
   portalRole: PortalRole;
+  onOpenWelcome?: () => void;
 }
 
 interface TabButtonProps {
   id: string;
   label: string;
-  icon: React.ReactNode;
+  count?: number;
   active: boolean;
   onSelect: (id: string) => void;
 }
 
-const TabButton: React.FC<TabButtonProps> = ({ id, label, icon, active, onSelect }) => (
+const TabButton: React.FC<TabButtonProps> = ({ id, label, count, active, onSelect }) => (
   <button
     onClick={() => onSelect(id)}
     aria-current={active ? 'page' : undefined}
-    className={`h-9 px-3.5 rounded-full flex items-center gap-1.5 text-xs font-bold font-sans transition-colors ${
-      active ? 'bg-[#1A2225] text-[#FFF9E9]' : 'text-[#1A2225] hover:bg-[#F3ECD8]'
+    className={`h-8 px-4 rounded-full text-[13px] font-semibold font-sans ios-press flex items-center gap-1.5 ${
+      active ? 'bg-[#FFFDF9] text-[#13191F] shadow-[0_1px_3px_rgba(19,25,31,0.12)]' : 'text-[#594C3D] hover:text-[#13191F]'
     }`}
   >
-    {icon}
     {label}
+    {count !== undefined && count > 0 && (
+      <span className="h-4 min-w-4 px-1 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[9px] font-bold flex items-center justify-center">
+        {count}
+      </span>
+    )}
   </button>
 );
 
@@ -73,122 +76,130 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
   isDrawerOpen,
   setIsDrawerOpen,
   portalRole,
+  onOpenWelcome,
 }) => {
+  // iOS bar behavior: transparent over the page top, material plus hairline once content scrolls under it
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 4);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Discover carries its own search field and city menu, so the bar only shows them elsewhere
+  const showBarSearch = activeTab !== 'feed';
+
   return (
-    <header className="sticky top-0 z-50 bg-[#FBF4E4]/90 backdrop-blur-md border-b border-[#E6DCC0]">
+    <header
+      className={`sticky top-0 z-50 transition-[background-color,box-shadow,backdrop-filter] duration-300 pt-[env(safe-area-inset-top)] ${
+        scrolled ? 'ios-material-bar ios-hairline-b' : 'bg-[#FAF5EB]'
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-2 sm:gap-3 h-14 sm:h-16">
+        <div className="flex items-center justify-between gap-3 h-13 sm:h-15">
           {/* Brand */}
-          <button
-            onClick={() => setActiveTab('feed')}
-            className="flex items-center gap-2 shrink-0"
-            aria-label="Haraya home"
-          >
-            <span className="h-8 w-8 rounded-full bg-[#1A2225] flex items-center justify-center">
-              <FlameMark />
-            </span>
-            <span className="font-cooper text-xl sm:text-2xl font-bold text-[#1A2225] tracking-tight">Haraya</span>
-          </button>
+          <div className="flex items-center gap-3 shrink-0">
+            <button
+              onClick={() => setActiveTab('feed')}
+              className="flex items-center ios-press min-h-11"
+              aria-label="Haraya home"
+            >
+              <BrandLogo className="h-11 sm:h-12" eager />
+            </button>
+          </div>
 
-          {/* Sister ecosystem switcher: Haraya (coffee) and Habi (fashion) share one design DNA */}
-          <a
-            href={SISTER_PLATFORM.url}
-            title={`Switch to Habi: ${SISTER_PLATFORM.tagline}`}
-            className="h-9 hidden sm:flex items-center gap-1.5 pl-2.5 pr-3 rounded-full bg-[#F3ECD8] border border-[#E6DCC0] hover:border-[#1A2225]/40 transition-colors shrink-0"
-          >
-            <ArrowLeftRight className="w-3.5 h-3.5 text-[#55615D]" />
-            <span className="text-[10px] font-bold font-sans tracking-widest text-[#55615D]">HABI</span>
-          </a>
-
-          {/* Desktop navigation */}
-          <nav className="hidden lg:flex items-center gap-1 ml-1" aria-label="Primary">
+          {/* Clean Desktop Navigation (Text links without icon clutter) */}
+          <nav className="hidden lg:flex items-center gap-0.5 p-0.5 rounded-full ios-fill" aria-label="Primary">
             {NAV_TABS.map((tab) => (
               <TabButton
                 key={tab.id}
                 id={tab.id}
                 label={tab.label}
-                icon={<tab.icon className="w-4 h-4" />}
+                count={tab.id === 'profile' ? savedCount : undefined}
                 active={activeTab === tab.id}
                 onSelect={setActiveTab}
               />
             ))}
-            <TabButton
-              id={PORTAL_TAB_ID}
-              label={PORTAL_LABELS[portalRole].short}
-              icon={<PortalIcon role={portalRole} className="w-4 h-4" />}
-              active={activeTab === PORTAL_TAB_ID}
-              onSelect={setActiveTab}
-            />
           </nav>
 
-          <div className="flex-1 min-w-2" />
+          {/* Right Actions */}
+          <div className="flex items-center gap-2">
+            {/* Unified Search & City Filter Capsule on Desktop */}
+            <div className={`${showBarSearch ? 'hidden md:flex' : 'hidden'} items-center ios-fill rounded-[10px] h-9 transition-colors overflow-hidden`}>
+              {showBarSearch && (
+              <div className="relative flex items-center pl-2.5 pr-1">
+                <Search className="w-4 h-4 text-[#6E6150] shrink-0 pointer-events-none" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder="Search cafes, beans..."
+                  aria-label="Search cafes and beans"
+                  className="w-28 lg:w-40 bg-transparent pl-2 pr-2 font-sans text-[13px] text-[#13191F] placeholder:text-[#6E6150] focus:outline-none"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    aria-label="Clear search"
+                    className="h-4.5 w-4.5 rounded-full bg-[#6E6150]/70 text-[#FFFDF9] flex items-center justify-center mr-1"
+                  >
+                    <X className="w-3 h-3" strokeWidth={3} />
+                  </button>
+                )}
+              </div>
+              )}
 
-          {/* District select (desktop) */}
-          <select
-            value={selectedCity}
-            onChange={(event) => setSelectedCity(event.target.value)}
-            aria-label="Filter by city"
-            className="hidden md:block h-9 rounded-full bg-[#F3ECD8] border border-[#E6DCC0] px-3 font-sans text-xs font-semibold text-[#1A2225] focus:outline-none focus:border-[#55615D] cursor-pointer max-w-40"
-          >
-            {DAVAO_CITIES.map((city) => (
-              <option key={city} value={city}>
-                {city}
-              </option>
-            ))}
-          </select>
+              {showBarSearch && <div className="h-4 w-px bg-[#594C3D]/20" />}
 
-          {/* Search (desktop) */}
-          <div className="hidden md:block relative w-40 lg:w-52 shrink-0">
-            <Search className="w-3.5 h-3.5 text-[#55615D] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Search cafes, beans"
-              aria-label="Search cafes and beans"
-              className="w-full h-9 bg-[#F3ECD8] border border-[#E6DCC0] rounded-full pl-8 pr-3 font-sans text-xs text-[#1A2225] placeholder:text-[#55615D] focus:outline-none focus:bg-[#FFF9E9] focus:border-[#55615D] transition-colors"
-            />
-          </div>
+              <select
+                value={selectedCity}
+                onChange={(event) => setSelectedCity(event.target.value)}
+                aria-label="Filter by city"
+                className="bg-transparent appearance-none px-3 h-9 font-sans text-[13px] font-semibold text-[#7D5C3D] focus:outline-none cursor-pointer"
+              >
+                {DAVAO_CITIES.map((city) => (
+                  <option key={city} value={city}>
+                    {city === 'All Davao Region' ? 'All Davao' : city}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          {/* Saved with count (tablet and up) */}
-          <button
-            onClick={() => setActiveTab('saved')}
-            aria-label={`Saved cafes and beans${savedCount ? `, ${savedCount} saved` : ''}`}
-            className={`relative hidden sm:flex h-9 w-9 shrink-0 rounded-full items-center justify-center border transition-colors ${
-              activeTab === 'saved'
-                ? 'bg-[#1A2225] text-[#FFF9E9] border-[#1A2225]'
-                : 'bg-[#F3ECD8] border-[#E6DCC0] text-[#1A2225] hover:bg-[#E6DCC0]'
-            }`}
-          >
-            <SavedIcon className="w-4 h-4" />
-            {savedCount > 0 && (
-              <span className="absolute -top-1 -right-1 h-4 min-w-4 px-1 rounded-full bg-[#C86428] text-[#FFF9E9] text-[9px] font-bold flex items-center justify-center">
-                {savedCount > 9 ? '9+' : savedCount}
-              </span>
+            {/* Welcome / Get Started Button for guests */}
+            {portalRole === 'guest' && onOpenWelcome && (
+              <button
+                onClick={onOpenWelcome}
+                className="hidden sm:inline-flex items-center h-9 px-4 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[13px] font-semibold font-sans hover:bg-[#7D5C3D] ios-press"
+              >
+                Get Started
+              </button>
             )}
-          </button>
 
-          {/* Mobile menu */}
-          <button
-            onClick={() => setIsDrawerOpen(!isDrawerOpen)}
-            aria-label={isDrawerOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={isDrawerOpen}
-            className="lg:hidden h-9 w-9 shrink-0 rounded-full bg-[#F3ECD8] border border-[#E6DCC0] flex items-center justify-center text-[#1A2225] hover:bg-[#E6DCC0] transition-colors"
-          >
-            <Menu className="w-4 h-4" />
-          </button>
+            {/* Portal / Roaster Button */}
+            <button
+              onClick={() => setActiveTab(PORTAL_TAB_ID)}
+              className={`hidden sm:inline-flex items-center h-9 px-4 rounded-full text-[13px] font-semibold font-sans ios-press ${
+                activeTab === PORTAL_TAB_ID ? 'bg-[#13191F] text-[#FFFDF9]' : 'ios-fill text-[#13191F] hover:bg-[#766046]/20'
+              }`}
+            >
+              {PORTAL_LABELS[portalRole].short}
+            </button>
+
+            {/* Mobile menu trigger */}
+            <button
+              onClick={() => setIsDrawerOpen(!isDrawerOpen)}
+              aria-label={isDrawerOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={isDrawerOpen}
+              className="lg:hidden h-11 w-11 -mr-1.5 rounded-full flex items-center justify-center ios-press"
+            >
+              <span className="h-8.5 w-8.5 rounded-full ios-fill flex items-center justify-center text-[#13191F]">
+                <Menu className="w-4.5 h-4.5" />
+              </span>
+            </button>
+          </div>
         </div>
       </div>
     </header>
   );
 };
-
-/** Flame mark drawn inline so the brand mark carries the roast accent without extra assets. */
-const FlameMark: React.FC = () => (
-  <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" aria-hidden="true">
-    <path
-      d="M12 3.5c1 2.5 4.5 4.5 4.5 8.5a4.5 4.5 0 0 1-9 0c0-1.6.6-2.9 1.5-4 .2 1 .8 1.8 1.5 2.2 0-2.4.5-4.7 1.5-6.7Z"
-      fill="#C86428"
-    />
-  </svg>
-);

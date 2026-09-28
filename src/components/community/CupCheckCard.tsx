@@ -17,92 +17,96 @@ export const CupCheckCard: React.FC<CupCheckCardProps> = ({ post, onOpenComments
   const liked = communityService.isLiked(post.id);
   const cafe = post.cafeId ? catalogService.getCafeById(post.cafeId) : undefined;
 
+  const likeCount = post.likes + (liked ? 1 : 0);
+
   return (
-    <article className="bg-[#FFF9E9] border border-[#E6DCC0] rounded-2xl overflow-hidden shadow-sm">
-      <div className="relative aspect-[4/5] bg-[#1A2225]">
+    <article className="card-ambient bg-[#FFFDF9] rounded-[20px] overflow-hidden break-inside-avoid">
+      {/* Author row */}
+      <header className="flex items-center justify-between gap-2 px-3.5 pt-3 pb-2.5">
+        <div className="min-w-0">
+          <span className="ios-headline text-[#13191F] truncate block">{post.author}</span>
+          <span className="ios-footnote text-[#594C3D] truncate block">
+            @{post.authorHandle}
+            {cafe && onOpenCafe ? (
+              <>
+                {' at '}
+                <button onClick={() => onOpenCafe(cafe.id)} className="font-medium text-[#7D5C3D] hover:underline underline-offset-2">
+                  {cafe.name}
+                </button>
+              </>
+            ) : cafe ? (
+              ` at ${cafe.name}`
+            ) : null}
+          </span>
+        </div>
+        {post.brewMethod && (
+          <span className="shrink-0 h-6 px-2.5 rounded-full ios-fill text-[11px] font-medium font-sans text-[#594C3D] flex items-center">
+            {post.brewMethod}
+          </span>
+        )}
+      </header>
+
+      <div className="relative aspect-[4/5] bg-[#13191F] overflow-hidden">
         <img src={post.image} alt={`${post.author}'s cup`} loading="lazy" className="w-full h-full object-cover" />
 
         {/* Floating tasting tag pins */}
         {post.pins.map((pin) => (
           <span
             key={pin.id}
-            className="flavor-pin absolute -translate-x-1/2 -translate-y-1/2 inline-flex items-center gap-1 h-7 px-2.5 rounded-full bg-[#1A2225]/85 border border-[#FFF9E9]/30 text-[10px] font-bold font-sans text-[#FFF9E9] whitespace-nowrap"
+            className="flavor-pin absolute -translate-x-1/2 -translate-y-1/2 inline-flex items-center gap-1.5 h-7 px-2.5 rounded-full ios-material-dark text-[11px] font-semibold font-sans text-[#FFFDF9] whitespace-nowrap cursor-default"
             style={{ left: `${pin.x}%`, top: `${pin.y}%` }}
             title={`Tasting note: ${pin.label}`}
           >
-            <span className="h-1.5 w-1.5 rounded-full bg-[#C86428]" />
+            <span className="h-1.5 w-1.5 rounded-full bg-[#FFFDF9] shrink-0" aria-hidden="true" />
             {pin.label}
           </span>
         ))}
       </div>
 
-      <div className="p-3 sm:p-4 space-y-2">
-        <div className="flex items-center justify-between gap-2">
-          <div className="min-w-0">
-            <span className="text-sm font-sans font-bold text-[#1A2225] truncate block">{post.author}</span>
-            <span className="text-[10px] font-sans text-[#55615D] truncate block">
-              @{post.authorHandle}
-              {cafe && onOpenCafe ? (
-                <>
-                  {' at '}
-                  <button onClick={() => onOpenCafe(cafe.id)} className="font-bold text-[#C86428] hover:underline">
-                    {cafe.name}
-                  </button>
-                </>
-              ) : cafe ? (
-                ` at ${cafe.name}`
-              ) : null}
-            </span>
-          </div>
-          {post.brewMethod && (
-            <span className="shrink-0 h-6 px-2 rounded-full bg-[#F3ECD8] border border-[#E6DCC0] text-[9px] font-bold font-sans text-[#55615D] flex items-center tracking-wide">
-              {post.brewMethod}
-            </span>
-          )}
-        </div>
-
-        <p className="text-xs font-sans text-[#1A2225]/85 leading-relaxed line-clamp-3">{post.caption}</p>
-
-        <div className="flex items-center gap-3 pt-1">
-          <button
-            onClick={() => communityService.toggleLike(post.id)}
-            aria-pressed={liked}
-            aria-label={liked ? 'Unlike post' : 'Like post'}
-            className={`inline-flex items-center gap-1.5 h-9 px-3 rounded-full text-[11px] font-bold font-sans border transition-colors ${
-              liked ? 'bg-[#C86428] border-[#C86428] text-[#FFF9E9]' : 'border-[#E6DCC0] text-[#1A2225] hover:bg-[#F3ECD8]'
-            }`}
-          >
-            <Heart className={`w-3.5 h-3.5 ${liked ? 'fill-current' : ''}`} />
-            {post.likes + (liked ? 1 : 0)}
-          </button>
-          <button
-            onClick={() => onOpenComments(post.id)}
-            className="inline-flex items-center gap-1.5 h-9 px-3 rounded-full text-[11px] font-bold font-sans border border-[#E6DCC0] text-[#1A2225] hover:bg-[#F3ECD8] transition-colors"
-          >
-            <MessageCircle className="w-3.5 h-3.5" />
-            {post.comments.length}
-          </button>
-          <span className="ml-auto text-[10px] font-sans text-[#55615D]">
-            {new Date(post.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-          </span>
-        </div>
+      {/* Action row: icon buttons on 44px targets */}
+      <div className="flex items-center px-1.5 pt-1">
+        <button
+          onClick={() => communityService.toggleLike(post.id)}
+          aria-pressed={liked}
+          aria-label={liked ? 'Unlike post' : 'Like post'}
+          className="h-11 min-w-11 px-2 inline-flex items-center justify-center gap-1.5 ios-press active:scale-90"
+        >
+          <Heart
+            className={`w-6 h-6 transition-colors ${liked ? 'fill-[#906D4B] text-[#906D4B]' : 'text-[#13191F]'}`}
+            strokeWidth={1.75}
+          />
+          <span className="text-[14px] font-semibold font-mono text-[#13191F]">{likeCount}</span>
+        </button>
+        <button
+          onClick={() => onOpenComments(post.id)}
+          aria-label={`Comments, ${post.comments.length}`}
+          className="h-11 min-w-11 px-2 inline-flex items-center justify-center gap-1.5 ios-press"
+        >
+          <MessageCircle className="w-6 h-6 text-[#13191F]" strokeWidth={1.75} />
+          <span className="text-[14px] font-semibold font-mono text-[#13191F]">{post.comments.length}</span>
+        </button>
+        <span className="ml-auto pr-2 ios-footnote text-[#594C3D] font-mono">
+          {new Date(post.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+        </span>
       </div>
+
+      <p className="px-3.5 pb-3.5 text-[14px] leading-[1.45] font-sans text-[#13191F]/85 line-clamp-3">{post.caption}</p>
     </article>
   );
 };
 
-/** Small helper badge shown in the view header. */
+/** Empty state for the community feed with a compose shortcut. */
 export const CupCheckEmpty: React.FC<{ onNewPost: () => void }> = ({ onNewPost }) => (
-  <div className="py-16 text-center space-y-3">
-    <h3 className="font-cooper text-xl font-bold text-[#1A2225]">No cups checked yet today</h3>
-    <p className="text-sm font-sans text-[#55615D] max-w-sm mx-auto">
+  <div className="py-16 text-center space-y-2">
+    <h3 className="ios-title text-[19px]">No cups checked yet today</h3>
+    <p className="text-[14px] font-sans text-[#594C3D] max-w-sm mx-auto">
       Be the first to post a brew. Pin your tasting notes right on the photo.
     </p>
     <button
       onClick={onNewPost}
-      className="h-10 px-5 rounded-full bg-[#1A2225] text-[#FFF9E9] text-xs font-bold font-sans inline-flex items-center gap-2"
+      className="mt-2 h-11 px-5 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[15px] font-semibold font-sans inline-flex items-center gap-1.5 hover:bg-[#7D5C3D] ios-press"
     >
-      <Plus className="w-4 h-4" />
+      <Plus className="w-4.5 h-4.5" strokeWidth={2.5} />
       Post a Cup Check
     </button>
   </div>

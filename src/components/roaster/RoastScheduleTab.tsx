@@ -92,11 +92,11 @@ export const RoastScheduleTab: React.FC<RoastScheduleTabProps> = ({ roaster, bea
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="font-cooper text-lg font-bold text-[#1A2225]">Roast Schedule</h2>
+        <h2 className="font-cooper text-lg font-bold text-[#13191F]">Roast Schedule</h2>
         <button
           onClick={openForm}
           disabled={beans.length === 0}
-          className="h-10 px-5 rounded-full bg-[#1A2225] text-[#FFF9E9] text-xs font-bold font-sans disabled:opacity-40 inline-flex items-center gap-2 hover:bg-[#26302F] transition-colors"
+          className="h-10 px-5 rounded-full bg-[#13191F] text-[#FFFDF9] text-xs font-bold font-sans disabled:opacity-40 inline-flex items-center gap-2 hover:bg-[#2B2F2E] transition-colors"
         >
           <CalendarClock className="w-4 h-4" />
           Schedule Batch
@@ -104,7 +104,7 @@ export const RoastScheduleTab: React.FC<RoastScheduleTabProps> = ({ roaster, bea
       </div>
 
       {beans.length === 0 && (
-        <p className="text-xs font-sans text-[#55615D]">
+        <p className="text-xs font-sans text-[#594C3D]">
           Publish a bean lot first: every batch roasts one of your shelf lots.
         </p>
       )}
@@ -113,18 +113,18 @@ export const RoastScheduleTab: React.FC<RoastScheduleTabProps> = ({ roaster, bea
 
       <div className="space-y-3">
         {drops.length === 0 && (
-          <p className="text-xs font-sans text-[#55615D]">No batches scheduled yet. The drop calendar is empty without them.</p>
+          <p className="text-xs font-sans text-[#594C3D]">No batches scheduled yet. The drop calendar is empty without them.</p>
         )}
         {drops.map((drop) => {
           const status = catalogService.getDropStatus(drop);
           return (
-            <article key={drop.id} className="rounded-2xl bg-[#FFF9E9] border border-[#E6DCC0] p-4 flex flex-wrap items-center gap-3">
-              <img src={drop.coverImage} alt="" className="h-14 w-14 rounded-xl object-cover border border-[#E6DCC0]" />
+            <article key={drop.id} className="rounded-2xl bg-[#FFFDF9] border border-[#E4D9C8] p-4 flex flex-wrap items-center gap-3">
+              <img src={drop.coverImage} alt="" className="h-14 w-14 rounded-xl object-cover border border-[#E4D9C8]" />
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-sans font-bold text-[#1A2225] truncate">{drop.title}</p>
-                <p className="text-[11px] font-sans text-[#55615D]">
+                <p className="text-sm font-sans font-bold text-[#13191F] truncate">{drop.title}</p>
+                <p className="text-[11px] font-sans text-[#594C3D]">
                   {new Date(drop.dropAt).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
-                  : {drop.batchBags} bags at P{drop.price}
+                  : {drop.batchBags} bags at ₱{drop.price}
                 </p>
                 <div className="mt-1">
                   <DropCountdownTimer dropAt={drop.dropAt} compact />
@@ -132,17 +132,17 @@ export const RoastScheduleTab: React.FC<RoastScheduleTabProps> = ({ roaster, bea
               </div>
               <span className={`text-[9px] font-bold tracking-widest uppercase px-2 py-1 rounded-full font-sans ${
                 status === 'live'
-                  ? 'bg-[#3E5C48] text-[#FFF9E9]'
+                  ? 'bg-[#3E5C48] text-[#FFFDF9]'
                   : status === 'soldOut'
-                    ? 'bg-[#F3ECD8] text-[#55615D] border border-[#E6DCC0]'
-                    : 'bg-[#C86428]/15 text-[#A34F1E] border border-[#C86428]/40'
+                    ? 'bg-[#F2EAE0] text-[#594C3D] border border-[#E4D9C8]'
+                    : 'bg-[#906D4B]/15 text-[#6D5135] border border-[#906D4B]/40'
               }`}>
                 {status === 'live' ? 'LIVE' : status === 'soldOut' ? 'SOLD OUT' : 'SCHEDULED'}
               </span>
               {status !== 'soldOut' && (
                 <button
                   onClick={() => sellOut(drop)}
-                  className="h-9 px-3.5 rounded-full border border-[#E6DCC0] text-[11px] font-bold font-sans text-[#1A2225] inline-flex items-center gap-1.5 hover:bg-[#F3ECD8] transition-colors"
+                  className="h-9 px-3.5 rounded-full border border-[#E4D9C8] text-[11px] font-bold font-sans text-[#13191F] inline-flex items-center gap-1.5 hover:bg-[#F2EAE0] transition-colors"
                 >
                   <PackageX className="w-3.5 h-3.5" />
                   Mark Sold Out
@@ -151,7 +151,7 @@ export const RoastScheduleTab: React.FC<RoastScheduleTabProps> = ({ roaster, bea
               <button
                 onClick={() => remove(drop)}
                 aria-label={`Remove ${drop.title}`}
-                className="h-9 w-9 rounded-full border border-[#E6DCC0] flex items-center justify-center text-[#55615D] hover:text-[#8C3A2E] hover:bg-[#F3ECD8] transition-colors"
+                className="h-9 w-9 rounded-full border border-[#E4D9C8] flex items-center justify-center text-[#594C3D] hover:text-[#8C3A2E] hover:bg-[#F2EAE0] transition-colors"
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
@@ -184,7 +184,7 @@ export const RoastScheduleTab: React.FC<RoastScheduleTabProps> = ({ roaster, bea
               <TextInput value={batchBags} onChange={setBatchBags} type="number" />
             </Field>
           </div>
-          <Field label="Batch Price" hint={selectedBean ? `Defaults to the lot price: P${selectedBean.price}` : undefined}>
+          <Field label="Batch Price" hint={selectedBean ? `Defaults to the lot price: ₱${selectedBean.price}` : undefined}>
             <TextInput value={price} onChange={setPrice} type="number" placeholder={selectedBean ? String(selectedBean.price) : '450'} />
           </Field>
           {error && <ErrorNote message={error} />}

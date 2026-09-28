@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { MapPin, Bookmark, BookmarkCheck, UserPlus, UserCheck, BadgeCheck, Clock, ArrowLeft, Navigation } from 'lucide-react';
+import { MapPin, Bookmark, BookmarkCheck, UserPlus, UserCheck, BadgeCheck, Clock, ChevronLeft, ListPlus, Navigation } from 'lucide-react';
 import type { Cafe } from '../../types/coffee';
 import { catalogService } from '../../services/catalogService';
 import { userPrefsService } from '../../services/userPrefsService';
@@ -36,102 +36,100 @@ export const RoasteryStorefront: React.FC<RoasteryStorefrontProps> = ({
   const following = userPrefsService.isFollowing(cafe.id);
   const openNow = isOpenNow(cafe.hours);
 
+  const actionClass = 'h-11 px-4 rounded-full text-[15px] font-semibold font-sans inline-flex items-center justify-center gap-1.5 ios-press';
+  const tintAction = `${actionClass} bg-[#906D4B] text-[#FFFDF9] hover:bg-[#7D5C3D]`;
+  const fillAction = `${actionClass} ios-fill text-[#7D5C3D] hover:bg-[#766046]/20`;
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-1 pb-6 sm:pt-3 space-y-6">
+      {/* iOS back button */}
       <button
         onClick={onBack}
-        className="inline-flex items-center gap-2 text-xs font-bold font-sans text-[#55615D] hover:text-[#1A2225] transition-colors"
+        className="h-11 -ml-2 pr-3 inline-flex items-center gap-0.5 text-[17px] font-sans text-[#7D5C3D] ios-press"
       >
-        <ArrowLeft className="w-4 h-4" />
-        Back to Discover
+        <ChevronLeft className="w-6 h-6" strokeWidth={2.25} />
+        Back
       </button>
 
       {/* Brand header */}
-      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-[#E6DCC0] bg-[#FFF9E9] shadow-sm">
-        <div className="relative h-40 sm:h-56 bg-[#1A2225]">
-          <img src={cafe.images[0]} alt={`${cafe.name} cover`} className="w-full h-full object-cover opacity-90" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+      <header className="space-y-4">
+        <div className="relative h-44 sm:h-64 rounded-[20px] overflow-hidden ios-card-shadow bg-[#13191F]">
+          <img src={cafe.images[0]} alt={`${cafe.name} cover`} className="w-full h-full object-cover" />
         </div>
-        <div className="px-4 sm:px-6 pb-5">
-          <div className="flex items-end gap-3 sm:gap-4 -mt-8 sm:-mt-10">
-            <img
-              src={cafe.logoUrl}
-              alt={`${cafe.name} logo`}
-              className="h-16 w-16 sm:h-20 sm:w-20 rounded-2xl object-cover border-2 border-[#FFF9E9] shadow-lg bg-[#1A2225]"
-            />
-            <div className="flex-1 min-w-0 pb-1">
-              <h1 className="font-cooper text-xl sm:text-2xl font-bold text-[#1A2225] truncate flex items-center gap-2">
-                {cafe.name}
-                {cafe.verified && <BadgeCheck className="w-5 h-5 text-[#3E5C48] shrink-0" />}
-              </h1>
-              <p className="text-xs font-sans text-[#55615D] truncate">
-                @{cafe.handle} : {cafe.district}, {cafe.city}
-              </p>
-            </div>
-          </div>
 
-          <p className="text-sm font-sans text-[#1A2225]/85 leading-relaxed mt-3">{cafe.description}</p>
-
-          <div className="flex flex-wrap items-center gap-2 mt-3 text-[11px] font-sans">
-            <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 border font-bold ${
-              openNow ? 'bg-[#3E5C48]/10 border-[#3E5C48]/30 text-[#3E5C48]' : 'bg-[#C86428]/10 border-[#C86428]/30 text-[#A34F1E]'
-            }`}>
-              <span className={`h-1.5 w-1.5 rounded-full ${openNow ? 'bg-[#3E5C48]' : 'bg-[#C86428]'}`} />
-              {openNow ? 'Open Now' : 'Closed'}
-            </span>
-            <span className="inline-flex items-center gap-1.5 text-[#55615D]">
-              <Clock className="w-3.5 h-3.5" />
-              {hoursTodayLabel(cafe.hours)}
-            </span>
-            <span className="inline-flex items-center gap-1.5 text-[#55615D]">
-              <MapPin className="w-3.5 h-3.5" />
-              {cafe.address}
-            </span>
-          </div>
-
-          <div className="flex flex-wrap gap-2 mt-4">
-            <button
-              onClick={() => onToggleSave(cafe)}
-              className={`h-10 px-5 rounded-full text-xs font-bold font-sans inline-flex items-center gap-2 border transition-colors ${
-                saved ? 'bg-[#C86428] border-[#C86428] text-[#FFF9E9]' : 'bg-[#F3ECD8] border-[#E6DCC0] text-[#1A2225] hover:bg-[#E6DCC0]'
-              }`}
-            >
-              {saved ? <BookmarkCheck className="w-3.5 h-3.5" /> : <Bookmark className="w-3.5 h-3.5" />}
-              {saved ? 'Saved' : 'Save Roastery'}
-            </button>
-            <button
-              onClick={() => userPrefsService.toggleFollowing(cafe.id)}
-              className={`h-10 px-5 rounded-full text-xs font-bold font-sans inline-flex items-center gap-2 border transition-colors ${
-                following ? 'bg-[#1A2225] border-[#1A2225] text-[#FFF9E9]' : 'bg-[#FFF9E9] border-[#E6DCC0] text-[#1A2225] hover:bg-[#F3ECD8]'
-              }`}
-            >
-              {following ? <UserCheck className="w-3.5 h-3.5" /> : <UserPlus className="w-3.5 h-3.5" />}
-              {following ? 'Following' : 'Follow Roaster'}
-            </button>
-            <a
-              href={`https://www.google.com/maps/dir/?api=1&destination=${cafe.lat},${cafe.lng}`}
-              target="_blank"
-              rel="noreferrer"
-              className="h-10 px-5 rounded-full bg-[#F3ECD8] border border-[#E6DCC0] text-xs font-bold font-sans text-[#1A2225] inline-flex items-center gap-2 hover:bg-[#E6DCC0] transition-colors"
-            >
-              <Navigation className="w-3.5 h-3.5" />
-              Directions
-            </a>
-            <button
-              onClick={() => setIsListSheetOpen(true)}
-              className="h-10 px-5 rounded-full border border-[#E6DCC0] text-xs font-bold font-sans text-[#1A2225] hover:bg-[#F3ECD8] transition-colors"
-            >
-              Add to List
-            </button>
+        <div className="flex items-center gap-3">
+          <img
+            src={cafe.logoUrl}
+            alt={`${cafe.name} logo`}
+            className="h-14 w-14 sm:h-16 sm:w-16 shrink-0 rounded-[14px] object-cover bg-[#13191F] ios-card-shadow"
+          />
+          <div className="min-w-0 flex-1">
+            <h1 className="ios-large-title text-balance">
+              {cafe.name}
+              {cafe.verified && <BadgeCheck className="inline-block w-6 h-6 ml-1.5 -mt-1 align-middle text-[#3E5C48]" aria-label="Verified" />}
+            </h1>
+            <p className="ios-footnote text-[#594C3D] truncate mt-0.5">
+              @{cafe.handle}, {cafe.district}, {cafe.city}
+            </p>
           </div>
         </div>
-      </div>
+
+        <p className="text-[15px] leading-[1.45] text-[#13191F]/85 max-w-3xl">{cafe.description}</p>
+
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
+          <button
+            onClick={() => userPrefsService.toggleFollowing(cafe.id)}
+            aria-pressed={following}
+            className={following ? fillAction : tintAction}
+          >
+            {following ? <UserCheck className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
+            {following ? 'Following' : 'Follow'}
+          </button>
+          <button onClick={() => onToggleSave(cafe)} aria-pressed={saved} className={saved ? tintAction : fillAction}>
+            {saved ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+            {saved ? 'Saved' : 'Save'}
+          </button>
+          <a
+            href={`https://www.google.com/maps/dir/?api=1&destination=${cafe.lat},${cafe.lng}`}
+            target="_blank"
+            rel="noreferrer"
+            className={fillAction}
+          >
+            <Navigation className="w-4 h-4" />
+            Directions
+          </a>
+          <button onClick={() => setIsListSheetOpen(true)} className={fillAction}>
+            <ListPlus className="w-4 h-4" />
+            Add to List
+          </button>
+        </div>
+
+        {/* Visit info as a grouped list */}
+        <dl className="ios-group ios-card-shadow max-w-3xl">
+          <div className="ios-group-row">
+            <Clock className="w-4.5 h-4.5 shrink-0 text-[#906D4B]" />
+            <dt className="sr-only">Status</dt>
+            <dd className="flex-1 min-w-0 flex items-center justify-between gap-3 text-[15px]">
+              <span className={`font-medium inline-flex items-center gap-1.5 ${openNow ? 'text-[#3E5C48]' : 'text-[#8C3A2E]'}`}>
+                <span className={`h-1.5 w-1.5 rounded-full ${openNow ? 'bg-[#3E5C48]' : 'bg-[#8C3A2E]'}`} />
+                {openNow ? 'Open now' : 'Closed'}
+              </span>
+              <span className="font-mono text-[#594C3D] truncate">{hoursTodayLabel(cafe.hours)}</span>
+            </dd>
+          </div>
+          <div className="ios-group-row">
+            <MapPin className="w-4.5 h-4.5 shrink-0 text-[#906D4B]" />
+            <dt className="sr-only">Address</dt>
+            <dd className="flex-1 min-w-0 text-[15px] text-[#13191F]">{cafe.address}</dd>
+          </div>
+        </dl>
+      </header>
 
       {/* Bean shelf */}
       <section className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="font-cooper text-lg sm:text-xl font-bold text-[#1A2225]">Bean Shelf</h2>
-          <span className="text-[11px] font-sans text-[#55615D]">{beans.length} lots on the shelf</span>
+        <div className="flex items-baseline justify-between gap-3 px-1">
+          <h2 className="ios-title">Bean shelf</h2>
+          <span className="ios-footnote font-mono text-[#594C3D]">{beans.length} lots</span>
         </div>
         <BeanGrid
           beans={beans}
@@ -143,44 +141,49 @@ export const RoasteryStorefront: React.FC<RoasteryStorefrontProps> = ({
 
       {/* Drop schedule */}
       {drops.length > 0 && (
-        <section className="space-y-3">
-          <h2 className="font-cooper text-lg sm:text-xl font-bold text-[#1A2225]">Roast Schedule</h2>
-          <div className="grid sm:grid-cols-2 gap-3">
+        <section className="space-y-2">
+          <h2 className="ios-title px-1">Roast schedule</h2>
+          <ul className="ios-group ios-card-shadow max-w-3xl">
             {drops.map((drop) => (
-              <div key={drop.id} className="rounded-2xl bg-[#FFF9E9] border border-[#E6DCC0] p-4 flex items-center gap-3">
-                <img src={drop.coverImage} alt="" className="h-14 w-14 rounded-xl object-cover border border-[#E6DCC0]" />
+              <li key={drop.id} className="ios-group-row !px-3">
+                <img src={drop.coverImage} alt="" className="h-11 w-11 shrink-0 rounded-[10px] object-cover bg-[#13191F]" />
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-sans font-bold text-[#1A2225] truncate">{drop.title}</p>
-                  <p className="text-[11px] font-sans text-[#55615D]">
+                  <p className="ios-headline text-[#13191F] truncate">{drop.title}</p>
+                  <p className="ios-footnote text-[#594C3D] font-mono truncate">
                     {new Date(drop.dropAt).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
-                    : {drop.batchBags} bags at P{drop.price}
+                    , {drop.batchBags} bags at ₱{drop.price}
                   </p>
                 </div>
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
         </section>
       )}
 
       {/* Menu and hours */}
-      <section className="grid lg:grid-cols-2 gap-4">
-        <div className="rounded-2xl bg-[#FFF9E9] border border-[#E6DCC0] p-4 sm:p-5 space-y-3">
-          <h2 className="font-cooper text-lg font-bold text-[#1A2225]">Menu</h2>
-          <MenuSheet menu={menu} />
+      <section className="grid lg:grid-cols-2 gap-6 lg:gap-4 items-start">
+        <div className="space-y-2">
+          <h2 className="ios-title px-1">Menu</h2>
+          <div className="rounded-[20px] bg-[#FFFDF9] ios-card-shadow p-4 sm:p-5">
+            <MenuSheet menu={menu} />
+          </div>
         </div>
-        <div className="rounded-2xl bg-[#FFF9E9] border border-[#E6DCC0] p-4 sm:p-5 space-y-2">
-          <h2 className="font-cooper text-lg font-bold text-[#1A2225] mb-2">Weekly Hours</h2>
-          {WEEKDAY_ORDER.map((day) => {
-            const entry = cafe.hours[day];
-            return (
-              <div key={day} className="flex items-center justify-between text-xs font-sans border-b border-dashed border-[#E6DCC0] pb-1.5 last:border-0">
-                <span className="font-semibold text-[#1A2225]">{day}</span>
-                <span className="text-[#55615D] tabular-nums">
-                  {entry.open && entry.close ? `${entry.open} to ${entry.close}` : 'Closed'}
-                </span>
-              </div>
-            );
-          })}
+        <div className="space-y-2">
+          <h2 className="ios-title px-1">Weekly hours</h2>
+          <dl className="ios-group ios-card-shadow">
+            {WEEKDAY_ORDER.map((day) => {
+              const entry = cafe.hours[day];
+              const isOpenDay = Boolean(entry.open && entry.close);
+              return (
+                <div key={day} className="ios-group-row justify-between !min-h-11">
+                  <dt className="text-[15px] text-[#13191F]">{day}</dt>
+                  <dd className={`text-[15px] font-mono ${isOpenDay ? 'text-[#594C3D]' : 'text-[#8C3A2E]'}`}>
+                    {isOpenDay ? `${entry.open} to ${entry.close}` : 'Closed'}
+                  </dd>
+                </div>
+              );
+            })}
+          </dl>
         </div>
       </section>
 

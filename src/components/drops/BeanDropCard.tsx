@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CalendarPlus, Bell, BellRing, Flame } from 'lucide-react';
+import { CalendarPlus, Bell, BellRing, Check, Download } from 'lucide-react';
 import type { RoastDrop, Bean } from '../../types/coffee';
 import { catalogService } from '../../services/catalogService';
 import { userPrefsService } from '../../services/userPrefsService';
@@ -55,91 +55,85 @@ export const BeanDropCard: React.FC<BeanDropCardProps> = ({ drop, bean, onInspec
     setSynced(true);
   };
 
+  const statusTone =
+    status === 'live' ? 'text-[#3E5C48]' : status === 'soldOut' ? 'text-[#8C3A2E]' : 'text-[#7D5C3D]';
+  const statusDot = status === 'live' ? 'bg-[#3E5C48]' : status === 'soldOut' ? 'bg-[#8C3A2E]' : 'bg-[#906D4B]';
+  const fillButton =
+    'h-11 px-3.5 rounded-full ios-fill text-[14px] font-semibold font-sans text-[#7D5C3D] inline-flex items-center justify-center gap-1.5 hover:bg-[#766046]/20 ios-press';
+
   return (
-    <article
-      className={`rounded-2xl border overflow-hidden shadow-sm transition-all ${
-        bean?.isLimited ? 'bg-[#FFF9E9] border-[#C86428]/40' : 'bg-[#FFF9E9] border-[#E6DCC0]'
-      }`}
-    >
-      <div className="flex gap-3 p-3 sm:p-4">
-        <button onClick={() => bean && onInspectBean(bean.id)} className="shrink-0" aria-label={`Inspect ${bean?.name ?? drop.title}`}>
+    <article className="card-ambient rounded-[20px] bg-[#FFFDF9] overflow-hidden">
+      <div className="flex gap-3.5 p-3.5 sm:p-4">
+        <button
+          onClick={() => bean && onInspectBean(bean.id)}
+          className="shrink-0 rounded-[14px] ios-press"
+          aria-label={`Inspect ${bean?.name ?? drop.title}`}
+        >
           <img
             src={drop.coverImage}
             alt=""
-            className="h-20 w-20 sm:h-24 sm:w-24 rounded-xl object-cover border border-[#E6DCC0]"
+            className="h-20 w-20 sm:h-24 sm:w-24 rounded-[14px] object-cover bg-[#13191F]"
             loading="lazy"
           />
         </button>
 
-        <div className="min-w-0 flex-1 space-y-1.5">
+        <div className="min-w-0 flex-1 space-y-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className={`text-[9px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-full font-sans ${
-              status === 'live'
-                ? 'bg-[#3E5C48] text-[#FFF9E9]'
-                : status === 'soldOut'
-                  ? 'bg-[#F3ECD8] text-[#55615D] border border-[#E6DCC0]'
-                  : 'bg-[#C86428]/15 text-[#A34F1E] border border-[#C86428]/40'
-            }`}>
-              {status === 'live' ? 'LIVE NOW' : status === 'soldOut' ? 'SOLD OUT' : 'SCHEDULED'}
+            <span className={`inline-flex items-center gap-1.5 ios-footnote font-medium ${statusTone}`}>
+              <span className={`h-1.5 w-1.5 rounded-full ${statusDot} ${status === 'live' ? 'animate-status-pulse' : ''}`} aria-hidden="true" />
+              {status === 'live' ? 'Live now' : status === 'soldOut' ? 'Sold out' : 'Scheduled'}
             </span>
             {bean?.isLimited && (
-              <span className="inline-flex items-center gap-1 text-[9px] font-bold tracking-widest uppercase text-[#C86428] font-sans">
-                <Flame className="w-3 h-3" />
-                MICRO-LOT
+              <span className="h-5.5 px-2 rounded-full ios-fill text-[11px] font-medium font-sans text-[#594C3D] inline-flex items-center">
+                Micro-lot
               </span>
             )}
           </div>
 
-          <h3 className="font-cooper text-base sm:text-lg font-bold text-[#1A2225] leading-snug line-clamp-2">
-            {bean ? bean.name : drop.title}
-          </h3>
-          <p className="text-[11px] font-sans text-[#55615D] truncate">
-            {drop.roasterName} : {bean ? bean.tastingNotes.slice(0, 3).join(', ') : drop.description}
+          <h3 className="ios-headline text-[#13191F] line-clamp-2">{bean ? bean.name : drop.title}</h3>
+          <p className="ios-footnote text-[#594C3D] truncate">
+            {drop.roasterName}, {bean ? bean.tastingNotes.slice(0, 3).join(', ') : drop.description}
           </p>
 
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-0.5">
             <DropCountdownTimer dropAt={drop.dropAt} />
-            <span className="text-[11px] font-sans text-[#55615D]">
+            <span className="ios-footnote text-[#594C3D] font-mono">
               {new Date(drop.dropAt).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
             </span>
-            <span className="text-[11px] font-sans font-bold text-[#1A2225]">
-              P{drop.price} <span className="font-normal text-[#55615D]">: {drop.batchBags} bags</span>
-            </span>
           </div>
+          <p className="text-[14px] font-mono font-semibold text-[#13191F]">
+            ₱{drop.price}
+            <span className="font-sans font-normal ios-footnote text-[#594C3D]"> per bag, {drop.batchBags} in the batch</span>
+          </p>
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 px-3 sm:px-4 pb-3 sm:pb-4">
+      <div className="flex flex-wrap items-center gap-2 px-3.5 sm:px-4 pb-3.5 sm:pb-4 pt-3 ios-hairline-t">
         {bean && (
           <button
             onClick={() => onInspectBean(bean.id)}
-            className="h-9 px-4 rounded-full bg-[#1A2225] text-[#FFF9E9] text-[11px] font-bold font-sans hover:bg-[#26302F] transition-colors"
+            className="h-11 px-4.5 flex-1 min-[420px]:flex-none rounded-full bg-[#906D4B] text-[#FFFDF9] text-[14px] font-semibold font-sans hover:bg-[#7D5C3D] ios-press"
           >
             Reserve or Inquire
           </button>
         )}
-        <button
-          onClick={syncGoogle}
-          className="h-9 px-3.5 rounded-full border border-[#E6DCC0] text-[11px] font-bold font-sans text-[#1A2225] inline-flex items-center gap-1.5 hover:bg-[#F3ECD8] transition-colors"
-        >
-          <CalendarPlus className="w-3.5 h-3.5" />
-          Google Cal
+        <button onClick={syncGoogle} className={fillButton} aria-label="Add to Google Calendar">
+          <CalendarPlus className="w-4 h-4" />
+          <span>Google</span>
         </button>
-        <button
-          onClick={downloadIcsFile}
-          className="h-9 px-3.5 rounded-full border border-[#E6DCC0] text-[11px] font-bold font-sans text-[#1A2225] inline-flex items-center gap-1.5 hover:bg-[#F3ECD8] transition-colors"
-        >
-          .ics {synced ? 'saved' : 'file'}
+        <button onClick={downloadIcsFile} className={fillButton} aria-label={synced ? 'Calendar file saved' : 'Download calendar file'}>
+          {synced ? <Check className="w-4 h-4" /> : <Download className="w-4 h-4" />}
+          <span className="font-mono">.ics</span>
         </button>
         <button
           onClick={() => userPrefsService.toggleReminder(drop.id)}
           aria-pressed={reminded}
-          className={`h-9 px-3.5 rounded-full text-[11px] font-bold font-sans inline-flex items-center gap-1.5 border transition-colors ml-auto ${
-            reminded ? 'bg-[#C86428] border-[#C86428] text-[#FFF9E9]' : 'border-[#E6DCC0] text-[#1A2225] hover:bg-[#F3ECD8]'
+          className={`h-11 px-3.5 rounded-full text-[14px] font-semibold font-sans inline-flex items-center gap-1.5 ios-press ml-auto ${
+            reminded ? 'bg-[#906D4B] text-[#FFFDF9] hover:bg-[#7D5C3D]' : 'ios-fill text-[#7D5C3D] hover:bg-[#766046]/20'
           }`}
         >
-          {reminded ? <BellRing className="w-3.5 h-3.5" /> : <Bell className="w-3.5 h-3.5" />}
-          {reminded ? 'Reminding me' : 'Remind me'}
+          {reminded ? <BellRing className="w-4 h-4" /> : <Bell className="w-4 h-4" />}
+          {reminded ? 'Reminding' : 'Remind me'}
         </button>
       </div>
     </article>

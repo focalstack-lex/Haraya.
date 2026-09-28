@@ -3,85 +3,126 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-    background-color: #FBF4E4;
-    color: #1A2225;
+    font-family: var(--font-ui);
+    background-color: #FAF5EB;
+    color: #13191F;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
     margin: 0;
     padding: 0;
-    background-color: #FBF4E4;
-    color: #1A2225;
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    background-color: #FAF5EB;
+    color: #13191F;
+    font-family: var(--font-ui);
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     overflow-x: clip;
+    overscroll-behavior-y: none;
+  }
+
+  button,
+  a,
+  [role="button"] {
+    touch-action: manipulation;
+  }
+
+  input,
+  textarea,
+  select {
+    caret-color: #906D4B;
   }
 }
 
-/* Haraya Cream-Obsidian-Coffee design tokens. The page is warm cream linen, cards are
-   soft warm canvas, inputs and chips are light latte, headings are deep obsidian slate,
-   hairlines are taupe, secondary text is muted sage, and limited roasts carry the warm
-   roast accent. Tailwind v4 utilities reference theme variables, so remapping the zinc
-   scale (and white) lets stock utilities like bg-zinc-950 render as obsidian while
-   keeping every component free of hardcoded hex values. */
+/* Haraya River Styx, Tanned Wood & Amber Autumn Design Tokens.
+   - River Styx (#13191F): Deep obsidian slate for headings, dark cards, and rich contrast.
+   - Carbon Fibre (#2B2F2E): Dark slate neutral for borders and dark secondary surfaces.
+   - Afternoon Tea (#594C3D): Rich roasted coffee brown for secondary text and metadata.
+   - Tanned Wood (#906D4B): Warm chestnut caramel for primary actions, badges, and brand marks.
+   - Amber Autumn (#CA9C68): Glowing warm amber for ratings, highlights, and status accents.
+   - Canvas (#FAF5EB) & Surface (#FFFDF9): Clean, warm linen background and card canvas.
+   - Hairline (#E4D9C8) & Sub-surface (#F2EAE0): Soft taupe borders and input fills. */
 :root {
-  --color-white: #FFF9E9;
-  --color-zinc-50: #FBF4E4;
-  --color-zinc-100: #F3ECD8;
-  --color-zinc-200: #E6DCC0;
-  --color-zinc-300: #D6C9A8;
-  --color-zinc-400: #A89F8C;
-  --color-zinc-500: #55615D;
-  --color-zinc-600: #45514D;
-  --color-zinc-700: #333F3D;
-  --color-zinc-800: #26302F;
-  --color-zinc-900: #1E2726;
-  --color-zinc-950: #1A2225;
-  --color-amber-50: #FBF4E4;
-  --color-amber-100: #F3ECD8;
-  --color-amber-200: #E6DCC0;
-  --color-amber-800: #C86428;
-  --color-amber-900: #A34F1E;
+  --color-white: #FFFDF9;
+  --color-zinc-50: #FAF5EB;
+  --color-zinc-100: #F2EAE0;
+  --color-zinc-200: #E4D9C8;
+  --color-zinc-300: #D8CCA8;
+  --color-zinc-400: #9E917F;
+  --color-zinc-500: #594C3D;
+  --color-zinc-600: #483E31;
+  --color-zinc-700: #383027;
+  --color-zinc-800: #2B2F2E;
+  --color-zinc-900: #1D242B;
+  --color-zinc-950: #13191F;
+  --color-amber-50: #FAF5EB;
+  --color-amber-100: #F2EAE0;
+  --color-amber-200: #E4D9C8;
+  --color-amber-500: #CA9C68;
+  --color-amber-800: #906D4B;
+  --color-amber-900: #6D5135;
   --color-emerald-800: #3E5C48;
   --color-red-800: #8C3A2E;
 
-  --color-brand-canvas: #FBF4E4;
-  --color-brand-light: #FFF9E9;
-  --color-brand-surface: #F3ECD8;
-  --color-brand-dark: #1A2225;
-  --color-brand-hairline: #E6DCC0;
-  --color-brand-muted: #55615D;
-  --color-brand-roast: #C86428;
+  --color-brand-canvas: #FAF5EB;
+  --color-brand-light: #FFFDF9;
+  --color-brand-surface: #F2EAE0;
+  --color-brand-dark: #13191F;
+  --color-brand-subdark: #2B2F2E;
+  --color-brand-hairline: #E4D9C8;
+  --color-brand-muted: #594C3D;
+  --color-brand-roast: #906D4B;
+  --color-brand-amber: #CA9C68;
   --color-brand-leaf: #3E5C48;
+
+  /* iOS layer (see DESIGN.md). System face first so Apple devices render SF Pro;
+     Plus Jakarta Sans carries the same role everywhere else. */
+  --font-ui: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Plus Jakarta Sans', system-ui, sans-serif;
+
+  --ios-bg: #FAF5EB;
+  --ios-surface: #FFFDF9;
+  --ios-fill: rgba(118, 96, 70, 0.12);
+  --ios-fill-strong: rgba(118, 96, 70, 0.18);
+  --ios-separator: rgba(89, 76, 61, 0.2);
+  --ios-label: #13191F;
+  --ios-label-2: #594C3D;
+  --ios-label-3: #6E6150;
+  --ios-tint: #906D4B;
+  --ios-tint-text: #7D5C3D;
+  --ios-green: #3E5C48;
+  --ios-red: #8C3A2E;
+  --ios-ease: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-/* Typography: Cooper Black is the sibling brand face; Fraunces is the loaded web
-   fallback so the display serif renders on machines without Cooper. */
-.font-cooper {
-  font-family: 'Cooper BT', 'Cooper Black', 'Fraunces', 'Young Serif', serif;
-}
-
+/* Typography: headings use the system display face (SF Pro on Apple devices). */
+.font-recoleta,
+.font-cooper,
 .font-outfit {
-  font-family: 'Cooper BT', 'Cooper Black', 'Fraunces', 'Young Serif', serif;
+  font-family: var(--font-display);
+  letter-spacing: -0.015em;
 }
+
+/* The Haraya wordmark is the logo image (BrandLogo), never set in type */
 
 /* Micro copy (chips, tabs, meta rows) uses the body sans; a tracked display face
    rendered too thin below 12px on phones in the sibling platform. */
-.font-avantgarde {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-}
-
+.font-avantgarde,
 .font-sans {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: var(--font-ui);
 }
 
+/* Numbers (prices, counts, timers) use tabular figures of the UI face, not a monospace costume */
 .font-mono {
-  font-family: 'Space Mono', monospace;
+  font-family: var(--font-ui);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
 }
 
 .text-display {
-  font-family: 'Cooper BT', 'Cooper Black', 'Fraunces', 'Young Serif', serif;
+  font-family: var(--font-display);
   font-size: 38px;
   line-height: 1.1;
   letter-spacing: -0.02em;
@@ -89,7 +130,7 @@
 }
 
 .text-headline {
-  font-family: 'Cooper BT', 'Cooper Black', 'Fraunces', 'Young Serif', serif;
+  font-family: var(--font-display);
   font-size: 26px;
   line-height: 1.2;
   letter-spacing: -0.015em;
@@ -97,7 +138,7 @@
 }
 
 .text-title {
-  font-family: 'Cooper BT', 'Cooper Black', 'Fraunces', 'Young Serif', serif;
+  font-family: var(--font-display);
   font-size: 19px;
   line-height: 1.3;
   letter-spacing: -0.01em;
@@ -105,21 +146,21 @@
 }
 
 .text-body {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 14px;
   line-height: 1.6;
   letter-spacing: 0;
 }
 
 .text-meta {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 12px;
   line-height: 1.4;
   letter-spacing: 0.02em;
 }
 
 .text-micro {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: var(--font-ui);
   font-size: 10px;
   line-height: 1.3;
   letter-spacing: 0.04em;
@@ -127,48 +168,60 @@
 
 /* Warm Roast Accent helpers for limited single-origin badges and drop timers */
 .text-roast {
-  color: #C86428;
+  color: #906D4B;
 }
 
 .bg-roast {
-  background-color: #C86428;
+  background-color: #906D4B;
 }
 
 .border-roast {
-  border-color: #C86428;
+  border-color: #906D4B;
 }
 
 .bg-roast-soft {
-  background-color: rgba(200, 100, 40, 0.12);
+  background-color: rgba(144, 109, 75, 0.12);
+}
+
+.text-amber-autumn {
+  color: #CA9C68;
+}
+
+.bg-amber-autumn {
+  background-color: #CA9C68;
 }
 
 /* Brand palette utility helpers (used by map pins, editorial banners, footer) */
 .bg-brand-dark {
-  background-color: #1A2225;
+  background-color: #13191F;
+}
+
+.bg-brand-subdark {
+  background-color: #2B2F2E;
 }
 
 .bg-brand-light {
-  background-color: #FFF9E9;
+  background-color: #FFFDF9;
 }
 
 .bg-brand-canvas {
-  background-color: #FBF4E4;
+  background-color: #FAF5EB;
 }
 
 .bg-brand-surface {
-  background-color: #F3ECD8;
+  background-color: #F2EAE0;
 }
 
 .border-brand-hairline {
-  border-color: #E6DCC0;
+  border-color: #E4D9C8;
 }
 
 .text-brand-dark {
-  color: #141A1C;
+  color: #13191F;
 }
 
 .text-brand-muted {
-  color: #55615D;
+  color: #594C3D;
 }
 
 /* Density scale. Tailwind v4 sizes type, spacing, icons, and radii in rem, so the
@@ -247,28 +300,28 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: #FBF4E4;
+  background: #FAF5EB;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #E6DCC0;
+  background: #E4D9C8;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #D6C9A8;
+  background: #D8CCA8;
 }
 
 /* Editorial hero: 6-second auto-advance progress rail segments */
 .hero-progress-segment {
   overflow: hidden;
   border-radius: 9999px;
-  background: rgba(255, 249, 233, 0.28);
+  background: rgba(255, 253, 249, 0.28);
 }
 
 .hero-progress-segment > span {
   display: block;
   height: 100%;
-  background: #FFF9E9;
+  background: #FFFDF9;
   border-radius: 9999px;
 }
 
@@ -290,10 +343,234 @@ html {
 
 /* Cup Check flavor pins float over post photos */
 .flavor-pin {
-  filter: drop-shadow(0 2px 6px rgba(26, 34, 37, 0.45));
+  filter: drop-shadow(0 2px 8px rgba(19, 25, 31, 0.4));
+  transition: scale 0.25s var(--ios-ease);
+}
+
+/* Uses the standalone scale property so it composes with Tailwind's translate utilities */
+.flavor-pin:hover {
+  scale: 1.08;
+}
+
+@layer components {
+  /* Card elevation: soft offset shadow instead of borders (DESIGN.md, Shape and depth) */
+  .card-ambient,
+  .ios-card-shadow {
+    box-shadow: 0 0.5px 1px rgba(19, 25, 31, 0.06), 0 6px 20px -6px rgba(19, 25, 31, 0.14);
+  }
+
+  .card-lift {
+    transition: transform 0.35s var(--ios-ease), box-shadow 0.35s var(--ios-ease);
+  }
+
+  .card-lift:active {
+    transform: scale(0.98);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .card-ambient:hover {
+      box-shadow: 0 1px 2px rgba(19, 25, 31, 0.06), 0 14px 32px -10px rgba(19, 25, 31, 0.2);
+    }
+
+    .card-lift:hover {
+      transform: translateY(-2px);
+    }
+  }
+
+  /* Bar material: nav bar, tab bar, sheet headers */
+  .glass-warm,
+  .ios-material-bar {
+    background-color: rgba(250, 245, 235, 0.78);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+  }
+
+  /* Dark material for controls that sit on photography */
+  .ios-material-dark {
+    background-color: rgba(19, 25, 31, 0.36);
+    backdrop-filter: saturate(160%) blur(12px);
+    -webkit-backdrop-filter: saturate(160%) blur(12px);
+  }
+
+  .glass-card {
+    background-color: rgba(255, 253, 249, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+}
+
+/* Pulse animation for live status indicators */
+@keyframes status-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.35);
+    opacity: 0.65;
+  }
+}
+
+.animate-status-pulse {
+  animation: status-pulse 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Keyboard focus ring. Kept in the base layer so a component that draws its own
+   focus state (search field, sheet inputs) can replace it with a utility. */
+@layer base {
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  a:focus-visible {
+    outline: 2px solid #906D4B;
+    outline-offset: 2px;
+  }
 }
 
 ::selection {
-  background: #1A2225;
-  color: #FFF9E9;
+  background: rgba(144, 109, 75, 0.28);
+  color: #13191F;
 }
+
+@layer components {
+  /* iOS type roles (DESIGN.md, Type) */
+  .ios-large-title {
+    font-family: var(--font-display);
+    font-size: 30px;
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: -0.022em;
+    color: #13191F;
+  }
+
+  @media (min-width: 640px) {
+    .ios-large-title {
+      font-size: 34px;
+    }
+  }
+
+  .ios-title {
+    font-family: var(--font-display);
+    font-size: 21px;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: -0.018em;
+    color: #13191F;
+  }
+
+  .ios-headline {
+    font-family: var(--font-ui);
+    font-size: 15px;
+    line-height: 1.3;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .ios-footnote {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    line-height: 1.35;
+    letter-spacing: 0;
+  }
+
+  .ios-caption {
+    font-family: var(--font-ui);
+    font-size: 11px;
+    line-height: 1.3;
+    font-weight: 500;
+    letter-spacing: 0.005em;
+  }
+
+  /* 0.5px hairlines drawn as inset shadows so they stay crisp on retina and never shift layout */
+  .ios-hairline-b {
+    box-shadow: inset 0 -0.5px 0 var(--ios-separator);
+  }
+
+  .ios-hairline-t {
+    box-shadow: inset 0 0.5px 0 var(--ios-separator);
+  }
+
+  /* Fills: search fields, segmented tracks, secondary chips */
+  .ios-fill {
+    background-color: var(--ios-fill);
+  }
+
+  /* Press feedback shared by tappable rows, cards and buttons */
+  .ios-press {
+    transition: transform 0.2s var(--ios-ease), opacity 0.2s var(--ios-ease), background-color 0.2s var(--ios-ease);
+  }
+
+  .ios-press:active {
+    transform: scale(0.97);
+    opacity: 0.85;
+  }
+
+  /* Grouped inset list (Settings style) */
+  .ios-group {
+    background: #FFFDF9;
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .ios-group > * + * {
+    box-shadow: inset 0 0.5px 0 var(--ios-separator);
+  }
+
+  .ios-group-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 10px 16px;
+    width: 100%;
+    text-align: left;
+    transition: background-color 0.2s var(--ios-ease);
+  }
+
+  /* List rows highlight on press instead of scaling, as native table rows do */
+  .ios-group-row:active,
+  .ios-group-row.ios-press:active {
+    background-color: rgba(118, 96, 70, 0.1);
+    transform: none;
+    opacity: 1;
+  }
+
+  /* Horizontal shelves: snap cards to the leading edge like App Store shelves */
+  .ios-shelf {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 16px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .ios-shelf::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ios-shelf > * {
+    scroll-snap-align: start;
+  }
+
+  /* Sheet grabber */
+  .ios-grabber {
+    width: 36px;
+    height: 5px;
+    border-radius: 9999px;
+    background: rgba(89, 76, 61, 0.3);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+

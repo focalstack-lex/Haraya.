@@ -1,11 +1,29 @@
-import React, { useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { X } from 'lucide-react';
+import { motion, useDragControls, useReducedMotion, type PanInfo } from 'framer-motion';
 
 /**
- * Shared form primitives for Haraya: a mobile-first modal shell (bottom sheet
- * on phones, centered card on desktop), labeled inputs, selects, textareas,
- * and filter chips. Every interactive control meets the 36px touch floor.
+ * Shared form primitives for Haraya: an iOS-style sheet (bottom sheet with a
+ * drag-to-dismiss grabber on phones, centered card on desktop), labeled inputs,
+ * selects, textareas, and filter chips. Every interactive control meets the 44px touch floor.
  */
+
+/** Lets ModalHeader take the id that Modal's aria-labelledby points at. */
+const ModalLabelContext = createContext<string | undefined>(undefined);
+
+const SHEET_SPRING = { type: 'spring', stiffness: 380, damping: 36, mass: 0.9 } as const;
+const PHONE_QUERY = '(max-width: 639px)';
+
+const usePhoneLayout = () => {
+  const [isPhone, setIsPhone] = useState(() => typeof window !== 'undefined' && window.matchMedia(PHONE_QUERY).matches);
+  useEffect(() => {
+    const media = window.matchMedia(PHONE_QUERY);
+    const update = () => setIsPhone(media.matches);
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
+  return isPhone;
+};
 
 export const Modal: React.FC<{
   isOpen: boolean;
@@ -14,33 +32,72 @@ export const Modal: React.FC<{
   maxWidth?: string;
   labelledBy?: string;
 }> = ({ isOpen, onClose, children, maxWidth = 'sm:max-w-lg', labelledBy }) => {
+  const isPhone = usePhoneLayout();
+  const reduceMotion = useReducedMotion();
+  const dragControls = useDragControls();
+
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose();
     };
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    // Lock the page behind the sheet so only the sheet scrolls
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = previousOverflow;
+    };
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
+  const handleDragEnd = (_event: PointerEvent | MouseEvent | TouchEvent, info: PanInfo) => {
+    if (info.offset.y > 120 || info.velocity.y > 600) onClose();
+  };
+
+  const sheetMotion = reduceMotion
+    ? { initial: { opacity: 0 }, animate: { opacity: 1 } }
+    : isPhone
+      ? { initial: { y: '100%' }, animate: { y: 0 } }
+      : { initial: { opacity: 0, scale: 0.96, y: 12 }, animate: { opacity: 1, scale: 1, y: 0 } };
+
   return (
-    <div
-      className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center bg-[#1A2225]/55 backdrop-blur-sm p-0 sm:p-4"
+    <motion.div
+      className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center bg-[#13191F]/40 p-0 sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-labelledby={labelledBy}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.25 }}
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
     >
-      <div
-        className={`bg-[#FFF9E9] border border-[#E6DCC0] w-full ${maxWidth} rounded-t-3xl sm:rounded-3xl max-h-[92vh] overflow-y-auto shadow-2xl`}
+      <motion.div
+        {...sheetMotion}
+        transition={SHEET_SPRING}
+        drag={isPhone && !reduceMotion ? 'y' : false}
+        dragControls={dragControls}
+        dragListener={false}
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={{ top: 0, bottom: 0.9 }}
+        onDragEnd={handleDragEnd}
+        className={`relative bg-[#FFFDF9] w-full ${maxWidth} rounded-t-[28px] sm:rounded-[24px] max-h-[92dvh] overflow-y-auto overscroll-contain shadow-[0_-8px_40px_rgba(19,25,31,0.18)] sm:shadow-[0_24px_64px_-12px_rgba(19,25,31,0.35)] sheet-safe`}
       >
-        {children}
-      </div>
-    </div>
+        {/* Grabber: the drag handle on phones */}
+        <div
+          className="sm:hidden sticky top-0 z-20 h-5 -mb-5 flex justify-center pt-1.5 touch-none cursor-grab"
+          onPointerDown={(event) => dragControls.start(event)}
+          aria-hidden="true"
+        >
+          <span className="ios-grabber" />
+        </div>
+        <ModalLabelContext.Provider value={labelledBy}>{children}</ModalLabelContext.Provider>
+      </motion.div>
+    </motion.div>
   );
 };
 
@@ -48,21 +105,26 @@ export const ModalHeader: React.FC<{
   title: string;
   subtitle?: string;
   onClose: () => void;
-}> = ({ title, subtitle, onClose }) => (
-  <div className="sticky top-0 z-10 bg-[#FFF9E9]/95 backdrop-blur border-b border-[#E6DCC0] px-4 sm:px-6 py-3.5 flex items-start justify-between gap-3">
-    <div className="min-w-0">
-      <h2 className="font-cooper text-lg sm:text-xl font-bold text-[#1A2225] truncate">{title}</h2>
-      {subtitle && <p className="text-xs text-[#55615D] mt-0.5 font-sans truncate">{subtitle}</p>}
+}> = ({ title, subtitle, onClose }) => {
+  const labelId = useContext(ModalLabelContext);
+  return (
+    <div className="sticky top-0 z-10 ios-material-bar ios-hairline-b px-4 sm:px-6 pt-5 sm:pt-4 pb-3 flex items-start justify-between gap-3">
+      <div className="min-w-0 pt-1">
+        <h2 id={labelId} className="font-cooper text-[19px] sm:text-xl font-bold text-[#13191F] leading-tight truncate">{title}</h2>
+        {subtitle && <p className="ios-footnote text-[#594C3D] mt-0.5 truncate">{subtitle}</p>}
+      </div>
+      <button
+        onClick={onClose}
+        aria-label="Close dialog"
+        className="h-11 w-11 -mr-2 -mt-1 shrink-0 flex items-center justify-center ios-press"
+      >
+        <span className="h-7.5 w-7.5 rounded-full bg-[#766046]/15 flex items-center justify-center text-[#594C3D]">
+          <X className="w-4 h-4" strokeWidth={2.5} />
+        </span>
+      </button>
     </div>
-    <button
-      onClick={onClose}
-      aria-label="Close dialog"
-      className="h-9 w-9 shrink-0 rounded-full bg-[#F3ECD8] border border-[#E6DCC0] flex items-center justify-center text-[#1A2225] hover:bg-[#E6DCC0] transition-colors"
-    >
-      <X className="w-4 h-4" />
-    </button>
-  </div>
-);
+  );
+};
 
 export const Field: React.FC<{
   label: string;
@@ -70,14 +132,14 @@ export const Field: React.FC<{
   hint?: string;
 }> = ({ label, children, hint }) => (
   <label className="block space-y-1.5">
-    <span className="text-[11px] font-semibold uppercase tracking-wider text-[#55615D] font-sans">{label}</span>
+    <span className="block px-1 text-[13px] font-medium text-[#594C3D] font-sans">{label}</span>
     {children}
-    {hint && <span className="block text-[11px] text-[#55615D] font-sans">{hint}</span>}
+    {hint && <span className="block px-1 ios-footnote text-[#594C3D]">{hint}</span>}
   </label>
 );
 
 const inputClass =
-  'w-full bg-[#F3ECD8] border border-[#E6DCC0] rounded-xl px-3 h-10 font-sans text-sm text-[#1A2225] placeholder:text-[#55615D] focus:outline-none focus:bg-[#FFF9E9] focus:border-[#55615D] transition-colors';
+  'w-full ios-fill rounded-[12px] px-3.5 h-11 font-sans text-[15px] text-[#13191F] placeholder:text-[#6E6150] focus:outline-none focus:bg-[#FFFDF9] focus:shadow-[0_0_0_2px_#906D4B] transition-[background-color,box-shadow]';
 
 export const TextInput: React.FC<{
   value: string;
@@ -113,7 +175,7 @@ export const TextArea: React.FC<{
     maxLength={maxLength}
     placeholder={placeholder}
     onChange={(event) => onChange(event.target.value)}
-    className="w-full bg-[#F3ECD8] border border-[#E6DCC0] rounded-xl px-3 py-2.5 font-sans text-sm text-[#1A2225] placeholder:text-[#55615D] focus:outline-none focus:bg-[#FFF9E9] focus:border-[#55615D] transition-colors resize-none"
+    className="w-full ios-fill rounded-[12px] px-3.5 py-3 font-sans text-[15px] text-[#13191F] placeholder:text-[#6E6150] focus:outline-none focus:bg-[#FFFDF9] focus:shadow-[0_0_0_2px_#906D4B] transition-[background-color,box-shadow] resize-none"
   />
 );
 
@@ -125,7 +187,7 @@ export const SelectInput: React.FC<{
   <select
     value={value}
     onChange={(event) => onChange(event.target.value)}
-    className="w-full bg-[#F3ECD8] border border-[#E6DCC0] rounded-xl px-3 h-10 font-sans text-sm text-[#1A2225] focus:outline-none focus:border-[#55615D] transition-colors"
+    className="w-full ios-fill rounded-[12px] px-3.5 h-11 font-sans text-[15px] text-[#13191F] focus:outline-none focus:shadow-[0_0_0_2px_#906D4B] transition-shadow"
   >
     {options.map((option) => (
       <option key={option.value} value={option.value}>
@@ -146,7 +208,7 @@ export const PrimaryButton: React.FC<{
     type={type}
     onClick={onClick}
     disabled={disabled}
-    className={`h-10 px-5 rounded-full bg-[#1A2225] text-[#FFF9E9] text-xs font-bold font-sans tracking-wide hover:bg-[#26302F] disabled:opacity-40 disabled:cursor-not-allowed transition-colors ${className}`}
+    className={`h-11 px-5 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[15px] font-semibold font-sans hover:bg-[#7D5C3D] ios-press disabled:opacity-40 disabled:cursor-not-allowed ${className}`}
   >
     {children}
   </button>
@@ -160,7 +222,7 @@ export const SecondaryButton: React.FC<{
   <button
     type="button"
     onClick={onClick}
-    className={`h-10 px-5 rounded-full bg-[#F3ECD8] border border-[#E6DCC0] text-[#1A2225] text-xs font-bold font-sans tracking-wide hover:bg-[#E6DCC0] transition-colors ${className}`}
+    className={`h-11 px-5 rounded-full ios-fill text-[#7D5C3D] text-[15px] font-semibold font-sans hover:bg-[#766046]/20 ios-press ${className}`}
   >
     {children}
   </button>
@@ -176,10 +238,8 @@ export const Chip: React.FC<{
     type="button"
     onClick={onClick}
     aria-pressed={active}
-    className={`h-9 shrink-0 px-3.5 rounded-full border text-xs font-semibold font-sans whitespace-nowrap transition-all ${
-      active
-        ? 'bg-[#1A2225] text-[#FFF9E9] border-[#1A2225]'
-        : 'bg-[#F3ECD8] text-[#1A2225] border-[#E6DCC0] hover:border-[#1A2225]/40'
+    className={`h-8 shrink-0 px-3.5 rounded-full text-[13px] font-medium font-sans whitespace-nowrap ios-press ${
+      active ? 'bg-[#13191F] text-[#FFFDF9]' : 'ios-fill text-[#13191F] hover:bg-[#766046]/20'
     } ${className}`}
   >
     {label}
@@ -187,7 +247,7 @@ export const Chip: React.FC<{
 );
 
 export const ErrorNote: React.FC<{ message: string }> = ({ message }) => (
-  <p role="alert" className="text-xs font-sans text-[#8C3A2E] bg-[#8C3A2E]/10 border border-[#8C3A2E]/25 rounded-xl px-3 py-2">
+  <p role="alert" className="ios-footnote text-[#8C3A2E] bg-[#8C3A2E]/10 rounded-[12px] px-3.5 py-2.5">
     {message}
   </p>
 );

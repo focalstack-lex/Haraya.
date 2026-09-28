@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Flame, Vault } from 'lucide-react';
+import { LargeTitle } from '../common/LargeTitle';
 import type { RoastDrop } from '../../types/coffee';
 import { catalogService } from '../../services/catalogService';
 import { localDayKey } from '../../utils/calendar';
@@ -32,26 +32,20 @@ export const DropsView: React.FC<DropsViewProps> = ({ drops, onInspectBean }) =>
   }, [drops, selectedDay]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6">
-      <div className="relative overflow-hidden bg-[#1A2225] text-[#FFF9E9] p-5 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl shadow-xl space-y-2">
-        <h1 className="font-cooper text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">
-          Roast Drop Calendar
-        </h1>
-        <p className="text-xs sm:text-sm lg:text-base text-[#FFF9E9]/75 max-w-2xl font-sans leading-relaxed">
-          Fourteen days of fresh batches across the Davao Region. Pick a day to filter the vault, sync a batch
-          to your calendar, or reserve micro-lots straight from the roaster.
-        </p>
-      </div>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-1 pb-6 sm:pt-4 space-y-6">
+      <LargeTitle title="Roast Drops" subtitle="Fresh batches across the Davao Region, fourteen days out." />
 
-      <section className="space-y-2">
-        <div className="flex items-center justify-between">
-          <h2 className="text-[10px] font-bold uppercase tracking-widest text-[#55615D] font-sans">Next 14 Days</h2>
+      <section className="space-y-2" aria-labelledby="drops-calendar-title">
+        <div className="flex items-center justify-between gap-3 min-h-11">
+          <h2 id="drops-calendar-title" className="px-4 text-[13px] text-[#594C3D]">
+            Next 14 days
+          </h2>
           {selectedDay && (
             <button
               onClick={() => setSelectedDay(null)}
-              className="text-[11px] font-bold font-sans text-[#C86428] underline underline-offset-2"
+              className="h-11 px-3 -mr-3 text-[15px] font-medium font-sans text-[#7D5C3D] ios-press"
             >
-              Clear day filter
+              Show all
             </button>
           )}
         </div>
@@ -60,11 +54,8 @@ export const DropsView: React.FC<DropsViewProps> = ({ drops, onInspectBean }) =>
 
       {limited.length > 0 && !selectedDay && (
         <section className="space-y-3">
-          <h2 className="inline-flex items-center gap-2 font-cooper text-lg sm:text-xl font-bold text-[#1A2225]">
-            <Flame className="w-5 h-5 text-[#C86428]" />
-            Micro-Lot Vault
-          </h2>
-          <div className="grid lg:grid-cols-2 gap-3">
+          <h2 className="ios-title px-1">Micro-lot vault</h2>
+          <div className="grid lg:grid-cols-2 gap-3 sm:gap-4">
             {limited.map((drop) => (
               <BeanDropCard
                 key={`limited-${drop.id}`}
@@ -78,18 +69,18 @@ export const DropsView: React.FC<DropsViewProps> = ({ drops, onInspectBean }) =>
       )}
 
       <section className="space-y-3">
-        <h2 className="inline-flex items-center gap-2 font-cooper text-lg sm:text-xl font-bold text-[#1A2225]">
-          <Vault className="w-5 h-5 text-[#55615D]" />
+        <h2 className="ios-title px-1">
           {selectedDay
-            ? `Batches on ${new Date(`${selectedDay}T12:00:00`).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}`
-            : 'All Scheduled Batches'}
+            ? new Date(`${selectedDay}T12:00:00`).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })
+            : 'All scheduled batches'}
         </h2>
         {visibleDrops.length === 0 ? (
-          <p className="text-sm font-sans text-[#55615D] py-8 text-center">
-            No batches on this day yet. Roasters schedule new batches all week.
-          </p>
+          <div className="py-12 text-center space-y-1">
+            <p className="ios-headline text-[#13191F]">No batches on this day</p>
+            <p className="text-[14px] font-sans text-[#594C3D]">Roasters schedule new batches all week.</p>
+          </div>
         ) : (
-          <div className="grid lg:grid-cols-2 gap-3">
+          <div className="grid lg:grid-cols-2 gap-3 sm:gap-4">
             {visibleDrops.map((drop) => (
               <BeanDropCard key={drop.id} drop={drop} bean={beansById.get(drop.beanId)} onInspectBean={onInspectBean} />
             ))}

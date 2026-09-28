@@ -6,6 +6,7 @@ export type VibeFilterId =
   | AmenityKey
   | 'singleOrigin'
   | 'heritage'
+  | 'roastery'
   | `process:${Process}`
   | `roast:${RoastLevel}`;
 
@@ -13,9 +14,11 @@ interface VibeFilterBarProps {
   mode: 'cafes' | 'beans';
   active: Set<VibeFilterId>;
   onToggle: (id: VibeFilterId) => void;
+  isOpen?: boolean;
 }
 
-const CAFE_VIBES: { id: AmenityKey | 'heritage'; label: string }[] = [
+const CAFE_VIBES: { id: AmenityKey | 'heritage' | 'roastery'; label: string }[] = [
+  { id: 'roastery', label: 'Roasteries' },
   { id: 'quietFocus', label: 'Quiet Focus' },
   { id: 'workFriendly', label: 'Work-Friendly' },
   { id: 'outdoor', label: 'Outdoor Garden' },
@@ -40,22 +43,25 @@ const BEAN_VIBES: { id: VibeFilterId; label: string }[] = [
 ];
 
 /**
- * Distilled Row 2 chip rail: one horizontally scrollable line of vibe and
- * brew-method toggles, edge-to-edge on phones.
+ * Collapsible amenity and vibe chip rail: expands when toggled or active.
  */
-export const VibeFilterBar: React.FC<VibeFilterBarProps> = ({ mode, active, onToggle }) => {
+export const VibeFilterBar: React.FC<VibeFilterBarProps> = ({ mode, active, onToggle, isOpen = true }) => {
+  if (!isOpen && active.size === 0) return null;
+
   const vibes = mode === 'cafes' ? CAFE_VIBES : BEAN_VIBES;
 
   return (
-    <div className="flex gap-2 overflow-x-auto scrollbar-none py-2 -mx-4 px-4 sm:mx-0 sm:px-0" role="group" aria-label="Vibe and method filters">
-      {vibes.map((vibe) => (
-        <Chip
-          key={vibe.id}
-          label={vibe.label}
-          active={active.has(vibe.id)}
-          onClick={() => onToggle(vibe.id)}
-        />
-      ))}
+    <div className="-mx-4 sm:mx-0">
+      <div className="ios-shelf gap-2 px-4 sm:px-0 sm:flex-wrap py-0.5" role="group" aria-label={mode === 'cafes' ? 'Cafe filters' : 'Bean filters'}>
+        {vibes.map((vibe) => (
+          <Chip
+            key={vibe.id}
+            label={vibe.label}
+            active={active.has(vibe.id)}
+            onClick={() => onToggle(vibe.id)}
+          />
+        ))}
+      </div>
     </div>
   );
 };

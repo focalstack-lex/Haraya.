@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { Check } from 'lucide-react';
 import type { Bean, BeanReservation } from '../../types/coffee';
 import { catalogService } from '../../services/catalogService';
 import { Modal, ModalHeader, Field, TextInput, TextArea, SelectInput, PrimaryButton, ErrorNote } from '../common/FormControls';
@@ -49,7 +50,7 @@ export const BeanReservationModal: React.FC<BeanReservationModalProps> = ({ bean
   return (
     <Modal isOpen={Boolean(bean)} onClose={onClose} maxWidth="sm:max-w-md" labelledBy="reserve-title">
       <ModalHeader
-        title={sent ? 'Reservation Sent' : 'Reserve Fresh Beans'}
+        title={sent ? 'Reservation sent' : 'Reserve fresh beans'}
         subtitle={sent ? undefined : `${bean.name} : ${bean.roasterName}`}
         onClose={onClose}
       />
@@ -57,21 +58,21 @@ export const BeanReservationModal: React.FC<BeanReservationModalProps> = ({ bean
       <div className="px-4 sm:px-6 py-4 space-y-4">
         {sent ? (
           <div className="space-y-3 text-center py-6">
-            <span className="mx-auto h-12 w-12 rounded-full bg-[#3E5C48]/15 border border-[#3E5C48]/30 flex items-center justify-center">
-              <span className="h-3 w-3 rounded-full bg-[#3E5C48]" />
+            <span className="mx-auto h-14 w-14 rounded-full bg-[#3E5C48]/12 flex items-center justify-center">
+              <Check className="w-7 h-7 text-[#3E5C48]" strokeWidth={2.5} />
             </span>
-            <h3 className="font-cooper text-lg font-bold text-[#1A2225]">Your inquiry is in the roaster inbox.</h3>
-            <p className="text-xs font-sans text-[#55615D]">
+            <h3 className="ios-title">Your inquiry is in the roaster inbox.</h3>
+            <p className="text-[15px] font-sans text-[#594C3D] leading-relaxed max-w-sm mx-auto">
               {bean.roasterName} will reach out on the contact you left. Reserve another lot or close this sheet.
             </p>
-            <PrimaryButton onClick={onClose} className="w-full sm:w-auto">
+            <PrimaryButton onClick={onClose} className="w-full sm:w-auto sm:min-w-40">
               Done
             </PrimaryButton>
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="Your Name">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
+              <Field label="Your name">
                 <TextInput value={name} onChange={setName} placeholder="Juan de la Cruz" />
               </Field>
               <Field label="Contact" hint="Messenger, Viber, or mobile">
@@ -79,15 +80,15 @@ export const BeanReservationModal: React.FC<BeanReservationModalProps> = ({ bean
               </Field>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="Pack Type">
+            <div className="grid grid-cols-[minmax(0,1fr)_6.5rem] sm:grid-cols-2 gap-3">
+              <Field label="Pack type">
                 <SelectInput
                   value={packType}
                   onChange={(value) => setPackType(value as BeanReservation['packType'])}
                   options={[
-                    { value: 'Whole Bean', label: `Whole Bean 250g : P${bean.price}` },
+                    { value: 'Whole Bean', label: `Whole bean 250g, ₱${bean.price}` },
                     ...(bean.dripPackPrice !== null
-                      ? [{ value: 'Drip Pack', label: `Drip Pack : P${bean.dripPackPrice}` }]
+                      ? [{ value: 'Drip Pack', label: `Drip pack, ₱${bean.dripPackPrice}` }]
                       : []),
                   ]}
                 />
@@ -97,7 +98,7 @@ export const BeanReservationModal: React.FC<BeanReservationModalProps> = ({ bean
               </Field>
             </div>
 
-            <Field label="Message to the Roaster">
+            <Field label="Message to the roaster">
               <TextArea
                 value={message}
                 onChange={setMessage}
@@ -107,17 +108,19 @@ export const BeanReservationModal: React.FC<BeanReservationModalProps> = ({ bean
               />
             </Field>
 
-            <div className="flex items-center justify-between rounded-xl bg-[#F3ECD8] border border-[#E6DCC0] px-3 py-2.5">
-              <span className="text-xs font-sans text-[#55615D]">Estimated total</span>
-              <span className="font-cooper text-lg font-bold text-[#1A2225]">P{price * (Number(quantity) || 0)}</span>
+            <div className="ios-group bg-[#FAF5EB]">
+              <div className="ios-group-row">
+                <span className="text-[15px] font-sans text-[#13191F]">Estimated total</span>
+                <span className="ml-auto font-mono text-[17px] font-semibold text-[#13191F]">₱{price * (Number(quantity) || 0)}</span>
+              </div>
             </div>
 
             {error && <ErrorNote message={error} />}
 
             <PrimaryButton onClick={submit} className="w-full">
-              Send Reservation to {bean.roasterName}
+              <span className="block truncate">Send to {bean.roasterName}</span>
             </PrimaryButton>
-            <p className="text-[10px] font-sans text-[#55615D] leading-relaxed">
+            <p className="px-1 ios-footnote text-[#594C3D]">
               Reservations are direct inquiries with the roaster: payment and pickup are settled with them, not through Haraya.
             </p>
           </>

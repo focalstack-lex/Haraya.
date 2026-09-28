@@ -9,12 +9,20 @@ import type { Cafe, Bean } from '../types/coffee';
 const KEYS = {
   SAVED_CAFES: 'haraya_saved_cafes',
   SAVED_BEANS: 'haraya_saved_beans',
+  RATINGS: 'haraya_cafe_ratings',
   LISTS: 'haraya_custom_lists',
   FOLLOWING: 'haraya_following',
   RECENT: 'haraya_recent_views',
   REMINDERS: 'haraya_drop_reminders',
   SHARED: 'haraya_shared_lists',
 } as const;
+
+export interface CafeRating {
+  cafeId: string;
+  rating: number; // 1-5
+  note?: string;
+  ratedAt: string; // ISO date
+}
 
 export interface CustomList {
   id: string;
@@ -118,6 +126,45 @@ export const userPrefsService = {
 
   getSavedCount(): number {
     return this.getSavedCafes().length + this.getSavedBeans().length;
+  },
+
+  // Cafe ratings & curation --------------------------------------------------
+
+  getRatings(): Record<string, CafeRating> {
+    return readJson<Record<string, CafeRating>>(KEYS.RATINGS, {});
+  },
+
+  getRating(cafeId: string): CafeRating | undefined {
+    return this.getRatings()[cafeId];
+  },
+
+  setRating(cafeId: string, rating: number, note?: string): void {
+    const ratings = this.getRatings();
+    ratings[cafeId] = {
+      cafeId,
+      rating: Math.max(1, Math.min(5, Math.round(rating))),
+      note: note?.trim() || undefined,
+      ratedAt: new Date().toISOString(),
+    };
+    writeJson(KEYS.RATINGS, ratings);
+    notify();
+  },
+
+  removeRating(cafeId: string): void {
+    const ratings = this.getRatings();
+    if (ratings[cafeId]) {
+      delete ratings[cafeId];
+      writeJson(KEYS.RATINGS, ratings);
+      notify();
+    }
+  },
+
+  getRatedCafeIds(): string[] {
+    return Object.keys(this.getRatings());
+  },
+
+  getRatedCount(): number {
+    return this.getRatedCafeIds().length;
   },
 
   // Custom lists -------------------------------------------------------------
