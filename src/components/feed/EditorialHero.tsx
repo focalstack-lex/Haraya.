@@ -61,7 +61,7 @@ export const EditorialHero: React.FC<EditorialHeroProps> = ({ cafes, drops, onSe
       image: cafe.images[0],
       title: cafe.name,
       meta: `${cafe.isRoastery ? 'Micro-roastery' : 'Cafe'} in ${cafe.district}, ${cafe.city}`,
-      body: `Known for the ${cafe.signature}.`,
+      body: cafe.signature ? `Known for the ${cafe.signature}.` : '',
       cta: cafe.isRoastery ? 'View roastery' : 'View cafe',
       onOpen: () => (cafe.isRoastery ? onSelectRoastery(cafe.id) : onSelectCafe(cafe.id)),
     }));

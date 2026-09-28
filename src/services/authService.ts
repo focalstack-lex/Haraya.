@@ -10,6 +10,9 @@ import { catalogService } from './catalogService';
  * it with server-side auth (Security-First Deployment Gate, checks 3 and 4).
  */
 
+/** Neutral placeholder until the roaster uploads real photos. */
+const PLACEHOLDER_PHOTO = '/placeholders/no-photo.svg';
+
 const KEYS = {
   ACCOUNTS: 'haraya_accounts',
   APPLICATIONS: 'haraya_applications',
@@ -202,14 +205,16 @@ export const authService = {
       address: `${district}, ${city}`,
       lat: 7.07 + (Math.random() - 0.5) * 0.08,
       lng: 125.61 + (Math.random() - 0.5) * 0.08,
-      images: ['https://images.unsplash.com/photo-1521017432531-fbd92d768814?auto=format&fit=crop&w=1000&q=80'],
-      logoUrl: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=400&q=80',
+      // Nothing is invented for a real business: no stock photos, menu, amenities or Wi-Fi until the roaster
+      // adds them. Empty fields hide their sections in the app.
+      images: [PLACEHOLDER_PHOTO],
+      logoUrl: PLACEHOLDER_PHOTO,
       description: application?.description || 'Newly verified Haraya roastery. Menu and beans coming soon.',
-      signature: 'House Espresso',
-      menu: [{ name: 'House Espresso', price: 120, category: 'Espresso Bar' }],
-      amenities: ['plugs'],
-      wifiMbps: 30,
-      brewMethods: ['Espresso'],
+      signature: '',
+      menu: [],
+      amenities: [],
+      wifiMbps: 0,
+      brewMethods: [],
       priceLevel: 2,
       hours: {
         Monday: { open: '08:00', close: '20:00' },

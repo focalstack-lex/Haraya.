@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import L from 'leaflet';
 import { ChevronRight, LocateFixed, Minus, Navigation, Plus, X } from 'lucide-react';
 import type { Cafe, Trail } from '../../types/coffee';
-import { mockTrails } from '../../data/mockTrails';
+import { curatedTrails } from '../../data/trails';
 import { distanceKm, directionsUrl, formatKm, trailLengthKm, walkMinutes, type GeoPoint } from '../../utils/geo';
 import { isOpenNow } from '../../utils/calendar';
 import { LargeTitle } from '../common/LargeTitle';
@@ -47,7 +47,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
 
   const trailsWithCafes = useMemo(
     () =>
-      mockTrails
+      curatedTrails
         .map((trail) => ({
           trail,
           stops: trail.cafeIds
@@ -320,6 +320,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
 
         {/* Side column: curated trails, then every venue on the map */}
         <div className="space-y-6 min-w-0">
+          {trailsWithCafes.length > 0 && (
           <section className="space-y-3" aria-labelledby="map-trails-title">
             <h2 id="map-trails-title" className="ios-title px-1">Curated trails</h2>
             {trailsWithCafes.map(({ trail, stops }) => {
@@ -389,6 +390,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
               );
             })}
           </section>
+          )}
 
           <section className="space-y-2" aria-labelledby="map-venues-title">
             <h2 id="map-venues-title" className="px-4 text-[13px] text-[#594C3D]">

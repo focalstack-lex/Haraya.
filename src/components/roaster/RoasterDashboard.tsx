@@ -159,7 +159,7 @@ export const RoasterDashboard: React.FC<RoasterDashboardProps> = ({ account, onS
 
           <div className="rounded-2xl bg-[#FFFDF9] border border-[#E4D9C8] p-4 sm:p-5 space-y-3">
             <h2 className="text-[10px] font-bold uppercase tracking-widest text-[#594C3D] font-sans">
-              Views, last 14 days{metrics.isSample ? ' (sample until real traffic lands)' : ''}
+              Views, last 14 days
             </h2>
             <div className="flex items-end gap-1 h-24">
               {metrics.days.map((day) => (

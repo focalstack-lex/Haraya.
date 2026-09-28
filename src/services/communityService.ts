@@ -1,9 +1,7 @@
 import type { CupPost, FlavorPin, PostComment, BrewMethod } from '../types/coffee';
-import { mockPosts } from '../data/mockPosts';
 
 /**
- * Cup Check community layer: seed posts merged with browser-created posts,
- * likes, and comments. Likes are stored per browser (no accounts needed to
+ * Cup Check community layer: browser-created posts, likes, and comments. Likes are stored per browser (no accounts needed to
  * double-tap a cup).
  */
 
@@ -58,8 +56,7 @@ export const communityService = {
   },
 
   getPosts(): CupPost[] {
-    const custom = readJson<CupPost[]>(KEYS.POSTS, []);
-    return [...custom, ...mockPosts].sort(
+    return readJson<CupPost[]>(KEYS.POSTS, []).sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
   },
@@ -98,6 +95,17 @@ export const communityService = {
     return readJson<string[]>(KEYS.LIKES, []);
   },
 
+  /** Forgets likes on posts that no longer exist (the retired demo posts, or removed ones). */
+  pruneLikes(): void {
+    const postIds = new Set(this.getPosts().map((post) => post.id));
+    const liked = this.getLikedIds();
+    const kept = liked.filter((id) => postIds.has(id));
+    if (kept.length !== liked.length) {
+      writeJson(KEYS.LIKES, kept);
+      notify();
+    }
+  },
+
   isLiked(postId: string): boolean {
     return this.getLikedIds().includes(postId);
   },
@@ -130,7 +138,7 @@ export const communityService = {
     const custom = readJson<CupPost[]>(KEYS.POSTS, []);
     const index = custom.findIndex((post) => post.id === postId);
     if (index === -1) {
-      throw new Error('Comments on seed posts are read-only in this demo.');
+      throw new Error('That post no longer exists.');
     }
     custom[index] = { ...custom[index], comments: [...custom[index].comments, comment] };
     writeJson(KEYS.POSTS, custom);

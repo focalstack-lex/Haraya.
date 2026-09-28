@@ -317,4 +317,50 @@ export const userPrefsService = {
     notify();
     return nowReminded;
   },
+
+  // Housekeeping -------------------------------------------------------------
+
+  /**
+   * Drops references to catalog records that no longer exist (the retired demo dataset, or anything a
+   * roaster removed), so counts and badges never include ghosts. Writes only the keys that changed.
+   */
+  pruneMissing(valid: { cafeIds: Set<string>; beanIds: Set<string>; dropIds: Set<string> }): void {
+    let changed = false;
+    const keep = (key: string, ids: string[], isValid: (id: string) => boolean) => {
+      const next = ids.filter(isValid);
+      if (next.length !== ids.length) {
+        writeJson(key, next);
+        changed = true;
+      }
+    };
+    const isCafe = (id: string) => valid.cafeIds.has(id);
+    const isBean = (id: string) => valid.beanIds.has(id);
+
+    keep(KEYS.SAVED_CAFES, this.getSavedCafes(), isCafe);
+    keep(KEYS.SAVED_BEANS, this.getSavedBeans(), isBean);
+    keep(KEYS.FOLLOWING, this.getFollowing(), isCafe);
+    keep(KEYS.RECENT, this.getRecentViews(), (id) => isCafe(id) || isBean(id));
+    keep(KEYS.REMINDERS, this.getReminders(), (id) => valid.dropIds.has(id));
+
+    const ratings = this.getRatings();
+    const ratedIds = Object.keys(ratings);
+    const liveRatedIds = ratedIds.filter(isCafe);
+    if (liveRatedIds.length !== ratedIds.length) {
+      writeJson(KEYS.RATINGS, Object.fromEntries(liveRatedIds.map((id) => [id, ratings[id]])));
+      changed = true;
+    }
+
+    const lists = this.getLists();
+    const prunedLists = lists.map((list) => ({
+      ...list,
+      cafeIds: list.cafeIds.filter(isCafe),
+      beanIds: list.beanIds.filter(isBean),
+    }));
+    if (prunedLists.some((list, i) => list.cafeIds.length !== lists[i].cafeIds.length || list.beanIds.length !== lists[i].beanIds.length)) {
+      writeJson(KEYS.LISTS, prunedLists);
+      changed = true;
+    }
+
+    if (changed) notify();
+  },
 };

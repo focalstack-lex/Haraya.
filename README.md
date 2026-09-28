@@ -32,11 +32,12 @@ npm run preview    # serve the production build
 
 ## Data
 
-All content is a rich mock dataset centered on authentic Davao Region geography
-(`src/data/`): cafes and roasteries across Poblacion, Bajada, Juna Subd, Lanang, Matina,
-Toril, Tagum, Digos, Panabo, Mati, and the Mt. Apo highlands. Roaster-created records are
-merged from `localStorage` on top of the seed, so the Roaster Suite works end to end in the
-browser without a server.
+There is no bundled dataset. The demo cafes, beans, drops, trails and Cup Check posts were
+removed on 2026-09-28, so the catalog holds only listings created through the Roaster Suite.
+Those records, saves, ratings and posts are currently stored in `localStorage`, which means
+they live in one browser only; moving the catalog to Supabase is what makes listings visible
+to every visitor. Curated trails are defined in `src/data/trails.ts` (empty until real ones
+are added).
 
 ## Ecosystem bridge
 
@@ -51,7 +52,7 @@ See `docs/CODE_MAP.md` for the generated, per-file navigation map. High level:
 ```
 src/
   components/   feed, cafe, drops, map, community, saved, roaster, auth, admin, layout, common
-  data/         mockCafes, mockBeans, mockDrops, mockTrails, mockPosts
+  data/         trails.ts (curated trails, empty until real ones are added)
   services/     catalogService, userPrefsService, roasterService, communityService, authService
   types/        coffee.ts, auth.ts
   utils/        router.ts (hash routes), calendar.ts (.ics + open hours), geo.ts (distances)

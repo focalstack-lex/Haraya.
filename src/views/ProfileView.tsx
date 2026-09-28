@@ -104,8 +104,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   const exploredPercent = Math.round((ratedCafes.length / Math.max(allCafesCount, 1)) * 100);
   const points = ratedCafes.length * 50 + savedCafes.length * 10;
 
-  const displayName = account ? (account.role === 'admin' ? 'Haraya Admin' : account.name) : 'Davao Cupper';
-  const displayEmail = account ? account.email : 'explorer@haraya.ph';
+  const displayName = account ? (account.role === 'admin' ? 'Haraya Admin' : account.name) : 'Guest';
+  const displayEmail = account ? account.email : 'Saves and ratings stay on this device';
   const initials =
     displayName
       .split(/\s+/)
@@ -320,9 +320,9 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                       </span>
                       {userRating?.note ? (
                         <span className="block ios-footnote text-[#13191F] italic truncate">"{userRating.note}"</span>
-                      ) : (
+                      ) : cafe.signature ? (
                         <span className="block ios-footnote text-[#594C3D] truncate">Signature: {cafe.signature}</span>
-                      )}
+                      ) : null}
                     </span>
                   </button>
 
@@ -383,9 +383,11 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                           {openNow ? `Open · ${hoursTodayLabel(cafe.hours)}` : 'Closed'}
                         </span>
                       </span>
-                      <span className="block ios-footnote text-[#594C3D] truncate">
-                        Signature: <span className="text-[#13191F] font-medium">{cafe.signature}</span>
-                      </span>
+                      {cafe.signature && (
+                        <span className="block ios-footnote text-[#594C3D] truncate">
+                          Signature: <span className="text-[#13191F] font-medium">{cafe.signature}</span>
+                        </span>
+                      )}
                     </span>
                     <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]/60" strokeWidth={2.5} />
                   </button>

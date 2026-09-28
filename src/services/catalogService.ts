@@ -6,13 +6,11 @@ import type {
   DropStatus,
   BeanReservation,
 } from '../types/coffee';
-import { mockCafes } from '../data/mockCafes';
-import { mockBeans } from '../data/mockBeans';
-import { mockDrops } from '../data/mockDrops';
 
 /**
- * Catalog layer that merges the bundled mock dataset with roaster-created and
- * admin-moderated records kept in localStorage. Components read through
+ * Catalog layer over roaster-created and admin-moderated records kept in
+ * localStorage. There is no bundled dataset: the catalog holds only real
+ * listings added through the Roaster Suite. Components read through
  * catalogService; writers call the mutators here, which notify subscribers so
  * the view re-queries.
  */
@@ -30,12 +28,16 @@ const KEYS = {
 export interface CafeMetrics {
   totalViews: number;
   totalSaves: number;
-  /** Daily series for the dashboard chart; deterministic sample until real events exist. */
+  /** Last 14 days from recorded events; days without events are zero. */
   days: { date: string; views: number; saves: number }[];
-  isSample: boolean;
 }
 
-type MetricsStore = Record<string, { views: number; saves: number }>;
+type MetricsStore = Record<
+  string,
+  { views: number; saves: number; daily?: Record<string, { views: number; saves: number }> }
+>;
+
+const dayKey = (date: Date) => date.toISOString().split('T')[0];
 
 const listeners = new Set<() => void>();
 let version = 0;
@@ -56,12 +58,6 @@ function writeJson(key: string, value: unknown): void {
 function notify(): void {
   version += 1;
   listeners.forEach((listener) => listener());
-}
-
-function hashSeed(value: string): number {
-  let hash = 0;
-  for (let i = 0; i < value.length; i++) hash = (hash * 31 + value.charCodeAt(i)) >>> 0;
-  return hash;
 }
 
 export function makeCatalogId(prefix: string): string {
@@ -96,7 +92,7 @@ export const catalogService = {
   getCafes(): Cafe[] {
     const verifications = readJson<Record<string, boolean>>(KEYS.VERIFICATIONS, {});
     const custom = this.getCustomCafes();
-    const all = [...mockCafes, ...custom].map((cafe) =>
+    const all = custom.map((cafe) =>
       cafe.id in verifications ? { ...cafe, verified: verifications[cafe.id] } : cafe
     );
     return all;
@@ -157,7 +153,7 @@ export const catalogService = {
   },
 
   getBeans(): Bean[] {
-    return [...mockBeans, ...this.getCustomBeans()];
+    return this.getCustomBeans();
   },
 
   getBeanById(id: string): Bean | undefined {
@@ -189,7 +185,7 @@ export const catalogService = {
     const beans = this.getCustomBeans();
     const index = beans.findIndex((bean) => bean.id === beanId);
     if (index === -1) {
-      throw new Error(`Bean ${beanId} is a seeded record and cannot be edited in this demo.`);
+      throw new Error(`Bean ${beanId} was not found.`);
     }
     beans[index] = { ...beans[index], ...patch };
     writeJson(KEYS.BEANS, beans);
@@ -211,7 +207,7 @@ export const catalogService = {
   },
 
   getDrops(): RoastDrop[] {
-    return [...mockDrops, ...this.getCustomDrops()].sort(
+    return this.getCustomDrops().sort(
       (a, b) => new Date(a.dropAt).getTime() - new Date(b.dropAt).getTime()
     );
   },
@@ -247,7 +243,7 @@ export const catalogService = {
     const drops = this.getCustomDrops();
     const index = drops.findIndex((drop) => drop.id === dropId);
     if (index === -1) {
-      throw new Error(`Drop ${dropId} is a seeded record and cannot be edited in this demo.`);
+      throw new Error(`Drop ${dropId} was not found.`);
     }
     drops[index] = { ...drops[index], ...patch };
     writeJson(KEYS.DROPS, drops);
@@ -307,46 +303,36 @@ export const catalogService = {
   // Metrics ------------------------------------------------------------------
 
   recordView(id: string): void {
-    const store = readJson<MetricsStore>(KEYS.METRICS, {});
-    const entry = store[id] ?? { views: 0, saves: 0 };
-    entry.views += 1;
-    store[id] = entry;
-    writeJson(KEYS.METRICS, store);
+    this.recordEvent(id, 'views');
   },
 
   recordSave(id: string): void {
+    this.recordEvent(id, 'saves');
+  },
+
+  recordEvent(id: string, kind: 'views' | 'saves'): void {
     const store = readJson<MetricsStore>(KEYS.METRICS, {});
     const entry = store[id] ?? { views: 0, saves: 0 };
-    entry.saves += 1;
+    entry[kind] += 1;
+    const today = dayKey(new Date());
+    const daily = entry.daily ?? {};
+    const day = daily[today] ?? { views: 0, saves: 0 };
+    day[kind] += 1;
+    daily[today] = day;
+    entry.daily = daily;
     store[id] = entry;
     writeJson(KEYS.METRICS, store);
   },
 
+  /** Recorded counts only. Nothing is padded or sampled. */
   getMetrics(id: string): CafeMetrics {
-    const store = readJson<MetricsStore>(KEYS.METRICS, {});
-    const entry = store[id];
-    const totalViews = entry?.views ?? 0;
-    const totalSaves = (entry?.saves ?? 0) + (hashSeed(id) % 40);
-
+    const entry = readJson<MetricsStore>(KEYS.METRICS, {})[id];
     const days: CafeMetrics['days'] = [];
     for (let i = 13; i >= 0; i--) {
-      const date = new Date(Date.now() - i * 86_400_000);
-      const key = date.toISOString().split('T')[0];
-      const seed = hashSeed(`${id}:${key}`);
-      const baseViews = 40 + (seed % 60);
-      const baseSaves = 4 + (seed % 14);
-      days.push({
-        date: key,
-        views: baseViews + Math.round(totalViews / 14),
-        saves: baseSaves + Math.round(totalSaves / 14),
-      });
+      const key = dayKey(new Date(Date.now() - i * 86_400_000));
+      const day = entry?.daily?.[key];
+      days.push({ date: key, views: day?.views ?? 0, saves: day?.saves ?? 0 });
     }
-
-    return {
-      totalViews: totalViews + 480 + (hashSeed(id) % 900),
-      totalSaves,
-      days,
-      isSample: !entry,
-    };
+    return { totalViews: entry?.views ?? 0, totalSaves: entry?.saves ?? 0, days };
   },
 };

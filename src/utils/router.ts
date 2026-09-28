@@ -3,11 +3,11 @@
  * URLs without server configuration:
  *
  *   #/tab/feed           a top-level tab
- *   #/cafe/cafe-purge    opens the cafe detail modal over the current tab
- *   #/bean/bean-apo-anaerobic   opens the bean detail modal
- *   #/roastery/purgecoffee      a roastery storefront
- *   #/drop/drop-2        the drops tab scrolled to one drop
- *   #/list/<slug>?name=Weekend&items=cafe-purge,cafe-stash   a shared custom list
+ *   #/cafe/<cafe-id>    opens the cafe detail modal over the current tab
+ *   #/bean/<bean-id>   opens the bean detail modal
+ *   #/roastery/<handle>      a roastery storefront
+ *   #/drop/<drop-id>        the drops tab scrolled to one drop
+ *   #/list/<slug>?name=Weekend&items=<cafe-id>,<cafe-id>   a shared custom list
  */
 
 export interface Route {

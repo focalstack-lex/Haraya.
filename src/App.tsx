@@ -40,6 +40,7 @@ import type { MoodId } from './components/moodFinder/moods';
 import { catalogService } from './services/catalogService';
 import { userPrefsService } from './services/userPrefsService';
 import { authService } from './services/authService';
+import { communityService } from './services/communityService';
 import { useCatalogVersion, usePrefsVersion, useCommunityVersion, useAuthVersion } from './hooks/useServiceVersions';
 import { buildHash, parseHash, setHash } from './utils/router';
 import { distanceKm, type GeoPoint } from './utils/geo';
@@ -116,6 +117,21 @@ export const App: React.FC = () => {
   const [authMode, setAuthMode] = useState<AuthMode>('signin');
 
   const baseHashRef = useRef(buildHash('/tab/feed'));
+
+  // Once per load: forget saves, ratings, reminders and likes that point at records no longer in the
+  // catalog (the retired demo dataset included), so badges and counts only reflect real listings
+  useEffect(() => {
+    try {
+      userPrefsService.pruneMissing({
+        cafeIds: new Set(catalogService.getCafes().map((cafe) => cafe.id)),
+        beanIds: new Set(catalogService.getBeans().map((bean) => bean.id)),
+        dropIds: new Set(catalogService.getDrops().map((drop) => drop.id)),
+      });
+      communityService.pruneLikes();
+    } catch (error) {
+      console.warn('Haraya: could not clean up stale saved records', error);
+    }
+  }, []);
 
   useEffect(() => {
     const refresh = () => setAccount(authService.getCurrentAccount());

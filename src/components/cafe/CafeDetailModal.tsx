@@ -276,11 +276,14 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
             </div>
           </div>
 
-          <section className="space-y-1.5">
-            <h3 className={SECTION_LABEL}>Amenities</h3>
-            <AmenityBadges amenities={cafe.amenities} wifiMbps={cafe.wifiMbps} />
-          </section>
+          {cafe.amenities.length > 0 && (
+            <section className="space-y-1.5">
+              <h3 className={SECTION_LABEL}>Amenities</h3>
+              <AmenityBadges amenities={cafe.amenities} wifiMbps={cafe.wifiMbps} />
+            </section>
+          )}
 
+          {cafe.brewMethods.length > 0 && (
           <section className="space-y-1.5">
             <h3 className={SECTION_LABEL}>Brew methods</h3>
             <div className="flex flex-wrap gap-1.5">
@@ -291,11 +294,14 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
               ))}
             </div>
           </section>
+          )}
 
-          <section className="space-y-1.5">
-            <h3 className={SECTION_LABEL}>Menu</h3>
-            <MenuSheet menu={menu} />
-          </section>
+          {menu.length > 0 && (
+            <section className="space-y-1.5">
+              <h3 className={SECTION_LABEL}>Menu</h3>
+              <MenuSheet menu={menu} />
+            </section>
+          )}
 
           {roasterBeans.length > 0 && (
             <section className="space-y-1.5">

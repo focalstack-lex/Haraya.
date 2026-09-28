@@ -6,8 +6,8 @@ import { ImageUploadField } from '../common/ImageUploadField';
 
 const PROCESSES: Process[] = ['Washed', 'Natural', 'Honey', 'Anaerobic Natural', 'Wet-Hulled'];
 const ROAST_LEVELS: RoastLevel[] = ['Light', 'Medium-Light', 'Medium', 'Medium-Dark', 'Dark'];
-const FALLBACK_IMAGE =
-  'https://images.unsplash.com/photo-1447933601403-0c6688de566e?auto=format&fit=crop&w=1000&q=80';
+/** Neutral placeholder until the roaster uploads a real bag photo. */
+const FALLBACK_IMAGE = '/placeholders/no-photo.svg';
 
 interface BeanFormProps {
   isOpen: boolean;

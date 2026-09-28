@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-28 : commit a7a6244 : fingerprint 5bc3b35ca10a99a9
+Generated 2026-09-28 : commit b164ef3 : fingerprint c07e1916de262023
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -12,9 +12,9 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `index.html` (31 lines) : . module: index.html
 - `scripts/generate-code-map.mjs` (212 lines) : One-line purpose per file, inferred from its path and leading doc comment.
 - `scripts/seed-supabase.ts` (130 lines) : scripts module: seed-supabase
-- `src/App.tsx` (763 lines) : Storage can throw in private windows or with blocked site data; the welcome sheet is a convenience.
-  - L52 : SharedList
-  - L78 : App
+- `src/App.tsx` (779 lines) : Storage can throw in private windows or with blocked site data; the welcome sheet is a convenience.
+  - L53 : SharedList
+  - L79 : App
 - `src/index.css` (643 lines) : src entry point
 - `src/main.tsx` (11 lines) : src entry point
 - `vite.config.ts` (15 lines) : . module: vite.config
@@ -34,7 +34,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 ## src/components/cafe/
 
 - `src/components/cafe/BeanDetailModal.tsx` (201 lines) : Grouped list on the white sheet: the linen canvas tone lets the inset group read as a group.
-- `src/components/cafe/CafeDetailModal.tsx` (332 lines) : Grouped list on the white sheet: the linen canvas tone lets the inset group read as a group.
+- `src/components/cafe/CafeDetailModal.tsx` (338 lines) : Grouped list on the white sheet: the linen canvas tone lets the inset group read as a group.
   - L52 : AmenityBadges
   - L74 : MenuSheet
   - L102 : CafeDetailModalProps
@@ -87,7 +87,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/map/
 
-- `src/components/map/DavaoCoffeeMap.tsx` (434 lines) : Escapes catalog text before it is placed into Leaflet tooltip HTML.
+- `src/components/map/DavaoCoffeeMap.tsx` (436 lines) : Escapes catalog text before it is placed into Leaflet tooltip HTML.
   - L28 : DavaoCoffeeMapProps
   - L43 : DavaoCoffeeMap
 
@@ -109,7 +109,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/roaster/
 
-- `src/components/roaster/BeanForm.tsx` (238 lines) : Inventory form for roaster-owned bean lots. Seeded records stay read-only.
+- `src/components/roaster/BeanForm.tsx` (238 lines) : Neutral placeholder until the roaster uploads a real bag photo.
 - `src/components/roaster/RoasterDashboard.tsx` (403 lines) : Roaster Suite: overview analytics, bean inventory, roast schedule, menu, inbox.
   - L12 : RoasterDashboardProps
   - L18 : DashboardTab
@@ -130,15 +130,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/data/
 
-- `src/data/mockBeans.ts` (297 lines) : src/data module: mockBeans
-- `src/data/mockCafes.ts` (463 lines) : Standard 07:00 to 22:00 week used by most city cafes.
-  - L35 : standardHours
-  - L40 : lateNightHours
-  - L53 : highlandHours
-  - L84 : mockCafes
-- `src/data/mockDrops.ts` (138 lines) : Roast batch drops over the next 14 days. Timestamps are generated relative to
-- `src/data/mockPosts.ts` (122 lines) : Cup Check community posts with tasting tag pins placed on each photo.
-- `src/data/mockTrails.ts` (37 lines) : src/data module: mockTrails
+- `src/data/trails.ts` (8 lines) : Curated coffee trails. Empty until real trails are set up: each entry lists at least two cafe ids that
 
 ## src/hooks/
 
@@ -146,20 +138,19 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/services/
 
-- `src/services/authService.ts` (255 lines) : Browser-mock account layer for the Roaster Suite. Accounts, applications, and
-- `src/services/catalogService.ts` (353 lines) : Catalog layer that merges the bundled mock dataset with roaster-created and
-  - L30 : CafeMetrics
-  - L38 : MetricsStore
-  - L43 : readJson
-  - L52 : writeJson
-  - L56 : notify
-  - L61 : hashSeed
-  - L67 : makeCatalogId
-  - L75 : deriveStatus
-  - L80 : catalogService
-- `src/services/communityService.ts` (141 lines) : Cup Check community layer: seed posts merged with browser-created posts,
+- `src/services/authService.ts` (260 lines) : Browser-mock account layer for the Roaster Suite. Accounts, applications, and
+- `src/services/catalogService.ts` (339 lines) : Catalog layer over roaster-created and admin-moderated records kept in
+  - L28 : CafeMetrics
+  - L35 : MetricsStore
+  - L45 : readJson
+  - L54 : writeJson
+  - L58 : notify
+  - L63 : makeCatalogId
+  - L71 : deriveStatus
+  - L76 : catalogService
+- `src/services/communityService.ts` (149 lines) : Cup Check community layer: browser-created posts, likes, and comments. Likes are stored per browser (no accounts needed to
 - `src/services/roasterService.ts` (115 lines) : Roaster-facing facade over the catalog: everything an approved roaster or
-- `src/services/userPrefsService.ts` (321 lines) : Buyer-side preferences kept per browser: saved cafes and beans, custom coffee
+- `src/services/userPrefsService.ts` (367 lines) : Buyer-side preferences kept per browser: saved cafes and beans, custom coffee
   - L20 : CafeRating
   - L27 : CustomList
   - L35 : SharedList
@@ -185,7 +176,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 ## src/views/
 
 - `src/views/CommunityView.tsx` (74 lines) : Cup Check community feed: one-to-three column masonry of today's brews.
-- `src/views/ProfileView.tsx` (433 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
+- `src/views/ProfileView.tsx` (435 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
   - L23 : ProfileSection
   - L25 : ProfileViewProps
   - L66 : ProfileView
