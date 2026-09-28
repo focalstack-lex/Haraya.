@@ -87,8 +87,14 @@ Color is information. The tint marks the one active or primary thing in a region
   hairline once content scrolls under it.
 - **Large title:** each primary page opens with a left-aligned large title and one line of
   context (city picker on Discover).
-- **Tab bar:** bottom, bar material, 0.5px top hairline, 24px icons, 10px labels, tint color
-  on the active tab. No indicator lines.
+- **Tab bar (dock):** a floating bar, 64px tall with a 22px radius, inset 12px from the screen edges
+  above the safe area. It is filled with the mascot ink (`--ios-dock` #1D1203) so it reads as the one
+  dark object on the linen canvas. The active tab's icon lifts into a 48px puck in steam
+  (`--ios-dock-accent` #E7AC67) that sits in a notch carved out of the bar; the notch is a CSS mask,
+  so content shows through it. Puck, notch and icon slide together on `--ios-ease` (0.5s).
+  Every tab keeps its 10px label on one baseline; the active label turns steam, inactive icons and
+  labels use `--ios-dock-label` (linen at 64%). Geometry is in px, not Tailwind spacing units, because
+  it must match the notch mask. No indicator lines.
 - **Segmented control:** fill track, white thumb that slides between segments.
 - **Search field:** 36-40px tall, 10px radius, fill background, no border.
 - **Grouped list:** inset rows on `--ios-surface`, 14px radius container, hairline separators

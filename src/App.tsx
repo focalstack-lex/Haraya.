@@ -633,7 +633,7 @@ export const App: React.FC = () => {
 
       <FooterSection setActiveTab={setActiveTab} setSelectedCity={setSelectedCity} onAddSpot={openAddSpot} />
 
-      <div className="h-16 lg:hidden" aria-hidden="true" />
+      <div className="h-[92px] lg:hidden" aria-hidden="true" />
 
       <BottomTabBar
         activeTab={activeTab}

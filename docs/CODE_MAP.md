@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-28 : commit 1b825b1 : fingerprint b52fc63ee1ea4eae
+Generated 2026-09-28 : commit b8c69bb : fingerprint c842d2283b124e67
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -14,7 +14,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/App.tsx` (649 lines) : Storage can throw in private windows or with blocked site data; the welcome sheet is a convenience.
   - L53 : SharedList
   - L79 : App
-- `src/index.css` (693 lines) : src entry point
+- `src/index.css` (737 lines) : src entry point
 - `src/main.tsx` (13 lines) : src entry point
 - `vite.config.ts` (15 lines) : . module: vite.config
 
@@ -81,7 +81,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/layout/
 
-- `src/components/layout/BottomTabBar.tsx` (49 lines) : Persistent mobile bottom navigation (hidden while a detail modal is open).
+- `src/components/layout/BottomTabBar.tsx` (67 lines) : Persistent mobile bottom navigation (hidden while a detail modal is open). A floating dock: the
 - `src/components/layout/FooterSection.tsx` (97 lines) : Global footer: light canvas with a hairline top, the city directory and roaster links.
 - `src/components/layout/NavigationDrawer.tsx` (183 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
 - `src/components/layout/NavigationHeader.tsx` (204 lines) : The legacy roaster portal (sign-in, roaster dashboard, admin panel). Hidden from navigation since the
