@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-29 : commit 6777193 : fingerprint e37768ff6884b687
+Generated 2026-09-29 : commit e7bcbb6 : fingerprint 9d56d06002e91706
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -12,7 +12,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `index.html` (30 lines) : . module: index.html
 - `scripts/generate-code-map.mjs` (212 lines) : One-line purpose per file, inferred from its path and leading doc comment.
 - `scripts/verify-google-auth.mjs` (109 lines) : scripts module: verify-google-auth
-- `src/App.tsx` (810 lines) : Older links: the roaster portal is now the Place Portal.
+- `src/App.tsx` (813 lines) : Older links: the roaster portal is now the Place Portal.
   - L63 : SharedList
   - L89 : App
 - `src/index.css` (825 lines) : src entry point
@@ -115,7 +115,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/components/moodFinder/moodStorage.ts` (25 lines) : Remembers the last chosen must-haves. Storage can throw or hold stale values, so reads validate.
 - `src/components/moodFinder/parseQuery.test.ts` (50 lines) : src/components/moodFinder module: parseQuery.test
 - `src/components/moodFinder/parseQuery.ts` (85 lines) : Deterministic reading of a typed request ("quiet place to study, not too pricey, near Matina").
-- `src/components/moodFinder/scoreCafes.test.ts` (160 lines) : src/components/moodFinder module: scoreCafes.test
+- `src/components/moodFinder/scoreCafes.test.ts` (167 lines) : src/components/moodFinder module: scoreCafes.test
 - `src/components/moodFinder/scoreCafes.ts` (236 lines) : The mood finder's matcher. Pure: the same catalog, request and context always give the same
 - `src/components/moodFinder/useLocation.ts` (35 lines) : Asks for the visitor's position only when request() is called (the "Near me" tap).
 - `src/components/moodFinder/weather.ts` (63 lines) : Current Davao weather from Open-Meteo (free, no key). Fixed city coordinates, never the
@@ -153,6 +153,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/data/
 
+- `src/data/digosCafes.ts` (91 lines) : Coffee shops in Digos City found on OpenStreetMap (ODbL, (c) OpenStreetMap contributors), searched on
 - `src/data/spots.ts` (61 lines) : Curated spots listed by the Haraya team, shown ahead of roaster and community listings. Every field comes
 - `src/data/trails.ts` (8 lines) : Curated coffee trails. Empty until real trails are set up: each entry lists at least two cafe ids that
 
@@ -165,18 +166,18 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 ## src/services/
 
 - `src/services/adminService.ts` (66 lines) : Control Room account management: the list of profiles (readable by admins only, per Row Level
-- `src/services/catalogService.ts` (363 lines) : Catalog layer over roaster-created and admin-moderated records kept in
-  - L30 : CafeMetrics
-  - L37 : MetricsStore
-  - L52 : readJson
-  - L61 : writeJson
-  - L70 : notify
-  - L75 : makeCatalogId
-  - L83 : deriveStatus
-  - L88 : catalogService
+- `src/services/catalogService.ts` (364 lines) : Catalog layer over roaster-created and admin-moderated records kept in
+  - L31 : CafeMetrics
+  - L38 : MetricsStore
+  - L53 : readJson
+  - L62 : writeJson
+  - L71 : notify
+  - L76 : makeCatalogId
+  - L84 : deriveStatus
+  - L89 : catalogService
 - `src/services/communityService.ts` (154 lines) : Cup Check community layer: browser-created posts, likes, and comments. Likes are stored per browser (no accounts needed to
 - `src/services/placeMapping.test.ts` (155 lines) : src/services module: placeMapping.test
-- `src/services/placeMapping.ts` (368 lines) : Place Portal data: the application a place owner sends (place_applications), the public listing row
+- `src/services/placeMapping.ts` (369 lines) : Place Portal data: the application a place owner sends (place_applications), the public listing row
   - L12 : PLACE_TYPES
   - L17 : PlaceType
   - L20 : REGION_BOUNDS
@@ -196,27 +197,30 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L219 : parseMenu
   - L239 : cafeRowToCafe
   - L271 : listingFromCafe
-  - L293 : validateListing
-  - L331 : toCafeUpdateRow
-  - L358 : describePlaceError
+  - L294 : validateListing
+  - L332 : toCafeUpdateRow
+  - L359 : describePlaceError
 - `src/services/placeService.ts` (206 lines) : Public listings (table cafes) and Place Portal applications (table place_applications). Listings are
 - `src/services/roasterService.ts` (115 lines) : Roaster-facing facade over the catalog: everything an approved roaster or
 - `src/services/sessionService.test.ts` (35 lines) : src/services module: sessionService.test
-- `src/services/sessionService.ts` (559 lines) : The signed-in account: Supabase Auth session plus the caller's row in public.profiles (role, status,
+- `src/services/sessionService.ts` (602 lines) : The signed-in account: Supabase Auth session plus the caller's row in public.profiles (role, status,
   - L14 : RESET_RETURN_TAB
   - L37 : PASSWORD_MIN_LENGTH
   - L40 : PendingConfirmation
   - L50 : loadPendingConfirmation
-  - L72 : notify
-  - L77 : setPendingConfirmation
-  - L86 : clearPendingConfirmation
-  - L100 : rememberReturnTab
-  - L109 : readReturnTab
-  - L131 : getAuthRedirectUrl
-  - L172 : describeAuthError
-  - L197 : loadProfile
-  - L219 : setUser
-  - L227 : sessionService
+  - L74 : notify
+  - L79 : setPendingConfirmation
+  - L88 : clearPendingConfirmation
+  - L102 : rememberReturnTab
+  - L111 : readReturnTab
+  - L133 : getAuthRedirectUrl
+  - L175 : ConfirmationLinkType
+  - L177 : isConfirmationLinkType
+  - L182 : cleanAuthParams
+  - L197 : describeAuthError
+  - L222 : loadProfile
+  - L244 : setUser
+  - L252 : sessionService
 - `src/services/spotMapping.test.ts` (116 lines) : src/services module: spotMapping.test
 - `src/services/spotMapping.ts` (178 lines) : Community spot submissions: the row shape stored in Supabase (spot_submissions), the form input, the
 - `src/services/spotService.ts` (169 lines) : Add a Spot backed by Supabase (table spot_submissions). Row Level Security decides what each caller can
@@ -289,4 +293,8 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L15 : SavedViewProps
   - L25 : SavedView
 - `src/views/SharedListView.tsx` (123 lines) : Read-only view of a shared custom list. Items ride in the URL, so the link
+
+## supabase/templates/
+
+- `supabase/templates/confirm-signup.html` (49 lines) : supabase/templates module: confirm-signup.html
 

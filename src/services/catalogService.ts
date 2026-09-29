@@ -7,6 +7,7 @@ import type {
   BeanReservation,
 } from '../types/coffee';
 import { CURATED_CAFES } from '../data/spots';
+import { DIGOS_OSM_CAFES } from '../data/digosCafes';
 import { localDayKey } from '../utils/calendar';
 
 /**
@@ -103,7 +104,7 @@ export const catalogService = {
 
   getCafes(): Cafe[] {
     const verifications = readJson<Record<string, boolean>>(KEYS.VERIFICATIONS, {});
-    const custom = [...CURATED_CAFES, ...this.getCustomCafes(), ...listedCafes, ...communitySpots];
+    const custom = [...CURATED_CAFES, ...DIGOS_OSM_CAFES, ...this.getCustomCafes(), ...listedCafes, ...communitySpots];
     const all = custom.map((cafe) =>
       cafe.id in verifications ? { ...cafe, verified: verifications[cafe.id] } : cafe
     );

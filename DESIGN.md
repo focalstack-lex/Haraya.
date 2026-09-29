@@ -168,3 +168,15 @@ Color is information. The tint marks the one active or primary thing in a region
   the pending state and opens Create account). No nav bar, tab dock or footer.
 - It is a guide, not the lock. The lock is Supabase refusing a session to an unconfirmed address; clearing site
   data or choosing "wrong address" returns the visitor to guest browsing, which has no account powers.
+- Confirmation email: `supabase/templates/confirm-signup.html` (paste into the hosted dashboard, Authentication >
+  Emails > Confirm signup). Linen canvas, one surface card, the wordmark, a tint pill button, Arial only. No hidden
+  preview text, one image, and the link is `{{ .SiteURL }}/?token_hash=...&type=email` so it shows Haraya's domain;
+  `sessionService.start()` verifies it with `verifyOtp`, which also works on a device that did not start the sign-up.
+
+## Catalog spots without a full record
+
+- `src/data/digosCafes.ts`: 27 Digos City coffee shops from OpenStreetMap (ODbL), carrying only what the source
+  states: name, map position and street. The card and sheet say "Hours not listed", use the no-photo placeholder
+  and show no price (`priceLevel: 0`, which the mood finder never treats as cheap and never filters out). Nothing is
+  guessed: no description, hours, menu, Wi-Fi or barangay. When a spot is checked, move it to `spots.ts` with the
+  full record. Rebuild with `reports/digos-cafes/build-digos-cafes.py`.

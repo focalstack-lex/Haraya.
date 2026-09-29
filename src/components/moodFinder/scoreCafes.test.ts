@@ -93,6 +93,13 @@ describe('scoreCafes', () => {
     expect(matches.map((m) => m.cafe.id)).toEqual([budgetMatina.id]);
   });
 
+  it('never calls a spot with no listed price cheap, and does not drop it for a price ceiling', () => {
+    const unpriced = cafe({ priceLevel: 0 });
+    const { matches } = scoreCafes([unpriced], req({ mood: 'social', maxPrice: 1 }), ctx());
+    expect(matches.map((m) => m.cafe.id)).toEqual([unpriced.id]);
+    expect(matches[0].reasons).not.toContain('Easy on the wallet');
+  });
+
   it('ranks mood fit above a small distance advantage', () => {
     const focusFit = cafe({ km: 3, amenities: ['quietFocus', 'workFriendly', 'plugs'], wifiMbps: 60 });
     const nearNoFit = cafe({ km: 0.4 });
