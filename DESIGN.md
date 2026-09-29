@@ -46,7 +46,8 @@ The tokens live in `src/index.css`; this file is the contract behind them.
   hidden Roast Drops view. The sanctuary passport adds six poses, one emotion each: `focus` (calm, half-lidded
   over an open book; peeks over the floating focus banner), `arrive` (delight, both paws up with steam sparkles;
   check-in within range), `wander` (wistful, gazing up at a map pin with one ear drooped and a dotted trail;
-  check-in too far away, location off), `content` (happy closed eyes and blush, cup held to her chest; finishing a
+  check-in too far away, location off; also the route loader in the live navigation card, while the GPS fix
+  and the first street route are on their way), `content` (happy closed eyes and blush, cup held to her chest; finishing a
   session), `stamp` (proud, rubber stamp raised over a stamped passport page; Passport tab) and `clink` (cheerful,
   cup raised in a toast; empty Diary). Idle motion (bob, blink, steam, wave) rests under reduced
   motion. Beside text that already carries the message, pass `alt=""` so she stays decorative.

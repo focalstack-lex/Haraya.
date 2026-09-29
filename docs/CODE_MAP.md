@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-29 : commit b83447d : fingerprint f4e80beaedfafd52
+Generated 2026-09-29 : commit 773334d : fingerprint b24b63f89bbe7136
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -103,12 +103,15 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/map/
 
-- `src/components/map/DavaoCoffeeMap.tsx` (606 lines) : Escapes catalog text before it is placed into Leaflet tooltip HTML.
-  - L34 : DavaoCoffeeMapProps
-  - L50 : DavaoCoffeeMap
+- `src/components/map/DavaoCoffeeMap.tsx` (611 lines) : Escapes catalog text before it is placed into Leaflet tooltip HTML.
+  - L36 : DavaoCoffeeMapProps
+  - L52 : DavaoCoffeeMap
 - `src/components/map/DirectionsActionSheet.tsx` (58 lines) : External map apps. Apple Maps uses its https form so the link also works outside Apple devices.
 - `src/components/map/liveNavMath.test.ts` (71 lines) : src/components/map module: liveNavMath.test
 - `src/components/map/liveNavMath.ts` (63 lines) : Pure math for in-app walking navigation. These straight-line figures are the fallback when no street route
+- `src/components/map/RouteLoader.tsx` (50 lines) : Holds a loading phase on screen for at least MIN_LOADER_MS after it first appears, so a quick answer does not
+- `src/components/map/routeLoadPhase.test.ts` (34 lines) : src/components/map module: routeLoadPhase.test
+- `src/components/map/routeLoadPhase.ts` (22 lines) : What the walk is still waiting for before the first route can be drawn; null once there is nothing to wait for.
 - `src/components/map/routeMath.test.ts` (53 lines) : src/components/map module: routeMath.test
 - `src/components/map/routeMath.ts` (63 lines) : Pure math for following a street route: snap the visitor onto the nearest route segment, measure what is
 - `src/components/map/useLiveNavigation.ts` (129 lines) : Walking navigation driven by navigator.geolocation.watchPosition with high accuracy. Positions stay in
