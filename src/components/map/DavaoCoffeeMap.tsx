@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { TILE_URL, TILE_OPTIONS } from './tiles';
 import L from 'leaflet';
 import { ChevronRight, Crosshair, LocateFixed, Minus, Navigation, Plus, X } from 'lucide-react';
 import type { Cafe, Trail } from '../../types/coffee';
@@ -90,10 +91,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
       zoomControl: false,
       attributionControl: true,
     });
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: 'OpenStreetMap contributors',
-      maxZoom: 19,
-    }).addTo(map);
+    L.tileLayer(TILE_URL, TILE_OPTIONS).addTo(map);
     mapRef.current = map;
 
     return () => {

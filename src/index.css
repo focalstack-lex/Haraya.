@@ -440,6 +440,11 @@ html {
   border: none;
 }
 
+/* Map tiles sit back in a warm, muted tone so the pins carry the color */
+.haraya-tiles {
+  filter: grayscale(0.4) sepia(0.14) saturate(0.85);
+}
+
 /* Map pin labels hide at region zoom so nearby pins do not pile up */
 .haraya-map-far .haraya-pin-label {
   display: none !important;

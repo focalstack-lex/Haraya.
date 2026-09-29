@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { TILE_URL, TILE_OPTIONS } from '../map/tiles';
 import L from 'leaflet';
 import { LocateFixed } from 'lucide-react';
 
@@ -26,10 +27,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({ lat, lng, onChan
   useEffect(() => {
     if (!canvasRef.current || mapRef.current) return;
     const map = L.map(canvasRef.current, { center: DAVAO_CENTER, zoom: 12, zoomControl: true, scrollWheelZoom: false });
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      maxZoom: 19,
-    }).addTo(map);
+    L.tileLayer(TILE_URL, TILE_OPTIONS).addTo(map);
     map.on('click', (event: L.LeafletMouseEvent) => onChangeRef.current({ lat: event.latlng.lat, lng: event.latlng.lng }));
     mapRef.current = map;
     return () => {
