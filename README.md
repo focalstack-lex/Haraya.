@@ -24,6 +24,13 @@ npm run lint       # oxlint
 npm run preview    # serve the production build
 ```
 
+## Installable app
+
+Haraya is an installable PWA (manifest plus an app-shell service worker via `vite-plugin-pwa`). The service worker
+only exists in builds, so test it with `npm run build && npm run preview`; `npm run dev` registers no service
+worker. Aya offers the install after the first finished tour on phones and tablets, and Profile has an "Add Haraya
+to your home screen" row.
+
 ## Scripts
 
 - `npm run map:code` regenerates `docs/CODE_MAP.md` (the agent navigation map; never hand-edit).
