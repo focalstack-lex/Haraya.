@@ -99,8 +99,8 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({ cafe, onClose, onDir
       case 'locating':
         return (
           <div className="py-10 flex flex-col items-center gap-3 text-center" aria-live="polite">
-            <LocateFixed className="w-7 h-7 text-[#906D4B] animate-pulse" />
-            <p className="text-[15px] text-[#594C3D]">Checking where you are...</p>
+            <LocateFixed className="w-7 h-7 text-tint animate-pulse" />
+            <p className="text-[15px] text-ink-2">Checking where you are...</p>
           </div>
         );
       case 'denied':
@@ -108,10 +108,10 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({ cafe, onClose, onDir
         return (
           <div className="py-6 flex flex-col items-center gap-3 text-center">
             <AyaMascot pose="wander" size={112} alt="" />
-            <h3 className="ios-title text-[19px] text-[#13191F]">
+            <h3 className="ios-title text-[19px] text-ink">
               {phase.kind === 'denied' ? 'Location is off for Haraya' : 'Your location is unavailable'}
             </h3>
-            <p className="text-[14px] text-[#594C3D] max-w-xs">
+            <p className="text-[14px] text-ink-2 max-w-xs">
               {phase.kind === 'denied'
                 ? 'Check-ins need your location to confirm you are at the spot. Allow it for this site in your browser settings, then try again.'
                 : 'Haraya could not get a GPS fix. Step near a window or outdoors and try again.'}
@@ -126,8 +126,8 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({ cafe, onClose, onDir
         return (
           <div className="py-4 flex flex-col items-center gap-3 text-center">
             <PassportStamp cafeName={cafe.name} city={cafe.city} stampedAt={phase.stampedAt} seed={cafe.id} size={132} />
-            <h3 className="ios-title text-[19px] text-[#13191F]">Stamp collected</h3>
-            <p className="text-[14px] text-[#594C3D] max-w-xs">
+            <h3 className="ios-title text-[19px] text-ink">Stamp collected</h3>
+            <p className="text-[14px] text-ink-2 max-w-xs">
               {phase.synced
                 ? `${cafe.name} is in your Davao Passport, with a 30 minute drop-in logged.`
                 : `${cafe.name} is in your passport on this device.${signedIn ? '' : ' Sign in to keep your passport across devices.'}`}
@@ -148,10 +148,10 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({ cafe, onClose, onDir
           return (
             <div className="py-4 flex flex-col items-center gap-3 text-center">
               <AyaMascot pose="wander" size={120} alt="" />
-              <h3 className="ios-title text-[19px] text-[#13191F]">
+              <h3 className="ios-title text-[19px] text-ink">
                 You are <span className="font-mono">{formatKm(phase.distance / 1000)}</span> away
               </h3>
-              <p className="text-[14px] text-[#594C3D] max-w-xs">
+              <p className="text-[14px] text-ink-2 max-w-xs">
                 Visit {cafe.name} in person to stamp your passport and log focus time. Check-ins open within{' '}
                 <span className="font-mono">{CHECK_IN_RADIUS_M} m</span> of the spot.
               </p>
@@ -172,18 +172,18 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({ cafe, onClose, onDir
           <div className="py-2 flex flex-col items-center gap-3 text-center">
             <AyaMascot pose="arrive" size={124} alt="" />
             <div className="space-y-1">
-              <h3 className="ios-title text-[19px] text-[#13191F] inline-flex items-center gap-2">
-                <span className="h-2.5 w-2.5 rounded-full bg-[#3E5C48] shadow-[0_0_0_4px_rgba(62,92,72,0.18)]" aria-hidden="true" />
+              <h3 className="ios-title text-[19px] text-ink inline-flex items-center gap-2">
+                <span className="h-2.5 w-2.5 rounded-full bg-ok shadow-[0_0_0_4px_rgba(62,92,72,0.18)]" aria-hidden="true" />
                 You are at {cafe.name}
               </h3>
-              <p className="ios-footnote text-[#594C3D]">
+              <p className="ios-footnote text-ink-2">
                 <span className="font-mono">{Math.round(phase.distance)} m</span> from the spot, verified by GPS
               </p>
             </div>
 
             {active ? (
-              <div className="w-full rounded-[14px] bg-[#FAF5EB] px-4 py-3 text-left space-y-2">
-                <p className="text-[14px] text-[#13191F]">
+              <div className="w-full rounded-[14px] bg-canvas px-4 py-3 text-left space-y-2">
+                <p className="text-[14px] text-ink">
                   You are already focusing at <span className="font-semibold">{active.cafeName}</span>. Finish that session first.
                 </p>
                 <SecondaryButton onClick={onFinishActive} className="w-full">
@@ -195,27 +195,27 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({ cafe, onClose, onDir
                 <button
                   onClick={startFocus}
                   disabled={busy}
-                  className="w-full min-h-14 px-4 py-3 rounded-[16px] bg-[#906D4B] hover:bg-[#7D5C3D] text-[#FFFDF9] text-left flex items-center gap-3 ios-press disabled:opacity-60"
+                  className="w-full min-h-14 px-4 py-3 rounded-[16px] bg-tint hover:bg-tint-ink text-surface text-left flex items-center gap-3 ios-press disabled:opacity-60"
                 >
                   <FocusTimerIcon className="w-6 h-6 shrink-0" />
                   <span className="min-w-0">
                     <span className="block text-[15px] font-semibold">Start Focus Session</span>
-                    <span className="block text-[12px] text-[#FFFDF9]/80">A timer runs while you study. It saves itself if you leave.</span>
+                    <span className="block text-[12px] text-surface/80">A timer runs while you study. It saves itself if you leave.</span>
                   </span>
                 </button>
                 <button
                   onClick={quickStamp}
                   disabled={busy}
-                  className="w-full min-h-14 px-4 py-3 rounded-[16px] ios-fill text-left flex items-center gap-3 text-[#13191F] ios-press disabled:opacity-60"
+                  className="w-full min-h-14 px-4 py-3 rounded-[16px] ios-fill text-left flex items-center gap-3 text-ink ios-press disabled:opacity-60"
                 >
-                  <RubberStampIcon className="w-6 h-6 shrink-0 text-[#7D5C3D]" />
+                  <RubberStampIcon className="w-6 h-6 shrink-0 text-tint-ink" />
                   <span className="min-w-0">
                     <span className="block text-[15px] font-semibold">{busy ? 'Stamping...' : 'Quick Stamp'}</span>
-                    <span className="block text-[12px] text-[#594C3D]">Log a 30 minute drop-in and collect the stamp now.</span>
+                    <span className="block text-[12px] text-ink-2">Log a 30 minute drop-in and collect the stamp now.</span>
                   </span>
                 </button>
                 {!signedIn && (
-                  <p className="ios-footnote text-[#594C3D] pt-1">Signed out, your visits stay on this device.</p>
+                  <p className="ios-footnote text-ink-2 pt-1">Signed out, your visits stay on this device.</p>
                 )}
               </div>
             )}

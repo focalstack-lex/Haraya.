@@ -35,7 +35,7 @@ export const FloatingFocusBanner: React.FC<FloatingFocusBannerProps> = ({ onFini
         <div
           role="group"
           aria-label={`Focus session at ${session.cafeName}`}
-          className="h-[44px] rounded-full bg-[#13191F] text-[#FFFDF9] shadow-[0_4px_16px_rgba(0,0,0,0.2)] flex items-center"
+          className="h-[44px] rounded-full bg-ink text-surface shadow-[0_4px_16px_rgba(0,0,0,0.2)] flex items-center"
         >
           <button
             onClick={onFinish}
@@ -44,12 +44,12 @@ export const FloatingFocusBanner: React.FC<FloatingFocusBannerProps> = ({ onFini
           >
             <span className="min-w-0 flex-1">
               <span className="block text-[13px] font-semibold leading-tight truncate">{session.cafeName}</span>
-              <span className="block text-[11px] leading-tight text-[#FFFDF9]/64">Deep focus</span>
+              <span className="block text-[11px] leading-tight text-surface/64">Deep focus</span>
             </span>
             <span className="shrink-0 inline-flex items-center gap-1.5">
               <span className="relative flex h-2 w-2" aria-hidden="true">
-                <span className="focus-pulse absolute inset-0 rounded-full bg-[#E7AC67]" />
-                <span className="relative h-2 w-2 rounded-full bg-[#E7AC67]" />
+                <span className="focus-pulse absolute inset-0 rounded-full bg-steam" />
+                <span className="relative h-2 w-2 rounded-full bg-steam" />
               </span>
               <span className="font-mono text-[14px] font-semibold tabular-nums">{clock}</span>
             </span>
@@ -58,7 +58,7 @@ export const FloatingFocusBanner: React.FC<FloatingFocusBannerProps> = ({ onFini
             onClick={onFinish}
             className="h-11 shrink-0 pr-1 pl-1 flex items-center rounded-r-full"
           >
-            <span className="h-9 px-4 rounded-full bg-[#906D4B] hover:bg-[#7D5C3D] text-[#FFFDF9] text-[13px] font-semibold inline-flex items-center ios-press">
+            <span className="h-9 px-4 rounded-full bg-tint hover:bg-tint-ink text-surface text-[13px] font-semibold inline-flex items-center ios-press">
               Finish
             </span>
           </button>
@@ -97,10 +97,10 @@ export const SessionToast: React.FC<SessionToastProps> = ({ message, onDismiss, 
       {message && (
         <button
           onClick={onDismiss}
-          className="pointer-events-auto mx-auto max-w-md w-full min-h-11 px-4 py-2.5 rounded-[14px] bg-[#FFFDF9] ios-card-shadow text-left text-[14px] text-[#13191F] flex items-center gap-2.5"
+          className="pointer-events-auto mx-auto max-w-md w-full min-h-11 px-4 py-2.5 rounded-[14px] bg-surface ios-card-shadow text-left text-[14px] text-ink flex items-center gap-2.5"
         >
           <span
-            className={`h-2 w-2 shrink-0 rounded-full ${message.tone === 'error' ? 'bg-[#8C3A2E]' : 'bg-[#3E5C48]'}`}
+            className={`h-2 w-2 shrink-0 rounded-full ${message.tone === 'error' ? 'bg-danger' : 'bg-ok'}`}
             aria-hidden="true"
           />
           <span className="min-w-0 flex-1">{message.text}</span>

@@ -78,7 +78,7 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
 
   return (
     <motion.div
-      className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-[#13191F]/40 p-0 sm:p-6"
+      className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-ink/40 p-0 sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-labelledby="welcome-title"
@@ -89,7 +89,7 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
       <motion.div
         {...sheetMotion}
         transition={SHEET_SPRING}
-        className="relative w-full sm:max-w-md bg-[#FFFDF9] text-[#13191F] rounded-t-[28px] sm:rounded-[28px] max-h-[92dvh] overflow-y-auto overscroll-contain shadow-[0_-8px_40px_rgba(19,25,31,0.18)] sm:shadow-[0_24px_64px_-12px_rgba(19,25,31,0.35)] sheet-safe"
+        className="relative w-full sm:max-w-md bg-surface text-ink rounded-t-[28px] sm:rounded-[28px] max-h-[92dvh] overflow-y-auto overscroll-contain shadow-[0_-8px_40px_rgba(19,25,31,0.18)] sm:shadow-[0_24px_64px_-12px_rgba(19,25,31,0.35)] sheet-safe"
       >
         {/* Grabber: visual sheet cue on phones */}
         <div className="sm:hidden flex justify-center pt-1.5" aria-hidden="true">
@@ -102,7 +102,7 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
           aria-label="Close and explore as a guest"
           className="absolute top-2 right-2 sm:top-3 sm:right-3 z-10 h-11 w-11 flex items-center justify-center ios-press"
         >
-          <span className="h-7.5 w-7.5 rounded-full bg-[#766046]/15 flex items-center justify-center text-[#594C3D]">
+          <span className="h-7.5 w-7.5 rounded-full bg-shade/15 flex items-center justify-center text-ink-2">
             <X className="w-4 h-4" strokeWidth={2.5} />
           </span>
         </button>
@@ -123,12 +123,12 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
           <ul className="space-y-4">
             {FEATURES.map((feature) => (
               <li key={feature.title} className="flex items-start gap-3.5">
-                <span className="h-10 w-10 shrink-0 rounded-[12px] bg-[#906D4B]/12 flex items-center justify-center text-[#906D4B]">
+                <span className="h-10 w-10 shrink-0 rounded-[12px] bg-tint/12 flex items-center justify-center text-tint">
                   <feature.icon className="w-5 h-5" />
                 </span>
                 <span className="min-w-0">
-                  <span className="block ios-headline text-[#13191F]">{feature.title}</span>
-                  <span className="block text-[14px] font-sans text-[#594C3D] leading-snug mt-0.5">{feature.body}</span>
+                  <span className="block ios-headline text-ink">{feature.title}</span>
+                  <span className="block text-[14px] font-sans text-ink-2 leading-snug mt-0.5">{feature.body}</span>
                 </span>
               </li>
             ))}
@@ -138,15 +138,15 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
           <div className="space-y-1 pt-1">
             <button
               onClick={onGetStarted}
-              className="w-full h-12 rounded-full bg-[#906D4B] hover:bg-[#7D5C3D] text-[#FFFDF9] font-sans font-semibold text-[16px] ios-press"
+              className="w-full h-12 rounded-full bg-tint hover:bg-tint-ink text-surface font-sans font-semibold text-[16px] ios-press"
             >
               Get started
             </button>
-            <div className="flex items-center justify-center gap-1 text-[14px] font-sans text-[#594C3D]">
+            <div className="flex items-center justify-center gap-1 text-[14px] font-sans text-ink-2">
               <span>Already have an account?</span>
               <button
                 onClick={onLogIn}
-                className="min-h-11 px-1 font-semibold text-[#7D5C3D] ios-press"
+                className="min-h-11 px-1 font-semibold text-tint-ink ios-press"
               >
                 Log in
               </button>

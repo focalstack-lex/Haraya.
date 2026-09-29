@@ -32,7 +32,7 @@ const PRICE_LABEL: Record<1 | 2 | 3, string> = { 1: 'Budget', 2: 'Up to mid-rang
 const mustHaveLabel = (id: MustHaveId) => MUST_HAVES.find((item) => item.id === id)?.label ?? id;
 
 const SectionLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <h3 className="px-1 text-[13px] font-medium text-[#594C3D]">{children}</h3>
+  <h3 className="px-1 text-[13px] font-medium text-ink-2">{children}</h3>
 );
 
 /** The mood finder: say how you feel and what you need, get three explained picks and a route. */
@@ -164,25 +164,25 @@ export const MoodFinderSheet: React.FC<MoodFinderSheetProps> = ({
         <form onSubmit={applyText} className="space-y-1.5">
           <div className="flex items-center gap-2">
             <label className="flex-1 flex items-center ios-fill rounded-[12px] h-11 px-3 focus-within:shadow-[0_0_0_1.5px_rgba(144,109,75,0.6)] transition-shadow">
-              <Search className="w-[18px] h-[18px] text-[#6E6150] shrink-0 mr-2" strokeWidth={2.2} />
+              <Search className="w-[18px] h-[18px] text-ink-3 shrink-0 mr-2" strokeWidth={2.2} />
               <input
                 value={text}
                 onChange={(event) => setText(event.target.value)}
                 enterKeyHint="search"
                 placeholder="Describe it: quiet place to study near Matina"
                 aria-label="Describe the cafe you want"
-                className="w-full min-w-0 bg-transparent text-[15px] text-[#13191F] placeholder:text-[#6E6150] focus:outline-none"
+                className="w-full min-w-0 bg-transparent text-[15px] text-ink placeholder:text-ink-3 focus:outline-none"
               />
             </label>
             <button
               type="submit"
               disabled={!text.trim()}
-              className="h-11 px-4 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[15px] font-semibold hover:bg-[#7D5C3D] disabled:opacity-40 ios-press"
+              className="h-11 px-4 rounded-full bg-tint text-surface text-[15px] font-semibold hover:bg-tint-ink disabled:opacity-40 ios-press"
             >
               Go
             </button>
           </div>
-          {parseNote && <p className="px-1 ios-footnote text-[#594C3D]">{parseNote}</p>}
+          {parseNote && <p className="px-1 ios-footnote text-ink-2">{parseNote}</p>}
         </form>
 
         {/* Mood */}
@@ -199,7 +199,7 @@ export const MoodFinderSheet: React.FC<MoodFinderSheetProps> = ({
             ))}
           </div>
           {request.mood && (
-            <p className="px-1 ios-footnote text-[#594C3D]">{MOODS.find((mood) => mood.id === request.mood)?.hint}</p>
+            <p className="px-1 ios-footnote text-ink-2">{MOODS.find((mood) => mood.id === request.mood)?.hint}</p>
           )}
         </section>
 
@@ -221,7 +221,7 @@ export const MoodFinderSheet: React.FC<MoodFinderSheetProps> = ({
               {request.district && (
                 <button
                   onClick={() => update({ ...request, district: null })}
-                  className="h-8 pl-3 pr-2 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[13px] font-medium inline-flex items-center gap-1 ios-press"
+                  className="h-8 pl-3 pr-2 rounded-full bg-tint text-surface text-[13px] font-medium inline-flex items-center gap-1 ios-press"
                   aria-label={`Remove area ${request.district}`}
                 >
                   In {request.district}
@@ -231,7 +231,7 @@ export const MoodFinderSheet: React.FC<MoodFinderSheetProps> = ({
               {request.maxPrice && (
                 <button
                   onClick={() => update({ ...request, maxPrice: null })}
-                  className="h-8 pl-3 pr-2 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[13px] font-medium inline-flex items-center gap-1 ios-press"
+                  className="h-8 pl-3 pr-2 rounded-full bg-tint text-surface text-[13px] font-medium inline-flex items-center gap-1 ios-press"
                   aria-label="Remove price limit"
                 >
                   {PRICE_LABEL[request.maxPrice]}
@@ -243,19 +243,19 @@ export const MoodFinderSheet: React.FC<MoodFinderSheetProps> = ({
         </section>
 
         {/* Where, and the weather */}
-        <section className="ios-group bg-[#FAF5EB]">
+        <section className="ios-group bg-canvas">
           <div className="ios-group-row">
-            <LocateFixed className="w-4.5 h-4.5 shrink-0 text-[#906D4B]" />
-            <span className="flex-1 min-w-0 text-[14px] text-[#13191F]" aria-live="polite">
+            <LocateFixed className="w-4.5 h-4.5 shrink-0 text-tint" />
+            <span className="flex-1 min-w-0 text-[14px] text-ink" aria-live="polite">
               {locationLine}
             </span>
             {location.status === 'granted' ? (
-              <Check className="w-5 h-5 text-[#3E5C48]" aria-hidden="true" />
+              <Check className="w-5 h-5 text-ok" aria-hidden="true" />
             ) : (
               <button
                 onClick={location.request}
                 disabled={location.status === 'locating'}
-                className="h-9 px-3.5 rounded-full ios-fill text-[14px] font-semibold text-[#7D5C3D] inline-flex items-center gap-1.5 ios-press disabled:opacity-60"
+                className="h-9 px-3.5 rounded-full ios-fill text-[14px] font-semibold text-tint-ink inline-flex items-center gap-1.5 ios-press disabled:opacity-60"
               >
                 {location.status === 'locating' && <Loader2 className="w-4 h-4 animate-spin" />}
                 Near me
@@ -264,8 +264,8 @@ export const MoodFinderSheet: React.FC<MoodFinderSheetProps> = ({
           </div>
           {weather && (
             <div className="ios-group-row">
-              <CloudRain className="w-4.5 h-4.5 shrink-0 text-[#906D4B]" />
-              <span className="flex-1 min-w-0 text-[14px] text-[#13191F]">
+              <CloudRain className="w-4.5 h-4.5 shrink-0 text-tint" />
+              <span className="flex-1 min-w-0 text-[14px] text-ink">
                 {weather.summary}
                 {weather.rainy ? ', leaning cozy and indoor' : weather.hot ? ', leaning air-con' : ''}
               </span>
@@ -286,9 +286,9 @@ export const MoodFinderSheet: React.FC<MoodFinderSheetProps> = ({
           )}
 
           {hasAsk && result.matches.length === 0 && (
-            <div className="bg-[#FAF5EB] rounded-[20px] px-4 py-5 text-center space-y-3">
+            <div className="bg-canvas rounded-[20px] px-4 py-5 text-center space-y-3">
               <AyaMascot pose="empty" size={88} alt="" />
-              <p className="text-[14px] text-[#594C3D]">
+              <p className="text-[14px] text-ink-2">
                 {relax
                   ? `Nothing matches ${request.mustHaves.map(mustHaveLabel).join(' and ')}. ${relax.count} ${
                       relax.count === 1 ? 'cafe matches' : 'cafes match'
@@ -298,7 +298,7 @@ export const MoodFinderSheet: React.FC<MoodFinderSheetProps> = ({
               {relax && (
                 <button
                   onClick={() => toggleMustHave(relax.mustHave)}
-                  className="h-11 px-5 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[15px] font-semibold hover:bg-[#7D5C3D] ios-press"
+                  className="h-11 px-5 rounded-full bg-tint text-surface text-[15px] font-semibold hover:bg-tint-ink ios-press"
                 >
                   Drop {mustHaveLabel(relax.mustHave)}
                 </button>
@@ -314,7 +314,7 @@ export const MoodFinderSheet: React.FC<MoodFinderSheetProps> = ({
               {result.matches.length > result.picks.length && (
                 <button
                   onClick={surpriseMe}
-                  className="h-10 px-4 rounded-full ios-fill text-[14px] font-semibold text-[#7D5C3D] inline-flex items-center gap-1.5 hover:bg-[#766046]/20 ios-press"
+                  className="h-10 px-4 rounded-full ios-fill text-[14px] font-semibold text-tint-ink inline-flex items-center gap-1.5 hover:bg-shade/20 ios-press"
                 >
                   <Shuffle className="w-4 h-4" />
                   Surprise me
@@ -323,7 +323,7 @@ export const MoodFinderSheet: React.FC<MoodFinderSheetProps> = ({
               <button
                 onClick={() => setShowAll((value) => !value)}
                 aria-expanded={showAll}
-                className="h-10 px-4 rounded-full ios-fill text-[14px] font-semibold text-[#7D5C3D] hover:bg-[#766046]/20 ios-press"
+                className="h-10 px-4 rounded-full ios-fill text-[14px] font-semibold text-tint-ink hover:bg-shade/20 ios-press"
               >
                 {showAll ? 'Hide full list' : `Show all ${result.matches.length} ${result.matches.length === 1 ? 'match' : 'matches'}`}
               </button>
@@ -331,15 +331,15 @@ export const MoodFinderSheet: React.FC<MoodFinderSheetProps> = ({
           )}
 
           {hasAsk && showAll && (
-            <div className="ios-group bg-[#FAF5EB]">
+            <div className="ios-group bg-canvas">
               {result.matches.map((match, index) => (
                 <button key={match.cafe.id} onClick={() => onOpenCafe(match.cafe.id)} className="ios-group-row">
-                  <span className="w-6 text-[13px] font-mono text-[#594C3D]">{index + 1}</span>
+                  <span className="w-6 text-[13px] font-mono text-ink-2">{index + 1}</span>
                   <span className="flex-1 min-w-0">
-                    <span className="block text-[15px] text-[#13191F] truncate">{match.cafe.name}</span>
-                    <span className="block ios-footnote text-[#594C3D] truncate">{match.reasons.join(', ')}</span>
+                    <span className="block text-[15px] text-ink truncate">{match.cafe.name}</span>
+                    <span className="block ios-footnote text-ink-2 truncate">{match.reasons.join(', ')}</span>
                   </span>
-                  <span className="text-[13px] font-mono text-[#594C3D] shrink-0">{formatKm(match.km)}</span>
+                  <span className="text-[13px] font-mono text-ink-2 shrink-0">{formatKm(match.km)}</span>
                 </button>
               ))}
             </div>

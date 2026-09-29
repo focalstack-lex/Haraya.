@@ -27,26 +27,26 @@ export const DirectionsActionSheet: React.FC<DirectionsActionSheetProps> = ({ ca
     <Modal isOpen={Boolean(cafe)} onClose={onClose} maxWidth="sm:max-w-md" labelledBy="directions-title">
       <ModalHeader title="Get directions" subtitle={cafe.name} onClose={onClose} />
       <div className="px-4 sm:px-6 py-4 space-y-4">
-        <div className="ios-group bg-[#FAF5EB]">
+        <div className="ios-group bg-canvas">
           <button onClick={() => onNavigateInApp(cafe)} className={ROW}>
-            <span className="h-8 w-8 shrink-0 rounded-[9px] bg-[#906D4B] text-[#FFFDF9] flex items-center justify-center">
+            <span className="h-8 w-8 shrink-0 rounded-[9px] bg-tint text-surface flex items-center justify-center">
               <Navigation className="w-4 h-4" />
             </span>
             <span className="flex-1 min-w-0">
-              <span className="block ios-headline text-[#13191F]">Navigate in Haraya</span>
-              <span className="block ios-footnote text-[#594C3D]">Live walking guide on the map, uses your location</span>
+              <span className="block ios-headline text-ink">Navigate in Haraya</span>
+              <span className="block ios-footnote text-ink-2">Live walking guide on the map, uses your location</span>
             </span>
-            <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]" strokeWidth={2.5} />
+            <ChevronRight className="w-4 h-4 shrink-0 text-ink-3" strokeWidth={2.5} />
           </button>
         </div>
 
         <div className="space-y-1.5">
-          <h3 className="px-4 text-[13px] text-[#594C3D]">Open in another app</h3>
-          <div className="ios-group bg-[#FAF5EB]">
+          <h3 className="px-4 text-[13px] text-ink-2">Open in another app</h3>
+          <div className="ios-group bg-canvas">
             {externalMapLinks(cafe).map((link) => (
               <a key={link.id} href={link.href} target="_blank" rel="noopener noreferrer" onClick={onClose} className={ROW}>
-                <span className="flex-1 text-[15px] text-[#13191F]">{link.label}</span>
-                <ExternalLink className="w-4 h-4 shrink-0 text-[#6E6150]" />
+                <span className="flex-1 text-[15px] text-ink">{link.label}</span>
+                <ExternalLink className="w-4 h-4 shrink-0 text-ink-3" />
               </a>
             ))}
           </div>

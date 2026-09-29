@@ -24,7 +24,7 @@ export const PopularPicksSection: React.FC<PopularPicksSectionProps> = ({ cafes,
         </h2>
         <button
           onClick={onViewAll}
-          className="inline-flex items-center gap-0.5 min-h-11 -my-2 text-[15px] font-medium text-[#7D5C3D] ios-press"
+          className="inline-flex items-center gap-0.5 min-h-11 -my-2 text-[15px] font-medium text-tint-ink ios-press"
         >
           See all
           <ChevronRight className="w-4 h-4" strokeWidth={2.5} />
@@ -41,23 +41,23 @@ export const PopularPicksSection: React.FC<PopularPicksSectionProps> = ({ cafes,
                 key={cafe.id}
                 type="button"
                 onClick={() => onSelectCafe(cafe.id)}
-                className="w-[62%] max-w-[260px] sm:w-auto sm:max-w-none shrink-0 text-left bg-[#FFFDF9] rounded-[20px] overflow-hidden ios-card-shadow ios-press active:scale-[0.98]"
+                className="w-[62%] max-w-[260px] sm:w-auto sm:max-w-none shrink-0 text-left bg-surface rounded-[20px] overflow-hidden ios-card-shadow ios-press active:scale-[0.98]"
               >
-                <span className="block relative aspect-[4/3] bg-[#13191F]">
+                <span className="block relative aspect-[4/3] bg-ink">
                   <img src={cafe.images[0]} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
                 </span>
                 <span className="block p-3.5 space-y-0.5">
-                  <span className="block ios-headline text-[#13191F] truncate">{cafe.name}</span>
-                  <span className="block ios-footnote text-[#594C3D] truncate">
+                  <span className="block ios-headline text-ink truncate">{cafe.name}</span>
+                  <span className="block ios-footnote text-ink-2 truncate">
                     {cafe.district}, {cafe.city}
                   </span>
                   <span className="flex items-center gap-2 pt-1.5 ios-footnote">
-                    <span className="inline-flex items-center gap-1 text-[#13191F] font-medium font-mono">
-                      <Bookmark className="w-3.5 h-3.5 text-[#906D4B]" strokeWidth={2.2} />
+                    <span className="inline-flex items-center gap-1 text-ink font-medium font-mono">
+                      <Bookmark className="w-3.5 h-3.5 text-tint" strokeWidth={2.2} />
                       {saves.format(cafe.saveCount)}
                     </span>
-                    <span className="text-[#594C3D] font-mono">{'₱'.repeat(cafe.priceLevel)}</span>
-                    <span className={`ml-auto font-medium ${!hoursKnown ? 'text-[#594C3D]' : openNow ? 'text-[#3E5C48]' : 'text-[#8C3A2E]'}`}>
+                    <span className="text-ink-2 font-mono">{'₱'.repeat(cafe.priceLevel)}</span>
+                    <span className={`ml-auto font-medium ${!hoursKnown ? 'text-ink-2' : openNow ? 'text-ok' : 'text-danger'}`}>
                       {!hoursKnown ? 'Hours not listed' : openNow ? 'Open' : 'Closed'}
                     </span>
                   </span>

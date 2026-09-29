@@ -45,7 +45,7 @@ const AMENITY_ICONS: Record<AmenityKey, React.ComponentType<{ className?: string
 };
 
 const SECONDARY_ACTION =
-  'h-11 px-3 rounded-full ios-fill text-[#7D5C3D] text-[15px] font-semibold font-sans inline-flex items-center justify-center gap-2 hover:bg-[#766046]/20 ios-press';
+  'h-11 px-3 rounded-full ios-fill text-tint-ink text-[15px] font-semibold font-sans inline-flex items-center justify-center gap-2 hover:bg-shade/20 ios-press';
 
 export const AmenityBadges: React.FC<{ amenities: AmenityKey[]; wifiMbps: number }> = ({ amenities, wifiMbps }) => (
   <div className={GROUP}>
@@ -54,14 +54,14 @@ export const AmenityBadges: React.FC<{ amenities: AmenityKey[]; wifiMbps: number
       return (
         <div
           key={amenity}
-          className="ios-group-row min-h-11 py-2 text-[15px] font-sans text-[#13191F]"
+          className="ios-group-row min-h-11 py-2 text-[15px] font-sans text-ink"
         >
-          <Icon className="w-4.5 h-4.5 text-[#906D4B] shrink-0" />
+          <Icon className="w-4.5 h-4.5 text-tint shrink-0" />
           <span className="truncate">
             {amenity === 'fastWifi' ? 'Fast WiFi' : AMENITY_LABELS[amenity]}
           </span>
           {amenity === 'fastWifi' && wifiMbps > 0 && (
-            <span className="ml-auto shrink-0 font-mono text-[13px] text-[#594C3D]">{wifiMbps} Mbps</span>
+            <span className="ml-auto shrink-0 font-mono text-[13px] text-ink-2">{wifiMbps} Mbps</span>
           )}
         </div>
       );
@@ -165,7 +165,7 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
                 const el = event.currentTarget;
                 setActiveImage(Math.round(el.scrollLeft / Math.max(el.clientWidth, 1)));
               }}
-              className="flex overflow-x-auto snap-x snap-mandatory overscroll-x-contain scrollbar-none rounded-[20px] aspect-[16/10] bg-[#13191F]"
+              className="flex overflow-x-auto snap-x snap-mandatory overscroll-x-contain scrollbar-none rounded-[20px] aspect-[16/10] bg-ink"
             >
               {cafe.images.map((src, index) => (
                 <img
@@ -186,7 +186,7 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
                 {cafe.images.map((src, index) => (
                   <span
                     key={src + index}
-                    className={`h-1.5 w-1.5 rounded-full transition-colors ${index === activeImage ? 'bg-[#FFFDF9]' : 'bg-[#FFFDF9]/45'}`}
+                    className={`h-1.5 w-1.5 rounded-full transition-colors ${index === activeImage ? 'bg-surface' : 'bg-surface/45'}`}
                   />
                 ))}
               </div>
@@ -197,32 +197,32 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] font-sans">
               <span className={`font-semibold inline-flex items-center gap-1.5 ${
-                !hoursKnown ? 'text-[#594C3D]' : openNow ? 'text-[#3E5C48]' : 'text-[#8C3A2E]'
+                !hoursKnown ? 'text-ink-2' : openNow ? 'text-ok' : 'text-danger'
               }`}>
-                {hoursKnown && <span className={`h-2 w-2 rounded-full ${openNow ? 'bg-[#3E5C48]' : 'bg-[#8C3A2E]'}`} />}
+                {hoursKnown && <span className={`h-2 w-2 rounded-full ${openNow ? 'bg-ok' : 'bg-danger'}`} />}
                 {!hoursKnown ? 'Hours not listed' : openNow ? 'Open now' : 'Closed'}
               </span>
               {cafe.verified && (
-                <span className="inline-flex items-center gap-1 text-[#594C3D]">
-                  <BadgeCheck className="w-4 h-4 text-[#3E5C48]" />
+                <span className="inline-flex items-center gap-1 text-ink-2">
+                  <BadgeCheck className="w-4 h-4 text-ok" />
                   Verified
                 </span>
               )}
               {cafe.isRoastery && (
-                <span className="inline-flex items-center gap-1 text-[#7D5C3D] font-medium">
-                  <Flame className="w-4 h-4 text-[#906D4B]" />
+                <span className="inline-flex items-center gap-1 text-tint-ink font-medium">
+                  <Flame className="w-4 h-4 text-tint" />
                   Brews in-house
                 </span>
               )}
               {cafe.community && (
-                <span className={`font-medium ${cafe.community.status === 'pending' ? 'text-[#7D5C3D]' : 'text-[#3E5C48]'}`}>
+                <span className={`font-medium ${cafe.community.status === 'pending' ? 'text-tint-ink' : 'text-ok'}`}>
                   {cafe.community.status === 'pending' ? 'Pending review, only you can see it' : 'Community gem'}
                 </span>
               )}
             </div>
-            {cafe.description && <p className="text-[15px] font-sans text-[#13191F]/85 leading-relaxed">{cafe.description}</p>}
+            {cafe.description && <p className="text-[15px] font-sans text-ink/85 leading-relaxed">{cafe.description}</p>}
             {cafe.community?.tip && (
-              <p className="rounded-[14px] bg-[#FAF5EB] px-3.5 py-2.5 text-[15px] text-[#13191F]">
+              <p className="rounded-[14px] bg-canvas px-3.5 py-2.5 text-[15px] text-ink">
                 <span className="font-semibold">Local tip: </span>
                 {cafe.community.tip}
               </p>
@@ -235,7 +235,7 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
             <div className="flex items-center gap-2">
               <button
                 onClick={() => onDirections(cafe)}
-                className="h-11 flex-1 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[15px] font-semibold font-sans inline-flex items-center justify-center gap-2 hover:bg-[#7D5C3D] ios-press"
+                className="h-11 flex-1 rounded-full bg-tint text-surface text-[15px] font-semibold font-sans inline-flex items-center justify-center gap-2 hover:bg-tint-ink ios-press"
               >
                 <Navigation className="w-4 h-4" />
                 Directions
@@ -246,7 +246,7 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
                 aria-label={saved ? `Remove ${cafe.name} from saved` : `Save ${cafe.name}`}
                 className={
                   saved
-                    ? 'h-11 w-11 rounded-full bg-[#906D4B] text-[#FFFDF9] inline-flex items-center justify-center hover:bg-[#7D5C3D] ios-press'
+                    ? 'h-11 w-11 rounded-full bg-tint text-surface inline-flex items-center justify-center hover:bg-tint-ink ios-press'
                     : `${SECONDARY_ACTION} w-11 px-0`
                 }
               >
@@ -294,13 +294,13 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
           {/* Visit details */}
           <div className={GROUP}>
             <div className="ios-group-row">
-              <Clock className="w-4.5 h-4.5 text-[#906D4B] shrink-0" />
-              <span className="text-[15px] font-sans text-[#13191F]">Today</span>
-              <span className="ml-auto text-[15px] font-mono text-[#594C3D] text-right">{hoursTodayLabel(cafe.hours)}</span>
+              <Clock className="w-4.5 h-4.5 text-tint shrink-0" />
+              <span className="text-[15px] font-sans text-ink">Today</span>
+              <span className="ml-auto text-[15px] font-mono text-ink-2 text-right">{hoursTodayLabel(cafe.hours)}</span>
             </div>
             <div className="ios-group-row items-start">
-              <MapPin className="w-4.5 h-4.5 text-[#906D4B] shrink-0 mt-0.5" />
-              <span className="text-[15px] font-sans text-[#13191F] leading-snug">{cafe.address}</span>
+              <MapPin className="w-4.5 h-4.5 text-tint shrink-0 mt-0.5" />
+              <span className="text-[15px] font-sans text-ink leading-snug">{cafe.address}</span>
             </div>
           </div>
 
@@ -318,7 +318,7 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
             <h3 className={SECTION_LABEL}>Brew methods</h3>
             <div className="flex flex-wrap gap-1.5">
               {cafe.brewMethods.map((method) => (
-                <span key={method} className="h-8 inline-flex items-center px-3 rounded-full ios-fill text-[13px] font-medium font-sans text-[#13191F]">
+                <span key={method} className="h-8 inline-flex items-center px-3 rounded-full ios-fill text-[13px] font-medium font-sans text-ink">
                   {method}
                 </span>
               ))}
@@ -344,11 +344,11 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
                     className="ios-group-row ios-press"
                   >
                     <span className="min-w-0 flex-1">
-                      <span className="block text-[15px] font-sans text-[#13191F] truncate">{bean.name}</span>
-                      <span className="block ios-footnote text-[#594C3D] truncate">{bean.origin}</span>
+                      <span className="block text-[15px] font-sans text-ink truncate">{bean.name}</span>
+                      <span className="block ios-footnote text-ink-2 truncate">{bean.origin}</span>
                     </span>
-                    <span className="font-mono text-[15px] text-[#594C3D] shrink-0">₱{bean.price}</span>
-                    <ChevronRight className="w-4 h-4 text-[#6E6150]/60 shrink-0" strokeWidth={2.5} />
+                    <span className="font-mono text-[15px] text-ink-2 shrink-0">₱{bean.price}</span>
+                    <ChevronRight className="w-4 h-4 text-ink-3/60 shrink-0" strokeWidth={2.5} />
                   </button>
                 ))}
               </div>

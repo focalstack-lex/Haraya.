@@ -48,13 +48,13 @@ const PRICE_OPTIONS: { value: 1 | 2 | 3; label: string }[] = [
   { value: 3, label: 'Premium' },
 ];
 
-const CARD = 'rounded-[20px] bg-[#FFFDF9] ios-card-shadow p-4 sm:p-5';
-const GROUP_LABEL = 'px-1 text-[13px] font-medium text-[#594C3D]';
+const CARD = 'rounded-[20px] bg-surface ios-card-shadow p-4 sm:p-5';
+const GROUP_LABEL = 'px-1 text-[13px] font-medium text-ink-2';
 
 const statusText: Record<SpotRow['status'], { label: string; tone: string }> = {
-  pending: { label: 'Waiting for review', tone: 'text-[#7D5C3D]' },
-  approved: { label: 'Live on the map', tone: 'text-[#3E5C48]' },
-  rejected: { label: 'Not approved', tone: 'text-[#8C3A2E]' },
+  pending: { label: 'Waiting for review', tone: 'text-tint-ink' },
+  approved: { label: 'Live on the map', tone: 'text-ok' },
+  rejected: { label: 'Not approved', tone: 'text-danger' },
 };
 
 const toggle = <T,>(list: T[], item: T): T[] => (list.includes(item) ? list.filter((entry) => entry !== item) : [...list, item]);
@@ -82,11 +82,11 @@ const SignInCard: React.FC<{ onOpenLogin: () => void }> = ({ onOpenLogin }) => {
   if (sent) {
     return (
       <div className={`${CARD} flex items-start gap-3`}>
-        <Mail className="w-5 h-5 text-[#906D4B] shrink-0 mt-0.5" />
+        <Mail className="w-5 h-5 text-tint shrink-0 mt-0.5" />
         <div className="space-y-1">
-          <h2 className="ios-headline text-[#13191F]">Check your email</h2>
-          <p className="text-[14px] text-[#594C3D]">
-            We sent a sign-in link to <span className="font-medium text-[#13191F]">{email.trim()}</span>. Open it on this
+          <h2 className="ios-headline text-ink">Check your email</h2>
+          <p className="text-[14px] text-ink-2">
+            We sent a sign-in link to <span className="font-medium text-ink">{email.trim()}</span>. Open it on this
             device to come back here signed in.
           </p>
         </div>
@@ -97,8 +97,8 @@ const SignInCard: React.FC<{ onOpenLogin: () => void }> = ({ onOpenLogin }) => {
   return (
     <div className={`${CARD} space-y-3`}>
       <div className="space-y-1">
-        <h2 className="ios-headline text-[#13191F]">Sign in to add a spot</h2>
-        <p className="text-[14px] text-[#594C3D]">No password. We email you a one-time link.</p>
+        <h2 className="ios-headline text-ink">Sign in to add a spot</h2>
+        <p className="text-[14px] text-ink-2">No password. We email you a one-time link.</p>
       </div>
       <Field label="Email">
         <TextInput value={email} onChange={setEmail} type="email" placeholder="you@email.com" />
@@ -115,10 +115,10 @@ const SignInCard: React.FC<{ onOpenLogin: () => void }> = ({ onOpenLogin }) => {
           </span>
         </SecondaryButton>
       </div>
-      <p className="ios-footnote text-[#594C3D]">
+      <p className="ios-footnote text-ink-2">
         By signing in you agree to the{' '}
-        <a href="#/tab/terms" className="font-semibold text-[#7D5C3D] underline underline-offset-2">Terms</a> and{' '}
-        <a href="#/tab/privacy" className="font-semibold text-[#7D5C3D] underline underline-offset-2">Privacy Notice</a>.
+        <a href="#/tab/terms" className="font-semibold text-tint-ink underline underline-offset-2">Terms</a> and{' '}
+        <a href="#/tab/privacy" className="font-semibold text-tint-ink underline underline-offset-2">Privacy Notice</a>.
       </p>
     </div>
   );
@@ -192,10 +192,10 @@ const SpotForm: React.FC<{ onSubmitted: () => void }> = ({ onSubmitted }) => {
                 type="button"
                 aria-pressed={active}
                 onClick={() => set('vibes', toggle<SpotVibe>(input.vibes, vibe.id))}
-                className={`text-left rounded-[14px] px-3.5 py-2.5 ios-press ${active ? 'bg-[#13191F] text-[#FFFDF9]' : 'ios-fill text-[#13191F]'}`}
+                className={`text-left rounded-[14px] px-3.5 py-2.5 ios-press ${active ? 'bg-ink text-surface' : 'ios-fill text-ink'}`}
               >
                 <span className="block text-[15px] font-semibold">{vibe.label}</span>
-                <span className={`block ios-footnote ${active ? 'text-[#FFFDF9]/80' : 'text-[#594C3D]'}`}>{vibe.hint}</span>
+                <span className={`block ios-footnote ${active ? 'text-surface/80' : 'text-ink-2'}`}>{vibe.hint}</span>
               </button>
             );
           })}
@@ -252,9 +252,9 @@ const SpotForm: React.FC<{ onSubmitted: () => void }> = ({ onSubmitted }) => {
           type="checkbox"
           checked={input.publicPlaceConfirmed}
           onChange={(event) => set('publicPlaceConfirmed', event.target.checked)}
-          className="accent-[#906D4B] h-5 w-5 mt-0.5 shrink-0"
+          className="accent-tint h-5 w-5 mt-0.5 shrink-0"
         />
-        <span className="text-[14px] text-[#13191F]">
+        <span className="text-[14px] text-ink">
           This is a business open to the public, not a private home, and the details are true to my knowledge.
         </span>
       </label>
@@ -263,7 +263,7 @@ const SpotForm: React.FC<{ onSubmitted: () => void }> = ({ onSubmitted }) => {
       <PrimaryButton onClick={() => void submit()} disabled={busy} className="w-full">
         {busy ? 'Sending' : 'Send for review'}
       </PrimaryButton>
-      <p className="ios-footnote text-[#594C3D]">
+      <p className="ios-footnote text-ink-2">
         Haraya reviews every spot before it goes public. Until then only you see it, marked Pending.
       </p>
     </div>
@@ -274,7 +274,7 @@ const MySpots: React.FC<{ rows: SpotRow[]; onViewSpot: (cafeId: string) => void 
   if (rows.length === 0) return null;
   return (
     <section className="space-y-1.5" aria-labelledby="my-spots-title">
-      <h2 id="my-spots-title" className="px-4 text-[13px] text-[#594C3D]">
+      <h2 id="my-spots-title" className="px-4 text-[13px] text-ink-2">
         Your spots
       </h2>
       <ul className="ios-group ios-card-shadow">
@@ -285,9 +285,9 @@ const MySpots: React.FC<{ rows: SpotRow[]; onViewSpot: (cafeId: string) => void 
               disabled={row.status === 'rejected'}
               className="ios-group-row ios-press text-left w-full disabled:cursor-default"
             >
-              <MapPin className="w-4.5 h-4.5 shrink-0 text-[#906D4B]" />
+              <MapPin className="w-4.5 h-4.5 shrink-0 text-tint" />
               <span className="flex-1 min-w-0">
-                <span className="block ios-headline text-[#13191F] truncate">{row.name}</span>
+                <span className="block ios-headline text-ink truncate">{row.name}</span>
                 <span className={`block ios-footnote ${statusText[row.status].tone}`}>
                   {statusText[row.status].label}
                   {row.status === 'rejected' && row.review_note ? `: ${row.review_note}` : ''}
@@ -317,19 +317,19 @@ export const AddSpotView: React.FC<AddSpotViewProps> = ({ onViewSpot, onOpenLogi
 
       {!spotService.isAvailable() ? (
         <div className={CARD}>
-          <p className="text-[15px] text-[#594C3D]">Adding spots is not available right now. Please check back soon.</p>
+          <p className="text-[15px] text-ink-2">Adding spots is not available right now. Please check back soon.</p>
         </div>
       ) : !user ? (
         <SignInCard onOpenLogin={onOpenLogin} />
       ) : (
         <>
           <div className="flex items-center justify-between gap-3 px-1">
-            <p className="ios-footnote text-[#594C3D] truncate">
-              Signed in as <span className="text-[#13191F] font-medium">{user.email}</span>
+            <p className="ios-footnote text-ink-2 truncate">
+              Signed in as <span className="text-ink font-medium">{user.email}</span>
             </p>
             <button
               onClick={() => void spotService.signOut()}
-              className="min-h-11 inline-flex items-center gap-1 text-[14px] font-medium text-[#7D5C3D] ios-press"
+              className="min-h-11 inline-flex items-center gap-1 text-[14px] font-medium text-tint-ink ios-press"
             >
               <LogOut className="w-4 h-4" /> Sign out
             </button>
@@ -338,7 +338,7 @@ export const AddSpotView: React.FC<AddSpotViewProps> = ({ onViewSpot, onOpenLogi
           {justSent && (
             <div className={`${CARD} flex items-center gap-3`} role="status">
               <AyaMascot pose="welcome" size={64} alt="" />
-              <p className="text-[15px] text-[#13191F]">
+              <p className="text-[15px] text-ink">
                 Thank you. Your spot shows on your map as Pending until Haraya reviews it.
               </p>
             </div>
@@ -351,10 +351,10 @@ export const AddSpotView: React.FC<AddSpotViewProps> = ({ onViewSpot, onOpenLogi
           {spotService.isAdmin() && (
             <button onClick={onOpenAdmin} className="ios-group ios-card-shadow w-full text-left">
               <span className="ios-group-row ios-press">
-                <ShieldCheck className="w-4.5 h-4.5 shrink-0 text-[#906D4B]" />
+                <ShieldCheck className="w-4.5 h-4.5 shrink-0 text-tint" />
                 <span className="flex-1 min-w-0">
-                  <span className="block ios-headline text-[#13191F]">Review spots in the Control Room</span>
-                  <span className="block ios-footnote text-[#594C3D]">
+                  <span className="block ios-headline text-ink">Review spots in the Control Room</span>
+                  <span className="block ios-footnote text-ink-2">
                     <span className="font-mono">{spotService.getReviewQueue().length}</span> waiting for review
                   </span>
                 </span>

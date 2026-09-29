@@ -47,15 +47,15 @@ export const AddToListSheet: React.FC<AddToListSheetProps> = ({ isOpen, onClose,
       <ModalHeader title="Add to list" subtitle="Build collections like Work Cafes or Weekend Pour-Overs" onClose={onClose} />
       <div className="px-4 sm:px-6 py-4 space-y-6">
         {lists.length === 0 && (
-          <p className="px-1 text-[15px] font-sans text-[#594C3D] leading-relaxed">
+          <p className="px-1 text-[15px] font-sans text-ink-2 leading-relaxed">
             No lists yet. Name your first one below: a list keeps cafes and beans together and can be shared with one link.
           </p>
         )}
 
         {lists.length > 0 && (
           <section className="space-y-1.5">
-            <h3 className="px-4 text-[13px] text-[#594C3D] font-sans">Your lists</h3>
-            <div className="ios-group bg-[#FAF5EB]">
+            <h3 className="px-4 text-[13px] text-ink-2 font-sans">Your lists</h3>
+            <div className="ios-group bg-canvas">
               {lists.map((list) => {
                 const has = containsItem(list.id);
                 const count = list.cafeIds.length + list.beanIds.length;
@@ -66,19 +66,19 @@ export const AddToListSheet: React.FC<AddToListSheetProps> = ({ isOpen, onClose,
                     disabled={has}
                     className={`ios-group-row font-sans ${has ? 'cursor-default' : 'ios-press'}`}
                   >
-                    <span className={`min-w-0 flex-1 truncate text-[15px] ${has ? 'text-[#594C3D]' : 'text-[#13191F]'}`}>
+                    <span className={`min-w-0 flex-1 truncate text-[15px] ${has ? 'text-ink-2' : 'text-ink'}`}>
                       {list.name}
                     </span>
-                    <span className="shrink-0 font-mono text-[13px] text-[#594C3D]">
+                    <span className="shrink-0 font-mono text-[13px] text-ink-2">
                       {count} {count === 1 ? 'item' : 'items'}
                     </span>
                     {has ? (
                       <>
-                        <Check className="w-4.5 h-4.5 text-[#3E5C48] shrink-0" strokeWidth={2.5} aria-hidden="true" />
+                        <Check className="w-4.5 h-4.5 text-ok shrink-0" strokeWidth={2.5} aria-hidden="true" />
                         <span className="sr-only">Already in this list</span>
                       </>
                     ) : (
-                      <Plus className="w-4.5 h-4.5 text-[#906D4B] shrink-0" strokeWidth={2.5} aria-hidden="true" />
+                      <Plus className="w-4.5 h-4.5 text-tint shrink-0" strokeWidth={2.5} aria-hidden="true" />
                     )}
                   </button>
                 );
@@ -88,7 +88,7 @@ export const AddToListSheet: React.FC<AddToListSheetProps> = ({ isOpen, onClose,
         )}
 
         <section className="space-y-1.5">
-          <h3 className="px-4 text-[13px] text-[#594C3D] font-sans">New list</h3>
+          <h3 className="px-4 text-[13px] text-ink-2 font-sans">New list</h3>
           <div className="flex gap-2">
             <TextInput value={newListName} onChange={setNewListName} placeholder="e.g. Work Cafes with Good WiFi" />
             <PrimaryButton onClick={createAndAdd} disabled={!newListName.trim()} className="shrink-0 w-11 px-0 flex items-center justify-center">

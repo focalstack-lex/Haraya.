@@ -83,7 +83,7 @@ export const RateCafeModal: React.FC<RateCafeModalProps> = ({ cafe, isOpen, onCl
                 >
                   <Star
                     className={`w-7 h-7 transition-colors ${
-                      active ? 'text-[#CA9C68] fill-[#CA9C68]' : 'text-[#6E6150]/50'
+                      active ? 'text-star fill-star' : 'text-ink-3/50'
                     }`}
                     strokeWidth={1.75}
                   />
@@ -91,7 +91,7 @@ export const RateCafeModal: React.FC<RateCafeModalProps> = ({ cafe, isOpen, onCl
               );
             })}
           </div>
-          <p className="text-[15px] font-sans font-semibold text-[#13191F]" aria-live="polite">
+          <p className="text-[15px] font-sans font-semibold text-ink" aria-live="polite">
             {RATING_LABELS[currentDisplayRating]}
           </p>
         </div>
@@ -116,7 +116,7 @@ export const RateCafeModal: React.FC<RateCafeModalProps> = ({ cafe, isOpen, onCl
               <button
                 type="button"
                 onClick={handleRemove}
-                className="h-11 px-3 rounded-full ios-fill text-[15px] font-semibold font-sans text-[#8C3A2E] hover:bg-[#766046]/20 inline-flex items-center justify-center gap-2 ios-press"
+                className="h-11 px-3 rounded-full ios-fill text-[15px] font-semibold font-sans text-danger hover:bg-shade/20 inline-flex items-center justify-center gap-2 ios-press"
               >
                 <Trash2 className="w-4 h-4" />
                 Remove

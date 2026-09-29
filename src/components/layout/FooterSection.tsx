@@ -10,9 +10,9 @@ interface FooterSectionProps {
   onAddSpot: () => void;
 }
 
-const headingClass = 'text-[13px] font-semibold text-[#13191F] mb-2';
+const headingClass = 'text-[13px] font-semibold text-ink mb-2';
 const desktopLinkClass =
-  'min-h-8 inline-flex items-center text-left text-[14px] text-[#594C3D] hover:text-[#13191F] transition-colors ios-press';
+  'min-h-8 inline-flex items-center text-left text-[14px] text-ink-2 hover:text-ink transition-colors ios-press';
 
 const activeCities = DAVAO_CITIES.filter((city) => city !== 'All Davao Region');
 
@@ -22,13 +22,13 @@ const activeCities = DAVAO_CITIES.filter((city) => city !== 'All Davao Region');
  */
 export const FooterSection: React.FC<FooterSectionProps> = ({ setActiveTab, setSelectedCity, onAddSpot }) => {
   return (
-    <footer className="bg-[#FAF5EB] ios-hairline-t mt-12 pb-8" role="contentinfo">
+    <footer className="bg-canvas ios-hairline-t mt-12 pb-8" role="contentinfo">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 space-y-8 lg:space-y-0 lg:grid lg:grid-cols-4 lg:gap-10">
         
         {/* Brand Information */}
         <div className="space-y-2">
           <BrandLogo className="h-14 -ml-1" />
-          <p className="text-[14px] text-[#594C3D] leading-relaxed max-w-sm">
+          <p className="text-[14px] text-ink-2 leading-relaxed max-w-sm">
             Coffee, study spots and hidden gems across the Davao Region.
           </p>
         </div>
@@ -71,12 +71,12 @@ export const FooterSection: React.FC<FooterSectionProps> = ({ setActiveTab, setS
         {/* Desktop Community Column (>= lg only) */}
         <div className="hidden lg:block space-y-3">
           <h3 className={headingClass}>Know a hidden spot?</h3>
-          <p className="text-[14px] text-[#594C3D] leading-relaxed">
+          <p className="text-[14px] text-ink-2 leading-relaxed">
             Share a quiet corner or study cafe that is not on the map yet. Haraya reviews every spot first.
           </p>
           <button
             onClick={onAddSpot}
-            className="inline-flex items-center gap-1.5 h-11 px-5 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[15px] font-semibold hover:bg-[#7D5C3D] ios-press"
+            className="inline-flex items-center gap-1.5 h-11 px-5 rounded-full bg-tint text-surface text-[15px] font-semibold hover:bg-tint-ink ios-press"
           >
             Add a Spot
             <ArrowUpRight className="w-4 h-4" strokeWidth={2.2} />
@@ -87,18 +87,18 @@ export const FooterSection: React.FC<FooterSectionProps> = ({ setActiveTab, setS
 
       {/* Legal & Copyright Row */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="ios-hairline-t py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 ios-footnote text-[#6E6150]">
+        <div className="ios-hairline-t py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 ios-footnote text-ink-3">
           <span>Haraya: Davao Coffee and Study Spot Guide</span>
           <span className="flex flex-wrap items-center gap-x-4 gap-y-1">
-            <button onClick={() => setActiveTab('privacy')} className="min-h-9 text-[#7D5C3D] font-medium ios-press">
+            <button onClick={() => setActiveTab('privacy')} className="min-h-9 text-tint-ink font-medium ios-press">
               Privacy Notice
             </button>
-            <span className="text-[#6E6150]/40 select-none">·</span>
-            <button onClick={() => setActiveTab('terms')} className="min-h-9 text-[#7D5C3D] font-medium ios-press">
+            <span className="text-ink-3/40 select-none">·</span>
+            <button onClick={() => setActiveTab('terms')} className="min-h-9 text-tint-ink font-medium ios-press">
               Terms of Use
             </button>
             {/* On phones the tagline takes its own line, so this dot would dangle at the end of the row */}
-            <span className="hidden sm:inline text-[#6E6150]/40 select-none">·</span>
+            <span className="hidden sm:inline text-ink-3/40 select-none">·</span>
             <span className="w-full sm:w-auto">
               Local Roasts. Your Cup. <span className="font-mono">2026</span>
             </span>

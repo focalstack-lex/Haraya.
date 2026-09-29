@@ -53,17 +53,17 @@ export const FeedControls: React.FC<FeedControlsProps> = ({
                 <motion.span
                   layoutId="feed-mode-thumb"
                   transition={{ type: 'spring', stiffness: 500, damping: 38 }}
-                  className="absolute inset-0 rounded-[8px] bg-[#FFFDF9] shadow-[0_1px_4px_rgba(19,25,31,0.14),0_0_0_0.5px_rgba(19,25,31,0.04)]"
+                  className="absolute inset-0 rounded-[8px] bg-surface shadow-[0_1px_4px_rgba(19,25,31,0.14),0_0_0_0.5px_rgba(19,25,31,0.04)]"
                 />
               )}
-              <span className={`relative ${active ? 'text-[#13191F]' : 'text-[#594C3D]'}`}>{entry.label}</span>
+              <span className={`relative ${active ? 'text-ink' : 'text-ink-2'}`}>{entry.label}</span>
             </button>
           );
         })}
       </div>
 
       <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2">
-        <span className="ios-footnote text-[#594C3D] font-mono">
+        <span className="ios-footnote text-ink-2 font-mono">
           {itemCount} {itemCount === 1 ? 'spot' : 'spots'}
         </span>
 

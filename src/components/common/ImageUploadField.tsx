@@ -41,11 +41,11 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({ label, hint,
 
   return (
     <div className="space-y-1.5">
-      <span className="block px-1 text-[13px] font-medium text-[#594C3D] font-sans">{label}</span>
+      <span className="block px-1 text-[13px] font-medium text-ink-2 font-sans">{label}</span>
       <input ref={inputRef} type="file" accept="image/*" onChange={pick} className="hidden" />
 
       {value ? (
-        <div className={`relative rounded-[14px] overflow-hidden bg-[#13191F] ${aspect === 'square' ? 'aspect-square w-32' : 'aspect-video w-full'}`}>
+        <div className={`relative rounded-[14px] overflow-hidden bg-ink ${aspect === 'square' ? 'aspect-square w-32' : 'aspect-video w-full'}`}>
           <img src={value} alt={`${label} preview`} className="w-full h-full object-cover" />
           <button
             type="button"
@@ -53,7 +53,7 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({ label, hint,
             aria-label={`Remove ${label}`}
             className="absolute top-0 right-0 h-11 w-11 flex items-center justify-center ios-press"
           >
-            <span className="h-7.5 w-7.5 rounded-full ios-material-dark text-[#FFFDF9] flex items-center justify-center">
+            <span className="h-7.5 w-7.5 rounded-full ios-material-dark text-surface flex items-center justify-center">
               <X className="w-4 h-4" strokeWidth={2.5} />
             </span>
           </button>
@@ -62,18 +62,18 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({ label, hint,
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className={`w-full rounded-[14px] ios-fill hover:bg-[#766046]/20 text-[#7D5C3D] font-sans flex flex-col items-center justify-center gap-1.5 ios-press ${
+          className={`w-full rounded-[14px] ios-fill hover:bg-shade/20 text-tint-ink font-sans flex flex-col items-center justify-center gap-1.5 ios-press ${
             aspect === 'wide' ? 'h-28' : 'h-24'
           }`}
         >
-          <ImagePlus className="w-5.5 h-5.5 text-[#906D4B]" />
+          <ImagePlus className="w-5.5 h-5.5 text-tint" />
           <span className="text-[15px] font-semibold">Attach photo</span>
         </button>
       )}
 
-      {hint && !error && <span className="block px-1 ios-footnote text-[#594C3D]">{hint}</span>}
+      {hint && !error && <span className="block px-1 ios-footnote text-ink-2">{hint}</span>}
       {error && (
-        <span role="alert" className="block px-1 ios-footnote text-[#8C3A2E]">
+        <span role="alert" className="block px-1 ios-footnote text-danger">
           {error}
         </span>
       )}

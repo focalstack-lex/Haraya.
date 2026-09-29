@@ -22,7 +22,7 @@ interface ConfirmEmailViewProps {
 }
 
 const RowIcon: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span className="h-7.5 w-7.5 shrink-0 rounded-[8px] bg-[#906D4B]/15 text-[#7D5C3D] flex items-center justify-center">
+  <span className="h-7.5 w-7.5 shrink-0 rounded-[8px] bg-tint/15 text-tint-ink flex items-center justify-center">
     {children}
   </span>
 );
@@ -49,7 +49,7 @@ export const ConfirmEmailView: React.FC<ConfirmEmailViewProps> = ({ email, onSig
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FAF5EB] text-[#13191F] font-sans">
+    <div className="min-h-screen flex flex-col bg-canvas text-ink font-sans">
       <header className="px-4 sm:px-6 lg:px-8 h-16 flex items-center">
         <BrandLogo className="h-10" eager />
       </header>
@@ -61,8 +61,8 @@ export const ConfirmEmailView: React.FC<ConfirmEmailViewProps> = ({ email, onSig
           <h1 className="mt-2 font-cooper text-[30px] sm:text-[34px] font-bold leading-[1.1] tracking-[-0.025em]">
             Confirm your email
           </h1>
-          <p className="mt-3 text-[16px] leading-[1.5] text-[#594C3D]">
-            We sent a link to <span className="font-semibold text-[#13191F] [overflow-wrap:anywhere]">{email}</span>. Open it to finish
+          <p className="mt-3 text-[16px] leading-[1.5] text-ink-2">
+            We sent a link to <span className="font-semibold text-ink [overflow-wrap:anywhere]">{email}</span>. Open it to finish
             creating your account. Haraya opens once your email is confirmed.
           </p>
 
@@ -71,25 +71,25 @@ export const ConfirmEmailView: React.FC<ConfirmEmailViewProps> = ({ email, onSig
               href={inbox.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-6 w-full inline-flex items-center justify-center gap-2 h-12 px-6 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[16px] font-semibold hover:bg-[#7D5C3D] ios-press focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#906D4B] focus-visible:ring-offset-2 focus-visible:ring-offset-[#FAF5EB] transition-colors"
+              className="mt-6 w-full inline-flex items-center justify-center gap-2 h-12 px-6 rounded-full bg-tint text-surface text-[16px] font-semibold hover:bg-tint-ink ios-press focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tint focus-visible:ring-offset-2 focus-visible:ring-offset-canvas transition-colors"
             >
               Open {inbox.name}
               <ArrowUpRight className="w-4.5 h-4.5" strokeWidth={2.4} />
             </a>
           ) : (
-            <p className="mt-6 rounded-[14px] ios-fill px-4 py-3 text-[15px] leading-[1.45] text-[#13191F]">
+            <p className="mt-6 rounded-[14px] ios-fill px-4 py-3 text-[15px] leading-[1.45] text-ink">
               Open your email app or webmail and look for the message from Haraya.
             </p>
           )}
 
-          <p className="mt-3 ios-footnote text-[#594C3D]">
+          <p className="mt-3 ios-footnote text-ink-2">
             Use this device and this browser, so the link brings you back signed in. It can land in spam.
           </p>
 
           <div className="mt-6 space-y-2" aria-live="polite">
             {error && <ErrorNote message={error} />}
             {resent && !error && (
-              <p role="status" className="ios-footnote text-[#3E5C48] bg-[#3E5C48]/10 rounded-[12px] px-3.5 py-2.5">
+              <p role="status" className="ios-footnote text-ok bg-ok/10 rounded-[12px] px-3.5 py-2.5">
                 Sent again to {email}.
               </p>
             )}
@@ -101,21 +101,21 @@ export const ConfirmEmailView: React.FC<ConfirmEmailViewProps> = ({ email, onSig
                 <MailPlus className="w-4 h-4" strokeWidth={2.2} />
               </RowIcon>
               <span className="flex-1 text-[15px]">{busy ? 'Sending' : 'Send the link again'}</span>
-              <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]/60" strokeWidth={2.5} />
+              <ChevronRight className="w-4 h-4 shrink-0 text-ink-3/60" strokeWidth={2.5} />
             </button>
             <button type="button" onClick={onSignIn} className="ios-group-row ios-press">
               <RowIcon>
                 <LogIn className="w-4 h-4" strokeWidth={2.2} />
               </RowIcon>
               <span className="flex-1 text-[15px]">I confirmed it, sign me in</span>
-              <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]/60" strokeWidth={2.5} />
+              <ChevronRight className="w-4 h-4 shrink-0 text-ink-3/60" strokeWidth={2.5} />
             </button>
             <button type="button" onClick={onChangeEmail} className="ios-group-row ios-press">
               <RowIcon>
                 <UserRoundPen className="w-4 h-4" strokeWidth={2.2} />
               </RowIcon>
               <span className="flex-1 text-[15px]">Wrong address, use another email</span>
-              <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]/60" strokeWidth={2.5} />
+              <ChevronRight className="w-4 h-4 shrink-0 text-ink-3/60" strokeWidth={2.5} />
             </button>
           </div>
         </div>

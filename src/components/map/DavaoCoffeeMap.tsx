@@ -26,7 +26,7 @@ const escapeHtml = (value: string): string => value.replace(/[&<>"']/g, (char) =
 /** Floating map control: a round bar-material button inside a 44px hit area. */
 const MapControl: React.FC<{ label: string; onClick: () => void; children: React.ReactNode }> = ({ label, onClick, children }) => (
   <button type="button" onClick={onClick} aria-label={label} className="h-11 w-11 flex items-center justify-center ios-press">
-    <span className="h-9 w-9 rounded-full ios-material-bar shadow-[0_1px_2px_rgba(19,25,31,0.12),0_4px_12px_-4px_rgba(19,25,31,0.25)] flex items-center justify-center text-[#7D5C3D]">
+    <span className="h-9 w-9 rounded-full ios-material-bar shadow-[0_1px_2px_rgba(19,25,31,0.12),0_4px_12px_-4px_rgba(19,25,31,0.25)] flex items-center justify-center text-tint-ink">
       {children}
     </span>
   </button>
@@ -322,7 +322,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
       <div className="grid lg:grid-cols-3 gap-4 lg:gap-6">
         {/* Map canvas. min-w-0 lets the long one-line address truncate instead of widening the grid */}
         <div className="lg:col-span-2 space-y-3 min-w-0">
-          <div className="relative isolate rounded-[20px] overflow-hidden ios-card-shadow bg-[#FFFDF9]">
+          <div className="relative isolate rounded-[20px] overflow-hidden ios-card-shadow bg-surface">
             <div
               ref={canvasRef}
               className="h-[380px] sm:h-[460px] lg:h-[520px] z-0"
@@ -332,12 +332,12 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
             {/* Navigation banner: destination, distance and time left */}
             {navTarget && remainingKm !== null && nav.status !== 'arrived' && (
               <div className="absolute top-2.5 left-2.5 right-14 z-[500] rounded-[14px] ios-material-bar shadow-[0_4px_16px_-6px_rgba(19,25,31,0.35)] px-3.5 py-2.5" aria-live="polite">
-                <p className="ios-footnote text-[#594C3D] truncate">To {navTarget.name}</p>
-                <p className="text-[17px] font-semibold text-[#13191F]">
+                <p className="ios-footnote text-ink-2 truncate">To {navTarget.name}</p>
+                <p className="text-[17px] font-semibold text-ink">
                   <span className="font-mono">{formatRemaining(remainingKm)}</span>
-                  <span className="text-[#594C3D] font-normal"> left, about </span>
+                  <span className="text-ink-2 font-normal"> left, about </span>
                   <span className="font-mono">{minutesLeft}</span>
-                  <span className="text-[#594C3D] font-normal"> min walk</span>
+                  <span className="text-ink-2 font-normal"> min walk</span>
                 </p>
               </div>
             )}
@@ -367,13 +367,13 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
                 <div className="flex items-center gap-3 px-4 py-3.5">
                   <AyaMascot pose="welcome" size={76} alt="" className="-my-1" />
                   <div className="min-w-0 flex-1">
-                    <h3 className="ios-headline text-[#13191F]">You're here</h3>
-                    <p className="ios-footnote text-[#594C3D] truncate">{navTarget.name}, {navTarget.address}</p>
+                    <h3 className="ios-headline text-ink">You're here</h3>
+                    <p className="ios-footnote text-ink-2 truncate">{navTarget.name}, {navTarget.address}</p>
                     <div className="flex flex-wrap gap-2 pt-2">
                       {onCheckIn && (
                         <button
                           onClick={() => onCheckIn(navTarget)}
-                          className="h-9 px-4 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[14px] font-semibold hover:bg-[#7D5C3D] ios-press"
+                          className="h-9 px-4 rounded-full bg-tint text-surface text-[14px] font-semibold hover:bg-tint-ink ios-press"
                         >
                           Check in
                         </button>
@@ -382,13 +382,13 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
                         onClick={() => onSelectCafe(navTarget.id)}
                         className={
                           onCheckIn
-                            ? 'h-9 px-4 rounded-full ios-fill text-[14px] font-semibold text-[#7D5C3D] ios-press'
-                            : 'h-9 px-4 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[14px] font-semibold hover:bg-[#7D5C3D] ios-press'
+                            ? 'h-9 px-4 rounded-full ios-fill text-[14px] font-semibold text-tint-ink ios-press'
+                            : 'h-9 px-4 rounded-full bg-tint text-surface text-[14px] font-semibold hover:bg-tint-ink ios-press'
                         }
                       >
                         View spot
                       </button>
-                      <button onClick={onEndNavigation} className="h-9 px-4 rounded-full ios-fill text-[14px] font-semibold text-[#7D5C3D] ios-press">
+                      <button onClick={onEndNavigation} className="h-9 px-4 rounded-full ios-fill text-[14px] font-semibold text-tint-ink ios-press">
                         Done
                       </button>
                     </div>
@@ -396,10 +396,10 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
                 </div>
               ) : nav.status === 'denied' || nav.status === 'unavailable' ? (
                 <div className="px-4 py-3.5 space-y-2.5">
-                  <h3 className="ios-headline text-[#13191F]">
+                  <h3 className="ios-headline text-ink">
                     {nav.status === 'denied' ? 'Location is off for Haraya' : 'Your location is unavailable'}
                   </h3>
-                  <p className="ios-footnote text-[#594C3D]">
+                  <p className="ios-footnote text-ink-2">
                     {nav.status === 'denied'
                       ? 'Allow location for this site in your browser settings to walk with Haraya, or open a maps app.'
                       : 'Haraya could not get a GPS fix. Try again outdoors, or open a maps app.'}
@@ -411,12 +411,12 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
                         href={link.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="h-9 px-3.5 rounded-full ios-fill text-[14px] font-semibold text-[#7D5C3D] inline-flex items-center ios-press"
+                        className="h-9 px-3.5 rounded-full ios-fill text-[14px] font-semibold text-tint-ink inline-flex items-center ios-press"
                       >
                         {link.label}
                       </a>
                     ))}
-                    <button onClick={onEndNavigation} className="h-9 px-3.5 text-[14px] font-medium text-[#594C3D] ios-press">
+                    <button onClick={onEndNavigation} className="h-9 px-3.5 text-[14px] font-medium text-ink-2 ios-press">
                       End
                     </button>
                   </div>
@@ -425,31 +425,31 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
                 <div className="px-4 pt-3 pb-3.5 space-y-2.5">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <h3 className="ios-headline text-[#13191F] truncate">{navTarget.name}</h3>
-                      <p className="ios-footnote text-[#594C3D] truncate">{navTarget.address}</p>
+                      <h3 className="ios-headline text-ink truncate">{navTarget.name}</h3>
+                      <p className="ios-footnote text-ink-2 truncate">{navTarget.address}</p>
                     </div>
                     <button
                       onClick={onEndNavigation}
-                      className="h-9 px-3.5 shrink-0 rounded-full ios-fill text-[14px] font-semibold text-[#8C3A2E] ios-press"
+                      className="h-9 px-3.5 shrink-0 rounded-full ios-fill text-[14px] font-semibold text-danger ios-press"
                     >
                       End
                     </button>
                   </div>
                   {nav.status === 'locating' ? (
-                    <p className="ios-footnote text-[#594C3D]">Finding your location</p>
+                    <p className="ios-footnote text-ink-2">Finding your location</p>
                   ) : (
                     <>
                       <div
-                        className="h-2 rounded-full bg-[#766046]/15 overflow-hidden"
+                        className="h-2 rounded-full bg-shade/15 overflow-hidden"
                         role="progressbar"
                         aria-label="Walk progress"
                         aria-valuemin={0}
                         aria-valuemax={100}
                         aria-valuenow={Math.round(progress * 100)}
                       >
-                        <div className="h-full rounded-full bg-[#906D4B] transition-[width] duration-500" style={{ width: `${Math.round(progress * 100)}%` }} />
+                        <div className="h-full rounded-full bg-tint transition-[width] duration-500" style={{ width: `${Math.round(progress * 100)}%` }} />
                       </div>
-                      <p className="ios-footnote text-[#594C3D]">
+                      <p className="ios-footnote text-ink-2">
                         <span className="font-mono">{Math.round(progress * 100)}%</span> of the walk done.{' '}
                         {walk.status === 'ready'
                           ? 'Follow the brown line along the streets.'
@@ -467,8 +467,8 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
           {activeTrail && (
             <div className="ios-group ios-card-shadow flex items-start justify-between gap-3 pl-4 pr-1 py-2">
               <div className="min-w-0 py-1.5">
-                <h3 className="ios-headline text-[#13191F] truncate">{activeTrail.name}</h3>
-                <p className="ios-footnote text-[#594C3D] line-clamp-2 mt-0.5">{activeTrail.description}</p>
+                <h3 className="ios-headline text-ink truncate">{activeTrail.name}</h3>
+                <p className="ios-footnote text-ink-2 line-clamp-2 mt-0.5">{activeTrail.description}</p>
               </div>
               <button
                 onClick={() => {
@@ -477,7 +477,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
                 aria-label="Clear trail"
                 className="h-11 w-11 shrink-0 flex items-center justify-center ios-press"
               >
-                <span className="h-7.5 w-7.5 rounded-full bg-[#766046]/15 flex items-center justify-center text-[#594C3D]">
+                <span className="h-7.5 w-7.5 rounded-full bg-shade/15 flex items-center justify-center text-ink-2">
                   <X className="w-4 h-4" strokeWidth={2.5} />
                 </span>
               </button>
@@ -496,21 +496,21 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
               return (
                 <article
                   key={trail.id}
-                  className={`rounded-[20px] bg-[#FFFDF9] p-4 space-y-2 ${
+                  className={`rounded-[20px] bg-surface p-4 space-y-2 ${
                     isActive ? 'shadow-[0_0_0_2px_#906D4B,0_6px_20px_-6px_rgba(19,25,31,0.14)]' : 'ios-card-shadow'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <h3 className="ios-headline text-[#13191F]">{trail.name}</h3>
-                    <span className="ios-footnote font-mono text-[#594C3D] shrink-0">{stops.length} stops</span>
+                    <h3 className="ios-headline text-ink">{trail.name}</h3>
+                    <span className="ios-footnote font-mono text-ink-2 shrink-0">{stops.length} stops</span>
                   </div>
-                  <p className="text-[14px] leading-[1.45] text-[#594C3D] line-clamp-2">{trail.description}</p>
-                  <p className="ios-footnote font-mono font-medium text-[#7D5C3D]">
+                  <p className="text-[14px] leading-[1.45] text-ink-2 line-clamp-2">{trail.description}</p>
+                  <p className="ios-footnote font-mono font-medium text-tint-ink">
                     {formatKm(totalKm)} total, about {walkMinutes(totalKm)} min walk
                   </p>
 
                   {/* Stops as an inset list on a fill, hop distance trailing */}
-                  <ol className="rounded-[14px] overflow-hidden bg-[#766046]/[0.07]">
+                  <ol className="rounded-[14px] overflow-hidden bg-shade/[0.07]">
                     {stops.map((cafe, index) => {
                       const hop = stopDistance(trail, index);
                       return (
@@ -519,12 +519,12 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
                             onClick={() => onSelectCafe(cafe.id)}
                             className="w-full min-h-11 flex items-center gap-2.5 px-3 py-2 text-left ios-press"
                           >
-                            <span className="h-5 w-5 shrink-0 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[11px] font-semibold font-mono flex items-center justify-center">
+                            <span className="h-5 w-5 shrink-0 rounded-full bg-tint text-surface text-[11px] font-semibold font-mono flex items-center justify-center">
                               {index + 1}
                             </span>
-                            <span className="flex-1 min-w-0 truncate text-[14px] font-medium text-[#13191F]">{cafe.name}</span>
-                            {hop !== null && <span className="shrink-0 ios-footnote font-mono text-[#594C3D]">{formatKm(hop)}</span>}
-                            <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]/60" />
+                            <span className="flex-1 min-w-0 truncate text-[14px] font-medium text-ink">{cafe.name}</span>
+                            {hop !== null && <span className="shrink-0 ios-footnote font-mono text-ink-2">{formatKm(hop)}</span>}
+                            <ChevronRight className="w-4 h-4 shrink-0 text-ink-3/60" />
                           </button>
                         </li>
                       );
@@ -538,7 +538,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
                       }}
                       aria-pressed={isActive}
                       className={`h-11 flex-1 px-4 rounded-full text-[15px] font-semibold ios-press ${
-                        isActive ? 'ios-fill text-[#7D5C3D] hover:bg-[#766046]/20' : 'bg-[#906D4B] text-[#FFFDF9] hover:bg-[#7D5C3D]'
+                        isActive ? 'ios-fill text-tint-ink hover:bg-shade/20' : 'bg-tint text-surface hover:bg-tint-ink'
                       }`}
                     >
                       {isActive ? 'Hide on map' : 'Show on map'}
@@ -547,7 +547,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
                       href={directionsUrl(stops.map((cafe) => ({ lat: cafe.lat, lng: cafe.lng })))}
                       target="_blank"
                       rel="noreferrer"
-                      className="h-11 flex-1 px-4 rounded-full ios-fill text-[15px] font-semibold text-[#7D5C3D] hover:bg-[#766046]/20 inline-flex items-center justify-center gap-1.5 ios-press"
+                      className="h-11 flex-1 px-4 rounded-full ios-fill text-[15px] font-semibold text-tint-ink hover:bg-shade/20 inline-flex items-center justify-center gap-1.5 ios-press"
                     >
                       <Navigation className="w-4 h-4" />
                       Directions
@@ -560,11 +560,11 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
           )}
 
           <section className="space-y-2" aria-labelledby="map-venues-title">
-            <h2 id="map-venues-title" className="px-4 text-[13px] text-[#594C3D]">
+            <h2 id="map-venues-title" className="px-4 text-[13px] text-ink-2">
               On the map <span className="font-mono">({cafes.length})</span>
             </h2>
             {cafes.length === 0 ? (
-              <p className="ios-group px-4 py-3 text-[14px] text-[#594C3D]">No venues in this city yet.</p>
+              <p className="ios-group px-4 py-3 text-[14px] text-ink-2">No venues in this city yet.</p>
             ) : (
               <ul className="ios-group ios-card-shadow">
                 {cafes.map((cafe) => {
@@ -577,18 +577,18 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
                           src={cafe.images[0]}
                           alt=""
                           loading="lazy"
-                          className="h-11 w-11 shrink-0 rounded-[10px] object-cover bg-[#13191F]"
+                          className="h-11 w-11 shrink-0 rounded-[10px] object-cover bg-ink"
                         />
                         <span className="flex-1 min-w-0">
-                          <span className="block ios-headline text-[#13191F] truncate">{cafe.name}</span>
-                          <span className="block ios-footnote text-[#594C3D] truncate">
+                          <span className="block ios-headline text-ink truncate">{cafe.name}</span>
+                          <span className="block ios-footnote text-ink-2 truncate">
                             {cafe.district}, {cafe.city}
-                            <span className={`ml-1.5 font-medium ${!hoursKnown ? 'text-[#594C3D]' : openNow ? 'text-[#3E5C48]' : 'text-[#8C3A2E]'}`}>
+                            <span className={`ml-1.5 font-medium ${!hoursKnown ? 'text-ink-2' : openNow ? 'text-ok' : 'text-danger'}`}>
                               {!hoursKnown ? 'Hours not listed' : openNow ? 'Open' : 'Closed'}
                             </span>
                           </span>
                         </span>
-                        <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]/60" />
+                        <ChevronRight className="w-4 h-4 shrink-0 text-ink-3/60" />
                       </button>
                     </li>
                   );

@@ -13,17 +13,17 @@ const LAST_UPDATED = '28 September 2026';
 
 const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
   <section className="space-y-2">
-    <h2 className="ios-title text-[19px] text-[#13191F]">{title}</h2>
-    <div className="space-y-2 text-[15px] leading-relaxed text-[#13191F]/85">{children}</div>
+    <h2 className="ios-title text-[19px] text-ink">{title}</h2>
+    <div className="space-y-2 text-[15px] leading-relaxed text-ink/85">{children}</div>
   </section>
 );
 
 const Placeholder: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span className="font-mono text-[13px] text-[#8C3A2E]">[{children}]</span>
+  <span className="font-mono text-[13px] text-danger">[{children}]</span>
 );
 
 const DraftNotice: React.FC = () => (
-  <p className="rounded-[14px] ios-fill px-4 py-3 text-[14px] text-[#594C3D]">
+  <p className="rounded-[14px] ios-fill px-4 py-3 text-[14px] text-ink-2">
     This page is being finalized. Items in brackets are still to be confirmed.
   </p>
 );

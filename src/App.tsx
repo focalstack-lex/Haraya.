@@ -643,7 +643,7 @@ export const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FAF5EB] text-[#13191F] font-sans">
+    <div className="min-h-screen flex flex-col bg-canvas text-ink font-sans">
       <NavigationHeader
         activeTab={activeTab}
         setActiveTab={setActiveTab}

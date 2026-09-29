@@ -18,8 +18,8 @@ interface LoginViewProps {
   onBrowse: () => void;
 }
 
-const CARD = 'rounded-[20px] bg-[#FFFDF9] ios-card-shadow p-4 sm:p-5';
-const LINK = 'min-h-11 inline-flex items-center px-1 text-[14px] font-semibold text-[#7D5C3D] ios-press';
+const CARD = 'rounded-[20px] bg-surface ios-card-shadow p-4 sm:p-5';
+const LINK = 'min-h-11 inline-flex items-center px-1 text-[14px] font-semibold text-tint-ink ios-press';
 
 const TITLES: Record<LoginMode, { title: string; subtitle: string }> = {
   signin: { title: 'Sign in', subtitle: 'Add spots, keep your place listing current, or run the Control Room.' },
@@ -33,13 +33,13 @@ const TITLES: Record<LoginMode, { title: string; subtitle: string }> = {
 const SentCard: React.FC<{ email: string; body: string; onSignIn?: () => void }> = ({ email, body, onSignIn }) => (
   <div className={`${CARD} space-y-4`} role="status">
     <div className="flex items-start gap-3">
-      <div className="w-10 h-10 rounded-full bg-[#906D4B]/10 flex items-center justify-center shrink-0">
-        <Mail className="w-5 h-5 text-[#906D4B]" />
+      <div className="w-10 h-10 rounded-full bg-tint/10 flex items-center justify-center shrink-0">
+        <Mail className="w-5 h-5 text-tint" />
       </div>
       <div className="space-y-1">
-        <h2 className="ios-headline text-[#13191F]">Check your email</h2>
-        <p className="text-[14px] text-[#594C3D] leading-relaxed">
-          We sent a verification link to <span className="font-semibold text-[#13191F]">{email}</span>. {body}
+        <h2 className="ios-headline text-ink">Check your email</h2>
+        <p className="text-[14px] text-ink-2 leading-relaxed">
+          We sent a verification link to <span className="font-semibold text-ink">{email}</span>. {body}
         </p>
       </div>
     </div>
@@ -52,10 +52,10 @@ const SentCard: React.FC<{ email: string; body: string; onSignIn?: () => void }>
 );
 
 const TermsNote: React.FC = () => (
-  <p className="ios-footnote text-[#594C3D]">
+  <p className="ios-footnote text-ink-2">
     By continuing you agree to the{' '}
-    <a href="#/tab/terms" className="font-semibold text-[#7D5C3D] underline underline-offset-2">Terms</a> and{' '}
-    <a href="#/tab/privacy" className="font-semibold text-[#7D5C3D] underline underline-offset-2">Privacy Notice</a>.
+    <a href="#/tab/terms" className="font-semibold text-tint-ink underline underline-offset-2">Terms</a> and{' '}
+    <a href="#/tab/privacy" className="font-semibold text-tint-ink underline underline-offset-2">Privacy Notice</a>.
   </p>
 );
 
@@ -158,7 +158,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
       <div className="max-w-md mx-auto px-4 pt-1 pb-8 sm:pt-4 space-y-5">
         <LargeTitle title="Sign in" />
         <div className={CARD}>
-          <p className="text-[15px] text-[#594C3D]">Accounts are not available right now. Please check back soon.</p>
+          <p className="text-[15px] text-ink-2">Accounts are not available right now. Please check back soon.</p>
         </div>
       </div>
     );
@@ -170,14 +170,14 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
       <div className="max-w-md mx-auto px-4 pt-1 pb-8 sm:pt-4 space-y-5">
         <LargeTitle title="Signed in" trailing={<AyaMascot pose="welcome" size={72} alt="" />} />
         <div className={`${CARD} space-y-3`}>
-          <p className="text-[15px] text-[#13191F]">
+          <p className="text-[15px] text-ink">
             You are signed in as <span className="font-medium">{user.email}</span>.
           </p>
           <div className="flex flex-col sm:flex-row gap-2">
             <PrimaryButton onClick={onSignedIn} className="w-full sm:w-auto">
               Continue
             </PrimaryButton>
-            <SecondaryButton onClick={() => void sessionService.signOut()} className="w-full sm:w-auto !text-[#8C3A2E]">
+            <SecondaryButton onClick={() => void sessionService.signOut()} className="w-full sm:w-auto !text-danger">
               <span className="inline-flex items-center gap-1.5">
                 <LogOut className="w-4 h-4" />
                 Sign out
@@ -215,10 +215,10 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
                   <motion.span
                     layoutId="login-mode-thumb"
                     transition={{ type: 'spring', stiffness: 500, damping: 38 }}
-                    className="absolute inset-0 rounded-[8px] bg-[#FFFDF9] shadow-[0_1px_4px_rgba(19,25,31,0.14),0_0_0_0.5px_rgba(19,25,31,0.04)]"
+                    className="absolute inset-0 rounded-[8px] bg-surface shadow-[0_1px_4px_rgba(19,25,31,0.14),0_0_0_0.5px_rgba(19,25,31,0.04)]"
                   />
                 )}
-                <span className={`relative ${active ? 'text-[#13191F]' : 'text-[#594C3D]'}`}>{entry.label}</span>
+                <span className={`relative ${active ? 'text-ink' : 'text-ink-2'}`}>{entry.label}</span>
               </button>
             );
           })}
@@ -249,7 +249,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
                 type="button"
                 onClick={() => void signInWithGoogle()}
                 disabled={busy}
-                className="w-full h-11 px-4 rounded-[12px] bg-[#FFFDF9] hover:bg-[#F5EFE6] border border-[#E6DEC9] text-[#13191F] text-[15px] font-semibold font-sans flex items-center justify-center gap-3 shadow-[0_1px_2px_rgba(19,25,31,0.05)] ios-press transition-colors disabled:opacity-50"
+                className="w-full h-11 px-4 rounded-[12px] bg-surface hover:bg-[#F5EFE6] border border-[#E6DEC9] text-ink text-[15px] font-semibold font-sans flex items-center justify-center gap-3 shadow-[0_1px_2px_rgba(19,25,31,0.05)] ios-press transition-colors disabled:opacity-50"
               >
                 <GoogleIcon className="w-5 h-5 shrink-0" />
                 <span>Continue with Google</span>
@@ -259,7 +259,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-[#E6DEC9]" />
                 </div>
-                <span className="relative bg-[#FFFDF9] px-2.5 text-[12px] font-medium text-[#7D7060]">
+                <span className="relative bg-surface px-2.5 text-[12px] font-medium text-[#7D7060]">
                   or with email
                 </span>
               </div>
@@ -348,7 +348,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
 
       <button
         onClick={onBrowse}
-        className="h-11 flex items-center justify-center gap-1.5 mx-auto px-3 text-[15px] font-medium font-sans text-[#7D5C3D] ios-press"
+        className="h-11 flex items-center justify-center gap-1.5 mx-auto px-3 text-[15px] font-medium font-sans text-tint-ink ios-press"
       >
         <Store className="w-4 h-4" />
         Keep browsing
