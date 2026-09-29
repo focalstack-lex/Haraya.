@@ -175,13 +175,21 @@ Color is information. The tint marks the one active or primary thing in a region
 
 ## Catalog spots without a full record
 
+- Stored in the database: `supabase/migrations/20260929040000_seed_catalog_cafes.sql` upserts Green Coffee and the
+  Digos spots into `public.cafes` (hours as jsonb, photo paths under `/spots/`, price 0 = not listed). It is generated
+  from `src/data` by `node scripts/generate-cafes-seed.mjs`, never edited by hand, and safe to run again: save and
+  view counts and the admin's verified flag are never overwritten. The app reads the table through `placeService`,
+  and `catalogService.getCafes()` lets a stored record replace the built-in copy with the same id, so the database is
+  the source of truth and the built-in copy is only the fallback (database empty, offline or not loaded yet). To change
+  a spot afterwards, edit the row; changing `src/data` and regenerating the SQL also works.
+
 - `src/data/digosCafes.ts`: 9 Digos City coffee shops chosen by Lex from Google Maps (2026-09-29), carrying only
   what the sources state: name, street as listed and an exact map position (OpenStreetMap, or decoded from the plus
   code on the listing with `reports/digos-cafes/decode-plus-code.py`, or a listing page's stated coordinates).
   Kofhi waits for a position; only shops with a photo are listed. Weekly hours are added only where a listing
   states them (restaurantguru.com, Google Business data updated within two months, checked against the "closes at"
-  line of Lex's Google Maps screenshots): G&Co., Café Vicente, The Tipsy Butter, Kaffeeneology, The Nook. The other
-  four say "Hours not listed"; the sources and the reading date sit beside `HOURS` in the data file. Spots show no
+  line of Lex's Google Maps screenshots): G&Co., Café Vicente, The Tipsy Butter, Kaffeeneology, The Nook; Cool Brews and Lil' Ben
+  come from Lex, applied to every day. Cely's Cafe and Infinitea say "Hours not listed"; the sources and the reading date sit beside `HOURS` in the data file. Spots show no
   price (the no-photo placeholder remains as a fallback; all 9 have one photo each, collected by Lex into
   `Haraya Files/Haraya Coffee Spots/<Shop> Digos/` and converted to WebP with `reports/digos-cafes/convert-photos.py`
   into `public/spots/<slug>/photo-1.webp`, long side 1200 px, quality 80; Kofhi's is converted and waiting) (`priceLevel: 0`, which the mood finder never treats as cheap and never filters out). Nothing is

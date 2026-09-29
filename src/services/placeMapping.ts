@@ -238,7 +238,8 @@ function parseMenu(value: unknown): MenuItem[] {
 /** A public listing as a Cafe. Photos stay a placeholder until real ones are uploaded. */
 export function cafeRowToCafe(row: CafeRow): Cafe {
   const images = row.images.filter((image) => typeof image === 'string' && image.trim());
-  const priceLevel = row.price_level === 1 || row.price_level === 3 ? row.price_level : 2;
+  // 0 means the price is not listed (catalog spots seeded without one); anything unknown falls back to mid
+  const priceLevel = row.price_level === 0 || row.price_level === 1 || row.price_level === 3 ? row.price_level : 2;
   return {
     id: row.id,
     handle: row.handle,

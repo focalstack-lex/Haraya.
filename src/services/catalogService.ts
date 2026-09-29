@@ -104,11 +104,16 @@ export const catalogService = {
 
   getCafes(): Cafe[] {
     const verifications = readJson<Record<string, boolean>>(KEYS.VERIFICATIONS, {});
-    const custom = [...CURATED_CAFES, ...DIGOS_CAFES, ...this.getCustomCafes(), ...listedCafes, ...communitySpots];
-    const all = custom.map((cafe) =>
+    // The database is the source of truth: a stored record replaces the built-in copy with the same id (the
+    // built-in ones keep the catalog whole until the database has loaded, or when it cannot be reached). A
+    // replaced spot keeps its place in the order, so the list does not jump when the data arrives.
+    const byId = new Map<string, Cafe>();
+    for (const cafe of [...CURATED_CAFES, ...DIGOS_CAFES, ...this.getCustomCafes(), ...listedCafes, ...communitySpots]) {
+      byId.set(cafe.id, cafe);
+    }
+    return [...byId.values()].map((cafe) =>
       cafe.id in verifications ? { ...cafe, verified: verifications[cafe.id] } : cafe
     );
-    return all;
   },
 
   /** Replaces the community spots shown on the map and feed; called by spotService after each load. */

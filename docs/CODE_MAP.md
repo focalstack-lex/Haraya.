@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-29 : commit e8081d2 : fingerprint 9a63685dcbfe45d8
+Generated 2026-09-29 : commit d3f4ebf : fingerprint af322febce042c59
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -10,6 +10,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 ## root/
 
 - `index.html` (30 lines) : . module: index.html
+- `scripts/generate-cafes-seed.mjs` (60 lines) : Writes the SQL that stores the catalog spots in the database: Green Coffee and the Digos City shops, with their
 - `scripts/generate-code-map.mjs` (212 lines) : One-line purpose per file, inferred from its path and leading doc comment.
 - `scripts/verify-google-auth.mjs` (109 lines) : scripts module: verify-google-auth
 - `src/App.tsx` (832 lines) : Older links: the roaster portal is now the Place Portal.
@@ -164,8 +165,8 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/data/
 
-- `src/data/digosCafes.test.ts` (67 lines) : src/data module: digosCafes.test
-- `src/data/digosCafes.ts` (129 lines) : Digos City coffee shops chosen by Lex from Google Maps on 2026-09-29 (names and streets as that listing shows
+- `src/data/digosCafes.test.ts` (78 lines) : src/data module: digosCafes.test
+- `src/data/digosCafes.ts` (134 lines) : Digos City coffee shops chosen by Lex from Google Maps on 2026-09-29 (names and streets as that listing shows
 - `src/data/spots.ts` (61 lines) : Curated spots listed by the Haraya team, shown ahead of roaster and community listings. Every field comes
 - `src/data/trails.ts` (8 lines) : Curated coffee trails. Empty until real trails are set up: each entry lists at least two cafe ids that
 
@@ -178,7 +179,8 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 ## src/services/
 
 - `src/services/adminService.ts` (66 lines) : Control Room account management: the list of profiles (readable by admins only, per Row Level
-- `src/services/catalogService.ts` (364 lines) : Catalog layer over roaster-created and admin-moderated records kept in
+- `src/services/catalogService.test.ts` (37 lines) : src/services module: catalogService.test
+- `src/services/catalogService.ts` (369 lines) : Catalog layer over roaster-created and admin-moderated records kept in
   - L31 : CafeMetrics
   - L38 : MetricsStore
   - L53 : readJson
@@ -188,8 +190,8 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L84 : deriveStatus
   - L89 : catalogService
 - `src/services/communityService.ts` (154 lines) : Cup Check community layer: browser-created posts, likes, and comments. Likes are stored per browser (no accounts needed to
-- `src/services/placeMapping.test.ts` (155 lines) : src/services module: placeMapping.test
-- `src/services/placeMapping.ts` (369 lines) : Place Portal data: the application a place owner sends (place_applications), the public listing row
+- `src/services/placeMapping.test.ts` (159 lines) : src/services module: placeMapping.test
+- `src/services/placeMapping.ts` (370 lines) : Place Portal data: the application a place owner sends (place_applications), the public listing row
   - L12 : PLACE_TYPES
   - L17 : PlaceType
   - L20 : REGION_BOUNDS
@@ -208,10 +210,10 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L204 : parseHours
   - L219 : parseMenu
   - L239 : cafeRowToCafe
-  - L271 : listingFromCafe
-  - L294 : validateListing
-  - L332 : toCafeUpdateRow
-  - L359 : describePlaceError
+  - L272 : listingFromCafe
+  - L295 : validateListing
+  - L333 : toCafeUpdateRow
+  - L360 : describePlaceError
 - `src/services/placeService.ts` (206 lines) : Public listings (table cafes) and Place Portal applications (table place_applications). Listings are
 - `src/services/roasterService.ts` (115 lines) : Roaster-facing facade over the catalog: everything an approved roaster or
 - `src/services/sessionService.test.ts` (35 lines) : src/services module: sessionService.test

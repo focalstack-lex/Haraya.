@@ -108,6 +108,10 @@ describe('cafeRowToCafe', () => {
     expect(cafe.community).toBeUndefined();
   });
 
+  it('keeps a price level of 0, which means the price is not listed', () => {
+    expect(cafeRowToCafe(cafeRow({ price_level: 0 })).priceLevel).toBe(0);
+  });
+
   it('falls back on unknown city, district and price level', () => {
     const cafe = cafeRowToCafe(cafeRow({ city: 'Manila', district: 'Nowhere', price_level: 9, hours: null, menu: 'nope' }));
     expect(cafe.city).toBe('Davao City');
