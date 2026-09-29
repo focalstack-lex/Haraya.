@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "bounce-easing",
+        "value": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+        "createdAt": "2026-09-29T08:48:42.858Z",
+        "reason": "user confirmed: keep the Aya mascot rise overshoot"
+      }
+    ]
+  }
+}
