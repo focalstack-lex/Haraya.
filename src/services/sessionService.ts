@@ -71,6 +71,44 @@ function readReturnTab(): string | null {
   }
 }
 
+/**
+ * Canonical redirect target for email confirmations, magic links, Google OAuth, and password resets.
+ *
+ * Ensures authentication flows return to the live production domain (https://www.haraya.space/)
+ * rather than localhost. Can be overridden via VITE_SITE_URL or VITE_AUTH_REDIRECT_URL if needed.
+ */
+export function getAuthRedirectUrl(originOverride?: string): string {
+  let origin = originOverride;
+  if (!origin && typeof window !== 'undefined' && window.location) {
+    origin = window.location.origin;
+  }
+
+  if (origin) {
+    try {
+      const parsed = new URL(origin);
+      // Production domain (apex haraya.space or www.haraya.space)
+      if (parsed.hostname === 'haraya.space' || parsed.hostname === 'www.haraya.space') {
+        return 'https://www.haraya.space/';
+      }
+      // Vercel deployment preview domain
+      if (parsed.hostname.endsWith('.vercel.app')) {
+        return `${parsed.origin}/`;
+      }
+    } catch {
+      // Ignore URL parsing errors and fall back to canonical production
+    }
+  }
+
+  const envUrl = (import.meta.env.VITE_SITE_URL || import.meta.env.VITE_AUTH_REDIRECT_URL || '') as string;
+  if (envUrl.trim()) {
+    const trimmed = envUrl.trim();
+    return trimmed.endsWith('/') ? trimmed : `${trimmed}/`;
+  }
+
+  // Canonical production fallback ensures email confirmations and OAuth always land on the live app
+  return 'https://www.haraya.space/';
+}
+
 /** Friendly wording for Supabase Auth errors; the raw message goes to the console only. */
 function describeAuthError(message: string, fallback: string): string {
   const text = message.toLowerCase();
@@ -238,7 +276,7 @@ export const sessionService = {
     const { data, error } = await supabase.auth.signUp({
       email: trimmed,
       password,
-      options: { data: { name: displayName }, emailRedirectTo: `${window.location.origin}/` },
+      options: { data: { name: displayName }, emailRedirectTo: getAuthRedirectUrl() },
     });
     if (error) {
       console.warn('Haraya: sign up failed', error.message);
@@ -260,7 +298,7 @@ export const sessionService = {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/`,
+        redirectTo: getAuthRedirectUrl(),
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
@@ -284,7 +322,7 @@ export const sessionService = {
     rememberReturnTab(returnTab);
     const { error } = await supabase.auth.signInWithOtp({
       email: trimmed,
-      options: { emailRedirectTo: `${window.location.origin}/`, shouldCreateUser: true },
+      options: { emailRedirectTo: getAuthRedirectUrl(), shouldCreateUser: true },
     });
     if (error) {
       console.warn('Haraya: sign-in link failed', error.message);
@@ -298,7 +336,7 @@ export const sessionService = {
     const trimmed = email.trim().toLowerCase();
     if (!EMAIL_PATTERN.test(trimmed)) throw new Error('Enter a valid email address.');
     rememberReturnTab(RESET_RETURN_TAB);
-    const { error } = await supabase.auth.resetPasswordForEmail(trimmed, { redirectTo: `${window.location.origin}/` });
+    const { error } = await supabase.auth.resetPasswordForEmail(trimmed, { redirectTo: getAuthRedirectUrl() });
     if (error) {
       console.warn('Haraya: password reset failed', error.message);
       throw new Error(describeAuthError(error.message, 'Could not send the reset email. Try again.'));
