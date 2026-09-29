@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-29 : commit d3f4ebf : fingerprint af322febce042c59
+Generated 2026-09-29 : commit a177197 : fingerprint afa433d3a2a5698e
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -13,10 +13,10 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `scripts/generate-cafes-seed.mjs` (60 lines) : Writes the SQL that stores the catalog spots in the database: Green Coffee and the Digos City shops, with their
 - `scripts/generate-code-map.mjs` (212 lines) : One-line purpose per file, inferred from its path and leading doc comment.
 - `scripts/verify-google-auth.mjs` (109 lines) : scripts module: verify-google-auth
-- `src/App.tsx` (832 lines) : Older links: the roaster portal is now the Place Portal.
+- `src/App.tsx` (833 lines) : Older links: the roaster portal is now the Place Portal.
   - L69 : SharedList
   - L95 : App
-- `src/index.css` (825 lines) : src entry point
+- `src/index.css` (890 lines) : src entry point
 - `src/main.tsx` (41 lines) : src entry point
 - `vite.config.ts` (43 lines) : . module: vite.config
 
@@ -92,7 +92,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/components/install/installPromptStore.ts` (62 lines) : Captures the browser's install prompt so Aya can offer it at the right moment. The event can
 - `src/components/install/InstallSheet.tsx` (150 lines) : Aya offers to put Haraya on the home screen. The variant follows the platform mode snapshot: a real
 - `src/components/install/installStorage.ts` (20 lines) : Remembers that Aya already offered to install Haraya. Storage can throw in private
-- `src/components/install/OfflineNotice.tsx` (31 lines) : src/components/install module: OfflineNotice
+- `src/components/install/OfflineNotice.tsx` (20 lines) : src/components/install module: OfflineNotice
 - `src/components/install/useInstallPrompt.ts` (19 lines) : src/components/install module: useInstallPrompt
 
 ## src/components/layout/
@@ -104,12 +104,20 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/map/
 
-- `src/components/map/DavaoCoffeeMap.tsx` (606 lines) : Escapes catalog text before it is placed into Leaflet tooltip HTML.
-  - L34 : DavaoCoffeeMapProps
-  - L50 : DavaoCoffeeMap
+- `src/components/map/DavaoCoffeeMap.tsx` (966 lines) : Floating map control: a round bar-material button inside a 44px hit area.
+  - L54 : RowHandlers
+  - L127 : DavaoCoffeeMapProps
+  - L145 : DavaoCoffeeMap
 - `src/components/map/DirectionsActionSheet.tsx` (58 lines) : External map apps. Apple Maps uses its https form so the link also works outside Apple devices.
 - `src/components/map/liveNavMath.test.ts` (71 lines) : src/components/map module: liveNavMath.test
 - `src/components/map/liveNavMath.ts` (63 lines) : Pure math for in-app walking navigation. These straight-line figures are the fallback when no street route
+- `src/components/map/mapFilters.test.ts` (70 lines) : src/components/map module: mapFilters.test
+- `src/components/map/mapFilters.ts` (33 lines) : True when the spot passes every active map filter; no filters means every spot.
+- `src/components/map/mapPins.test.ts` (72 lines) : src/components/map module: mapPins.test
+- `src/components/map/mapPins.ts` (95 lines) : Whether a spot is open right now, for the list and the preview card.
+- `src/components/map/MapPreviewCard.tsx` (123 lines) : Inside the last hour the card counts down, so a visitor does not walk to a door that is about to shut.
+- `src/components/map/nearby.test.ts` (31 lines) : src/components/map module: nearby.test
+- `src/components/map/nearby.ts` (21 lines) : Spots this close to the visitor show up on their own when the map opens.
 - `src/components/map/routeMath.test.ts` (53 lines) : src/components/map module: routeMath.test
 - `src/components/map/routeMath.ts` (63 lines) : Pure math for following a street route: snap the visitor onto the nearest route segment, measure what is
 - `src/components/map/useLiveNavigation.ts` (129 lines) : Walking navigation driven by navigator.geolocation.watchPosition with high accuracy. Positions stay in
@@ -129,7 +137,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/components/moodFinder/parseQuery.ts` (85 lines) : Deterministic reading of a typed request ("quiet place to study, not too pricey, near Matina").
 - `src/components/moodFinder/scoreCafes.test.ts` (167 lines) : src/components/moodFinder module: scoreCafes.test
 - `src/components/moodFinder/scoreCafes.ts` (236 lines) : The mood finder's matcher. Pure: the same catalog, request and context always give the same
-- `src/components/moodFinder/useLocation.ts` (35 lines) : Asks for the visitor's position only when request() is called (the "Near me" tap).
+- `src/components/moodFinder/useLocation.ts` (37 lines) : Asks for the visitor's position only when request() is called (the "Near me" tap).
 - `src/components/moodFinder/weather.ts` (63 lines) : Current Davao weather from Open-Meteo (free, no key). Fixed city coordinates, never the
 
 ## src/components/passport/
@@ -174,6 +182,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 - `src/hooks/useFocusSession.test.ts` (76 lines) : src/hooks module: useFocusSession.test
 - `src/hooks/useFocusSession.ts` (237 lines) : The running Deep Focus Session. It lives in localStorage (haraya_active_focus) so a refresh, a tab change or
+- `src/hooks/useOnline.ts` (19 lines) : True while the browser reports a network connection; re-renders when it drops or comes back.
 - `src/hooks/useServiceVersions.ts` (48 lines) : Subscriber-version hooks: each service exposes a monotonically increasing
 
 ## src/services/

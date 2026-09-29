@@ -681,6 +681,7 @@ export const App: React.FC = () => {
           <DavaoCoffeeMap
             cafes={cafes}
             onSelectCafe={openCafe}
+            onDirections={openDirections}
             selectedCity={selectedCity}
             navTarget={navTarget}
             onEndNavigation={() => setNavTarget(null)}
