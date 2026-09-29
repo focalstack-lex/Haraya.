@@ -109,7 +109,7 @@ const moodTraits = (mood: MoodId, cafe: Cafe, km: number, now: Date, recentIds: 
       return [
         { has: cafe.amenities.includes('outdoor'), reason: 'Outdoor tables' },
         { has: cafe.amenities.includes('lateNight'), reason: 'Open late' },
-        { has: cafe.priceLevel <= 2, reason: 'Easy on the wallet' },
+        { has: cafe.priceLevel >= 1 && cafe.priceLevel <= 2, reason: 'Easy on the wallet' },
       ];
     case 'treat':
       return [

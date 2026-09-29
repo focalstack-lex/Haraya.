@@ -254,6 +254,13 @@ otp_expiry = 3600
 # subject = "Your password has been changed"
 # content_path = "./templates/password_changed_notification.html"
 
+# Sign-up confirmation. The link goes to the site itself (?token_hash=), which App verifies with verifyOtp,
+# so the email shows haraya.space and the link works on any device. Paste the same file into the hosted
+# dashboard under Authentication > Emails > Confirm signup.
+[auth.email.template.confirmation]
+subject = "Confirm your Haraya email"
+content_path = "./supabase/templates/confirm-signup.html"
+
 [auth.sms]
 # Allow/disallow new user signups via SMS to your project.
 enable_signup = false

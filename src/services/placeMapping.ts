@@ -281,7 +281,8 @@ export function listingFromCafe(cafe: Cafe): ListingInput {
     signature: cafe.signature,
     amenities: [...cafe.amenities],
     brewMethods: [...cafe.brewMethods],
-    priceLevel: cafe.priceLevel,
+    // The form has no "not listed" choice; owner listings always carry a price, so 0 only means a catalog spot
+    priceLevel: cafe.priceLevel === 0 ? 2 : cafe.priceLevel,
     wifiMbps: cafe.wifiMbps,
     hours: { ...cafe.hours },
     menu: cafe.menu.map((item) => ({ ...item })),

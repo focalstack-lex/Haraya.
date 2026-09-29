@@ -126,8 +126,8 @@ export interface Cafe {
   amenities: AmenityKey[];
   wifiMbps: number;
   brewMethods: BrewMethod[];
-  /** 1 = budget cup, 2 = mid specialty, 3 = premium tasting bar. */
-  priceLevel: 1 | 2 | 3;
+  /** 0 = not listed (nothing is shown), 1 = budget cup, 2 = mid specialty, 3 = premium tasting bar. */
+  priceLevel: 0 | 1 | 2 | 3;
   hours: WeeklyHours;
   vibeTags: string[];
   verified: boolean;
