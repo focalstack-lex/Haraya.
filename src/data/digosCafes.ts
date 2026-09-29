@@ -4,8 +4,10 @@ import type { Cafe, WeeklyHours } from '../types/coffee';
  * Digos City coffee shops chosen by Lex from Google Maps on 2026-09-29 (names and streets as that listing shows
  * them). Map positions are exact: from OpenStreetMap, or decoded from the plus code printed on the Google listing
  * (`reports/digos-cafes/decode-plus-code.py`). The sources state a name, a street and a position, so that is all
- * these listings carry: no hours, photo, price, menu, Wi-Fi or description. The app shows what is missing as
- * missing: "Hours not listed", the no-photo placeholder, no price. When a spot's facts are checked (a Google
+ * these listings carry: no hours, price, menu, Wi-Fi or description. The app shows what is missing as missing:
+ * "Hours not listed", no price, and the no-photo placeholder for a spot without photos. Photos are the ones Lex
+ * collected into `Haraya Files/Haraya Coffee Spots/<Shop> Digos/`, converted to WebP by
+ * `reports/digos-cafes/convert-photos.py` into `public/spots/<slug>/`. Kofhi's photo is converted and waiting. When a spot's facts are checked (a Google
  * Business listing, the owner, a visit), move it to `spots.ts` with the full record.
  * Not yet placed, waiting for a position: Poblacion Coffee, Kofhi.
  */
@@ -39,6 +41,25 @@ const DIGOS_LISTED_CAFES: ListedCafe[] = [
 ];
 
 const PLACEHOLDER_PHOTO = '/placeholders/no-photo.svg';
+
+/** Web photos by spot id (folder slug under public/spots). A spot not listed here shows the placeholder. */
+const PHOTO_FOLDERS: Record<string, string> = {
+  'osm-w1431054042': 'g-co-cafe-digos',
+  'osm-n13308179172': 'lil-ben-coffee-house-digos',
+  'osm-n13168672184': 'cafe-vicente-digos',
+  'osm-n13049364628': 'cely-s-cafe-digos',
+  'digos-the-tipsy-butter': 'the-tipsy-butter-digos',
+  'digos-infinitea': 'infinitea-digos',
+  'digos-kaffeeneology': 'kaffeeneology-digos',
+  'digos-cool-brews': 'cool-brews-digos',
+  'digos-the-nook': 'the-nook-digos',
+};
+
+const photosFor = (spot: ListedCafe): string[] => {
+  const folder = PHOTO_FOLDERS[spot.id];
+  return folder ? [`/spots/${folder}/photo-1.webp`] : [PLACEHOLDER_PHOTO];
+};
+
 const NO_HOURS: WeeklyHours = {
   Monday: { open: null, close: null },
   Tuesday: { open: null, close: null },
@@ -63,8 +84,8 @@ export const DIGOS_CAFES: Cafe[] = DIGOS_LISTED_CAFES.map((spot) => ({
   address: [spot.street, 'Digos City, Davao del Sur'].filter(Boolean).join(', '),
   lat: spot.lat,
   lng: spot.lng,
-  images: [PLACEHOLDER_PHOTO],
-  logoUrl: PLACEHOLDER_PHOTO,
+  images: photosFor(spot),
+  logoUrl: photosFor(spot)[0],
   description: '',
   signature: '',
   menu: [],

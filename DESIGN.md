@@ -178,7 +178,9 @@ Color is information. The tint marks the one active or primary thing in a region
 - `src/data/digosCafes.ts`: 14 Digos City coffee shops chosen by Lex from Google Maps (2026-09-29), carrying only
   what the sources state: name, street as listed and an exact map position (OpenStreetMap, or decoded from the plus
   code on the listing with `reports/digos-cafes/decode-plus-code.py`, or a listing page's stated coordinates).
-  Poblacion Coffee and Kofhi wait for a position. The card and sheet say "Hours not listed", use the no-photo placeholder
-  and show no price (`priceLevel: 0`, which the mood finder never treats as cheap and never filters out). Nothing is
+  Poblacion Coffee and Kofhi wait for a position. The card and sheet say "Hours not listed" and show no price
+  (a spot without photos uses the no-photo placeholder; 9 of the 14 have one photo each, collected by Lex into
+  `Haraya Files/Haraya Coffee Spots/<Shop> Digos/` and converted to WebP with `reports/digos-cafes/convert-photos.py`
+  into `public/spots/<slug>/photo-1.webp`, long side 1200 px, quality 80; Kofhi's is converted and waiting) (`priceLevel: 0`, which the mood finder never treats as cheap and never filters out). Nothing is
   guessed: no description, hours, menu, Wi-Fi or barangay. When a spot is checked, move it to `spots.ts` with the
   full record.
