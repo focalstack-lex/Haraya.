@@ -66,6 +66,14 @@ export function absoluteUrl(hash: string): string {
   return `${window.location.origin}${window.location.pathname}${hash}`;
 }
 
+/** Running as the home-screen app (Android/desktop display-mode, or iOS's navigator.standalone). */
+export function isStandaloneDisplay(): boolean {
+  return (
+    window.matchMedia?.('(display-mode: standalone)').matches ||
+    (navigator as Navigator & { standalone?: boolean }).standalone === true
+  );
+}
+
 /**
  * Whether this load should open on the landing page: only a bare URL. Deep links (#/tab/..., #/cafe/...), a
  * sign-in or reset return from Supabase (?code=, #access_token=), and the home-screen app all go straight in.
@@ -75,8 +83,5 @@ export function isLandingEntry(): boolean {
   if (hash && hash !== '#' && hash !== '#/') return false;
   const params = new URLSearchParams(window.location.search);
   if (params.has('code') || params.has('error') || params.has('token_hash')) return false;
-  const standalone =
-    window.matchMedia?.('(display-mode: standalone)').matches ||
-    (navigator as Navigator & { standalone?: boolean }).standalone === true;
-  return !standalone;
+  return !isStandaloneDisplay();
 }

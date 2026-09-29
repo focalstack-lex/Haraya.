@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-29 : commit 243d255 : fingerprint 365439608f7d553a
+Generated 2026-09-29 : commit ce36459 : fingerprint f386bbd2c906da59
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -83,6 +83,11 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/components/feed/spotCategories.ts` (51 lines) : What a visitor is looking for; replaces the old Cafes / Beans / Following modes.
 - `src/components/feed/VibeFilterBar.tsx` (68 lines) : Collapsible amenity and vibe chip rail: expands when toggled or active.
 
+## src/components/install/
+
+- `src/components/install/installPlatform.test.ts` (183 lines) : src/components/install module: installPlatform.test
+- `src/components/install/installPlatform.ts` (27 lines) : src/components/install module: installPlatform
+
 ## src/components/layout/
 
 - `src/components/layout/BottomTabBar.tsx` (75 lines) : Persistent mobile bottom navigation (hidden while a detail modal is open).
@@ -143,7 +148,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 ## src/components/tour/
 
 - `src/components/tour/GuidedTour.tsx` (294 lines) : Space the sticky nav bar and the bottom tab bar cover, so targets are scrolled clear of them.
-- `src/components/tour/tourSteps.ts` (59 lines) : First-visit guided tour steps. Each step highlights the element tagged with the matching
+- `src/components/tour/tourSteps.ts` (61 lines) : First-visit guided tour steps. Each step highlights the element tagged with the matching
 - `src/components/tour/tourStorage.ts` (20 lines) : Remembers that the first-visit tour was finished or skipped. Storage can throw in private
 
 ## src/config/
@@ -258,7 +263,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/utils/geo.ts` (74 lines) : Distance and directions helpers for the coffee map and trails.
 - `src/utils/inbox.test.ts` (21 lines) : src/utils module: inbox.test
 - `src/utils/inbox.ts` (25 lines) : Where a visitor reads their mail, from the address they signed up with. Only providers with a stable web
-- `src/utils/router.ts` (83 lines) : Hash routes so cafes, beans, roasteries, drops, and shared lists have shareable
+- `src/utils/router.ts` (88 lines) : Hash routes so cafes, beans, roasteries, drops, and shared lists have shareable
 - `src/utils/weekdays.ts` (13 lines) : Canonical weekday iteration order for hours tables.
 
 ## src/views/

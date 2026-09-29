@@ -1,5 +1,7 @@
 import type { AyaPose } from '../common/AyaMascot';
 
+export type TourOutcome = 'done' | 'skipped';
+
 /**
  * First-visit guided tour steps. Each step highlights the element tagged with the matching
  * `data-tour` attribute; 'action' steps wait for the visitor to tap that element instead of Next.
