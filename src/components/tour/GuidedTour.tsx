@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { TOUR_STEPS } from './tourSteps';
+import { TOUR_STEPS, type TourOutcome } from './tourSteps';
 import { AyaMascot } from '../common/AyaMascot';
 
 interface GuidedTourProps {
   isOpen: boolean;
-  /** Called once when the visitor finishes or skips. */
-  onFinish: () => void;
+  /** Called once when the visitor finishes (outcome: 'done') or skips (outcome: 'skipped'). */
+  onFinish: (outcome: TourOutcome) => void;
 }
 
 interface Box {
@@ -78,17 +78,17 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ isOpen, onFinish }) => {
   const onFinishRef = useRef(onFinish);
   onFinishRef.current = onFinish;
 
-  const finish = useCallback(() => {
+  const finish = useCallback((outcome: TourOutcome) => {
     if (finishedRef.current) return;
     finishedRef.current = true;
-    onFinishRef.current();
+    onFinishRef.current(outcome);
   }, []);
 
   const indexRef = useRef(index);
   indexRef.current = index;
 
   const next = useCallback(() => {
-    if (indexRef.current >= TOUR_STEPS.length - 1) finish();
+    if (indexRef.current >= TOUR_STEPS.length - 1) finish('done');
     else setIndex(indexRef.current + 1);
   }, [finish]);
 
@@ -161,7 +161,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ isOpen, onFinish }) => {
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') finish();
+      if (event.key === 'Escape') finish('skipped');
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -272,7 +272,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ isOpen, onFinish }) => {
           </span>
           <button
             ref={isAction ? primaryRef : undefined}
-            onClick={finish}
+            onClick={() => finish('skipped')}
             className="ml-auto h-11 px-3 text-[15px] font-medium text-[#594C3D] ios-press"
           >
             Skip
