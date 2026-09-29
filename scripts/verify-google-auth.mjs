@@ -46,7 +46,24 @@ async function verify() {
 
   const googleVisibleSignup = await googleBtn.isVisible();
   console.log('375px Create account: Google button visible =', googleVisibleSignup);
-  await page.screenshot({ path: path.join(outDir, '02-signup-375.png') });
+
+  // Check confirm password field is visible
+  const confirmPasswordField = page.getByPlaceholder('Repeat your password');
+  const confirmPasswordVisible = await confirmPasswordField.isVisible();
+  console.log('Confirm password field visible =', confirmPasswordVisible);
+
+  // Test password mismatch validation
+  await page.getByPlaceholder('How Haraya greets you').fill('Test User');
+  await page.getByPlaceholder('you@email.com').fill('test@gmail.com');
+  await page.getByPlaceholder('Create a password').fill('Password123!');
+  await confirmPasswordField.fill('DifferentPassword!');
+  await page.getByRole('button', { name: 'Create account' }).click();
+  await page.waitForTimeout(300);
+
+  const mismatchError = await page.getByText('Passwords do not match.').isVisible();
+  console.log('Password mismatch error displayed =', mismatchError);
+
+  await page.screenshot({ path: path.join(outDir, '02-signup-mismatch-375.png') });
 
   // Switch to 320px viewport
   await page.setViewportSize({ width: 320, height: 640 });
@@ -74,6 +91,8 @@ async function verify() {
     timestamp: new Date().toISOString(),
     googleButtonVisibleSignIn: googleVisible,
     googleButtonVisibleSignUp: googleVisibleSignup,
+    confirmPasswordFieldVisible: confirmPasswordVisible,
+    passwordMismatchValidationPassed: mismatchError,
     horizontalOverflow320: overflow320,
     consoleErrors,
     pageErrors,

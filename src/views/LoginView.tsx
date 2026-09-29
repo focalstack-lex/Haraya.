@@ -30,15 +30,24 @@ const TITLES: Record<LoginMode, { title: string; subtitle: string }> = {
 };
 
 /** Sent-email confirmation shown after a magic link, a reset link or an unconfirmed sign-up. */
-const SentCard: React.FC<{ email: string; body: string }> = ({ email, body }) => (
-  <div className={`${CARD} flex items-start gap-3`} role="status">
-    <Mail className="w-5 h-5 text-[#906D4B] shrink-0 mt-0.5" />
-    <div className="space-y-1">
-      <h2 className="ios-headline text-[#13191F]">Check your email</h2>
-      <p className="text-[14px] text-[#594C3D]">
-        We sent it to <span className="font-medium text-[#13191F]">{email}</span>. {body}
-      </p>
+const SentCard: React.FC<{ email: string; body: string; onSignIn?: () => void }> = ({ email, body, onSignIn }) => (
+  <div className={`${CARD} space-y-4`} role="status">
+    <div className="flex items-start gap-3">
+      <div className="w-10 h-10 rounded-full bg-[#906D4B]/10 flex items-center justify-center shrink-0">
+        <Mail className="w-5 h-5 text-[#906D4B]" />
+      </div>
+      <div className="space-y-1">
+        <h2 className="ios-headline text-[#13191F]">Check your email</h2>
+        <p className="text-[14px] text-[#594C3D] leading-relaxed">
+          We sent a verification link to <span className="font-semibold text-[#13191F]">{email}</span>. {body}
+        </p>
+      </div>
     </div>
+    {onSignIn && (
+      <PrimaryButton onClick={onSignIn} className="w-full">
+        Return to sign in
+      </PrimaryButton>
+    )}
   </div>
 );
 
@@ -56,6 +65,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
   const [mode, setMode] = useState<LoginMode>(initialMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -77,6 +87,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
     setMode(next);
     setError('');
     setSent(null);
+    setConfirmPassword('');
   };
 
   const run = async (action: () => Promise<void>, failure: string) => {
@@ -105,9 +116,22 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
 
   const signUp = () =>
     run(async () => {
-      const { needsConfirmation } = await sessionService.signUpWithPassword(email, password, name);
+      const trimmedName = name.trim();
+      if (!trimmedName) {
+        throw new Error('Please enter your name.');
+      }
+      if (password.length < PASSWORD_MIN_LENGTH) {
+        throw new Error(`Use a password of at least ${PASSWORD_MIN_LENGTH} characters.`);
+      }
+      if (password !== confirmPassword) {
+        throw new Error('Passwords do not match.');
+      }
+      const { needsConfirmation } = await sessionService.signUpWithPassword(email, password, trimmedName);
       if (needsConfirmation) {
-        setSent({ email: email.trim(), body: 'Open the confirmation link, then come back and sign in.' });
+        setSent({
+          email: email.trim(),
+          body: 'Open the confirmation link in your Gmail, then come back and sign in.',
+        });
         return;
       }
       onSignedIn();
@@ -207,7 +231,11 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
       )}
 
       {sent ? (
-        <SentCard email={sent.email} body={sent.body} />
+        <SentCard
+          email={sent.email}
+          body={sent.body}
+          onSignIn={() => switchMode('signin')}
+        />
       ) : (
         <form
           className={`${CARD} space-y-3`}
@@ -265,6 +293,17 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
                 onChange={setPassword}
                 type="password"
                 placeholder={mode === 'signin' ? 'Your password' : 'Create a password'}
+              />
+            </Field>
+          )}
+
+          {mode === 'signup' && (
+            <Field label="Confirm password">
+              <TextInput
+                value={confirmPassword}
+                onChange={setConfirmPassword}
+                type="password"
+                placeholder="Repeat your password"
               />
             </Field>
           )}

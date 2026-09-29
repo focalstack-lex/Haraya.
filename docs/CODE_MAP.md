@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-29 : commit ea88337 : fingerprint 3e3268d2283395d9
+Generated 2026-09-29 : commit 04cdc95 : fingerprint 922549430b2fb372
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -11,10 +11,10 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 - `index.html` (30 lines) : . module: index.html
 - `scripts/generate-code-map.mjs` (212 lines) : One-line purpose per file, inferred from its path and leading doc comment.
-- `scripts/verify-google-auth.mjs` (90 lines) : scripts module: verify-google-auth
-- `src/App.tsx` (779 lines) : Older links: the roaster portal is now the Place Portal.
-  - L61 : SharedList
-  - L87 : App
+- `scripts/verify-google-auth.mjs` (109 lines) : scripts module: verify-google-auth
+- `src/App.tsx` (785 lines) : Older links: the roaster portal is now the Place Portal.
+  - L62 : SharedList
+  - L88 : App
 - `src/index.css` (825 lines) : src entry point
 - `src/main.tsx` (13 lines) : src entry point
 - `vite.config.ts` (15 lines) : . module: vite.config
@@ -40,6 +40,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/common/
 
+- `src/components/common/AccountSetupModal.tsx` (105 lines) : src/components/common module: AccountSetupModal
 - `src/components/common/AddToListSheet.tsx` (105 lines) : List picker used by the cafe and bean modals and the saved view.
 - `src/components/common/AyaMascot.tsx` (478 lines) : One pose per surface, so Aya reads as a character rather than a repeated sticker:
   - L19 : AyaPose
@@ -49,7 +50,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L244 : AyaMascot
 - `src/components/common/BrandLogo.tsx` (36 lines) : Haraya logo cut from the brand master (Haraya Files/LOGO.webp) with the background keyed out,
 - `src/components/common/CustomIcons.tsx` (242 lines) : Haraya Custom Icon Set: high-precision vector icons tailored for the Davao
-- `src/components/common/FormControls.tsx` (268 lines) : Shared form primitives for Haraya: an iOS-style sheet (bottom sheet with a
+- `src/components/common/FormControls.tsx` (270 lines) : Shared form primitives for Haraya: an iOS-style sheet (bottom sheet with a
 - `src/components/common/ImageUploadField.tsx` (83 lines) : File input that stores the image as a dataURL with type and size validation.
 - `src/components/common/LargeTitle.tsx` (46 lines) : iOS large title: the first thing on every primary page, left aligned.
 - `src/components/common/WelcomeModal.tsx` (160 lines) : What the app does, stated plainly: one row per real surface.
@@ -200,7 +201,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L358 : describePlaceError
 - `src/services/placeService.ts` (206 lines) : Public listings (table cafes) and Place Portal applications (table place_applications). Listings are
 - `src/services/roasterService.ts` (115 lines) : Roaster-facing facade over the catalog: everything an approved roaster or
-- `src/services/sessionService.ts` (327 lines) : The signed-in account: Supabase Auth session plus the caller's row in public.profiles (role, status,
+- `src/services/sessionService.ts` (372 lines) : The signed-in account: Supabase Auth session plus the caller's row in public.profiles (role, status,
   - L14 : RESET_RETURN_TAB
   - L17 : PASSWORD_MIN_LENGTH
   - L26 : notify
@@ -261,10 +262,10 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L14 : LandingViewProps
   - L104 : LandingView
 - `src/views/LegalView.tsx` (206 lines) : Privacy Notice and Terms. Statements of fact describe what the code does today; anything that needs a
-- `src/views/LoginView.tsx` (325 lines) : What the page is doing: the two account modes, the two email-link flows, and the new-password form.
+- `src/views/LoginView.tsx` (364 lines) : What the page is doing: the two account modes, the two email-link flows, and the new-password form.
   - L12 : LoginMode
   - L14 : LoginViewProps
-  - L54 : LoginView
+  - L63 : LoginView
 - `src/views/PlacePortalView.tsx` (680 lines) : What the portal offers, for visitors who are not signed in or have not applied.
   - L27 : PlacePortalViewProps
   - L583 : PlacePortalView

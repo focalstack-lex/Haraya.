@@ -26,6 +26,7 @@ import { SharedListView } from './views/SharedListView';
 import { LegalView } from './views/LegalView';
 import { RateCafeModal } from './components/cafe/RateCafeModal';
 import { WelcomeModal } from './components/common/WelcomeModal';
+import { AccountSetupModal } from './components/common/AccountSetupModal';
 import { LandingView } from './views/LandingView';
 import { LargeTitle, CityMenu } from './components/common/LargeTitle';
 import { GuidedTour } from './components/tour/GuidedTour';
@@ -753,6 +754,11 @@ export const App: React.FC = () => {
           markWelcomed();
           openLogin('profile');
         }}
+      />
+
+      <AccountSetupModal
+        isOpen={sessionService.needsAccountSetup()}
+        onCompleted={() => {}}
       />
 
       <GuidedTour isOpen={isTourOpen} onFinish={finishTour} />

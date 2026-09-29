@@ -163,16 +163,18 @@ export const TextInput: React.FC<{
   required?: boolean;
   min?: number;
   max?: number;
-}> = ({ value, onChange, placeholder, type = 'text', required, min, max }) => (
+  disabled?: boolean;
+}> = ({ value, onChange, placeholder, type = 'text', required, min, max, disabled }) => (
   <input
     type={type}
     value={value}
     required={required}
+    disabled={disabled}
     placeholder={placeholder}
     min={min}
     max={max}
     onChange={(event) => onChange(event.target.value)}
-    className={inputClass}
+    className={`${inputClass} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
   />
 );
 

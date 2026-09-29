@@ -296,6 +296,51 @@ export const sessionService = {
     notify();
   },
 
+  /** Whether the user signed in with Google/OAuth and still needs to complete initial account setup (username + password). */
+  needsAccountSetup(): boolean {
+    if (!user) return false;
+    const isOAuth =
+      user.app_metadata?.provider === 'google' ||
+      user.app_metadata?.providers?.includes('google') ||
+      user.identities?.some((i) => i.provider === 'google');
+    if (!isOAuth) return false;
+    return !user.user_metadata?.account_setup_done;
+  },
+
+  /** Completes initial account setup for Google users: updates username and sets a password. */
+  async completeAccountSetup(username: string, password: string): Promise<void> {
+    if (!supabase || !user) throw new Error('Sign in first.');
+    const trimmed = username.trim();
+    if (!trimmed) throw new Error('Enter your name or username.');
+    if (trimmed.length > 80) throw new Error('Keep your username under 80 characters.');
+    if (password.length < PASSWORD_MIN_LENGTH) {
+      throw new Error(`Use a password of at least ${PASSWORD_MIN_LENGTH} characters.`);
+    }
+
+    const { data, error } = await supabase.auth.updateUser({
+      password,
+      data: { name: trimmed, account_setup_done: true },
+    });
+    if (error) {
+      console.warn('Haraya: complete account setup failed', error.message);
+      throw new Error(describeAuthError(error.message, 'Could not complete account setup. Try again.'));
+    }
+    if (data.user) {
+      user = data.user;
+    }
+
+    // Also update profiles table
+    void supabase
+      .from('profiles')
+      .update({ name: trimmed, updated_at: new Date().toISOString() })
+      .eq('id', user.id);
+
+    if (profile) {
+      profile.name = trimmed;
+    }
+    notify();
+  },
+
   /** The tab to open after returning from an email link or OAuth sign in, read once. */
   takeReturnTab(): string | null {
     try {
