@@ -48,7 +48,13 @@ function describeAuthError(message: string, fallback: string): string {
     return `Use a password of at least ${PASSWORD_MIN_LENGTH} characters.`;
   }
   if (text.includes('rate') || text.includes('too many')) return 'Too many attempts. Wait a minute and try again.';
-  if (text.includes('signups not allowed')) return 'New accounts are closed right now.';
+  if (
+    text.includes('signups not allowed') ||
+    text.includes('email signups are disabled') ||
+    text.includes('email_provider_disabled')
+  ) {
+    return 'Email sign-up is disabled in your Supabase project. Use Continue with Google above, or enable Email in Supabase Auth Providers.';
+  }
   if (text.includes('same password') || text.includes('different from the old')) {
     return 'Choose a password you have not used before.';
   }

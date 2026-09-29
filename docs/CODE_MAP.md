@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-29 : commit f79c5cb : fingerprint be95e03b9703947d
+Generated 2026-09-29 : commit 23ff54c : fingerprint ef7c1e3e586047dc
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -200,15 +200,15 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L358 : describePlaceError
 - `src/services/placeService.ts` (206 lines) : Public listings (table cafes) and Place Portal applications (table place_applications). Listings are
 - `src/services/roasterService.ts` (115 lines) : Roaster-facing facade over the catalog: everything an approved roaster or
-- `src/services/sessionService.ts` (321 lines) : The signed-in account: Supabase Auth session plus the caller's row in public.profiles (role, status,
+- `src/services/sessionService.ts` (327 lines) : The signed-in account: Supabase Auth session plus the caller's row in public.profiles (role, status,
   - L14 : RESET_RETURN_TAB
   - L17 : PASSWORD_MIN_LENGTH
   - L26 : notify
   - L31 : rememberReturnTab
   - L40 : describeAuthError
-  - L59 : loadProfile
-  - L81 : setUser
-  - L87 : sessionService
+  - L65 : loadProfile
+  - L87 : setUser
+  - L93 : sessionService
 - `src/services/spotMapping.test.ts` (116 lines) : src/services module: spotMapping.test
 - `src/services/spotMapping.ts` (178 lines) : Community spot submissions: the row shape stored in Supabase (spot_submissions), the form input, the
 - `src/services/spotService.ts` (169 lines) : Add a Spot backed by Supabase (table spot_submissions). Row Level Security decides what each caller can
