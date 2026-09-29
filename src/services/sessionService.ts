@@ -30,6 +30,9 @@ const arrivedFromAuthRedirect = (() => {
   }
 })();
 
+/** Origins a developer runs the app on; their sign-in links must return to the same origin. */
+const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
+
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const PASSWORD_MIN_LENGTH = 8;
 
@@ -72,10 +75,13 @@ function readReturnTab(): string | null {
 }
 
 /**
- * Canonical redirect target for email confirmations, magic links, Google OAuth, and password resets.
+ * Redirect target for email confirmations, magic links, Google OAuth, and password resets.
  *
- * Ensures authentication flows return to the live production domain (https://www.haraya.space/)
- * rather than localhost. Can be overridden via VITE_SITE_URL or VITE_AUTH_REDIRECT_URL if needed.
+ * The link must come back to the origin that started the flow: with PKCE, supabase-js keeps the code
+ * verifier in that origin's storage, and the ?code= exchange fails anywhere else. So localhost stays on
+ * localhost and a Vercel preview stays on itself; only the apex domain is folded into www (the apex
+ * 308-redirects to www with the query intact, so the app never runs on the apex). Supabase still has to
+ * allow-list each origin, or it falls back to the project's Site URL. VITE_SITE_URL covers an unknown origin.
  */
 export function getAuthRedirectUrl(originOverride?: string): string {
   let origin = originOverride;
@@ -90,12 +96,12 @@ export function getAuthRedirectUrl(originOverride?: string): string {
       if (parsed.hostname === 'haraya.space' || parsed.hostname === 'www.haraya.space') {
         return 'https://www.haraya.space/';
       }
-      // Vercel deployment preview domain
-      if (parsed.hostname.endsWith('.vercel.app')) {
+      // Local development and Vercel previews: same origin, because the PKCE verifier lives there
+      if (LOCAL_HOSTS.has(parsed.hostname) || parsed.hostname.endsWith('.vercel.app')) {
         return `${parsed.origin}/`;
       }
     } catch {
-      // Ignore URL parsing errors and fall back to canonical production
+      // Ignore URL parsing errors and fall back to the configured or canonical production origin
     }
   }
 

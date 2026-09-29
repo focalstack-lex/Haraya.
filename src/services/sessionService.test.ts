@@ -17,6 +17,11 @@ describe('getAuthRedirectUrl', () => {
     expect(url).toBe('https://haraya-preview-branch.vercel.app/');
   });
 
+  it('keeps local development on its own origin, where the PKCE verifier is stored', () => {
+    expect(getAuthRedirectUrl('http://localhost:5173')).toBe('http://localhost:5173/');
+    expect(getAuthRedirectUrl('http://127.0.0.1:5173')).toBe('http://127.0.0.1:5173/');
+  });
+
   it('avoids double trailing slashes if origin already has trailing slash', () => {
     const url = getAuthRedirectUrl('https://www.haraya.space/');
     expect(url).toBe('https://www.haraya.space/');
