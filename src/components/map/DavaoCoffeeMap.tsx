@@ -322,7 +322,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
       <div className="grid lg:grid-cols-3 gap-4 lg:gap-6">
         {/* Map canvas. min-w-0 lets the long one-line address truncate instead of widening the grid */}
         <div className="lg:col-span-2 space-y-3 min-w-0">
-          <div className="relative isolate rounded-[20px] overflow-hidden ios-card-shadow bg-surface">
+          <div className="relative isolate rounded-card overflow-hidden ios-card-shadow bg-surface">
             <div
               ref={canvasRef}
               className="h-[380px] sm:h-[460px] lg:h-[520px] z-0"
@@ -331,7 +331,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
             />
             {/* Navigation banner: destination, distance and time left */}
             {navTarget && remainingKm !== null && nav.status !== 'arrived' && (
-              <div className="absolute top-2.5 left-2.5 right-14 z-[500] rounded-[14px] ios-material-bar shadow-[0_4px_16px_-6px_rgba(19,25,31,0.35)] px-3.5 py-2.5" aria-live="polite">
+              <div className="absolute top-2.5 left-2.5 right-14 z-[500] rounded-row ios-material-bar shadow-[0_4px_16px_-6px_rgba(19,25,31,0.35)] px-3.5 py-2.5" aria-live="polite">
                 <p className="ios-footnote text-ink-2 truncate">To {navTarget.name}</p>
                 <p className="text-[17px] font-semibold text-ink">
                   <span className="font-mono">{formatRemaining(remainingKm)}</span>
@@ -496,7 +496,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
               return (
                 <article
                   key={trail.id}
-                  className={`rounded-[20px] bg-surface p-4 space-y-2 ${
+                  className={`rounded-card bg-surface p-4 space-y-2 ${
                     isActive ? 'shadow-[0_0_0_2px_#906D4B,0_6px_20px_-6px_rgba(19,25,31,0.14)]' : 'ios-card-shadow'
                   }`}
                 >
@@ -510,7 +510,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
                   </p>
 
                   {/* Stops as an inset list on a fill, hop distance trailing */}
-                  <ol className="rounded-[14px] overflow-hidden bg-shade/[0.07]">
+                  <ol className="rounded-row overflow-hidden bg-shade/[0.07]">
                     {stops.map((cafe, index) => {
                       const hop = stopDistance(trail, index);
                       return (
@@ -577,7 +577,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
                           src={cafe.images[0]}
                           alt=""
                           loading="lazy"
-                          className="h-11 w-11 shrink-0 rounded-[10px] object-cover bg-ink"
+                          className="h-11 w-11 shrink-0 rounded-control object-cover bg-ink"
                         />
                         <span className="flex-1 min-w-0">
                           <span className="block ios-headline text-ink truncate">{cafe.name}</span>

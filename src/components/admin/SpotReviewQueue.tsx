@@ -4,7 +4,7 @@ import { ErrorNote } from '../common/FormControls';
 import { spotService } from '../../services/spotService';
 import type { SpotRow } from '../../services/spotMapping';
 
-const CARD = 'rounded-[20px] bg-surface ios-card-shadow p-4 sm:p-5';
+const CARD = 'rounded-card bg-surface ios-card-shadow p-4 sm:p-5';
 
 /** Admin review of community spot submissions: approve to publish, reject with a note to the contributor. */
 export const SpotReviewQueue: React.FC<{ rows: SpotRow[]; onViewSpot: (cafeId: string) => void }> = ({ rows, onViewSpot }) => {
@@ -59,7 +59,7 @@ export const SpotReviewQueue: React.FC<{ rows: SpotRow[]; onViewSpot: (cafeId: s
               maxLength={280}
               placeholder="Note to the contributor (shown if rejected)"
               aria-label={`Review note for ${row.name}`}
-              className="w-full h-11 ios-fill rounded-[12px] px-3.5 text-[14px] text-ink placeholder:text-ink-3 focus:outline-none focus:shadow-[0_0_0_2px_#906D4B]"
+              className="w-full h-11 ios-fill rounded-row px-3.5 text-[14px] text-ink placeholder:text-ink-3 focus:outline-none focus:focus-ring"
             />
             <div className="flex gap-2">
               <button

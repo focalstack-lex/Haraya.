@@ -16,9 +16,9 @@ interface MoodResultCardProps {
 export const MoodResultCard: React.FC<MoodResultCardProps> = ({ label, match, saved, onRoute, onOpen, onToggleSave }) => {
   const { cafe } = match;
   return (
-    <article className="bg-surface rounded-[20px] ios-card-shadow overflow-hidden">
+    <article className="bg-surface rounded-card ios-card-shadow overflow-hidden">
       <div className="flex gap-3 p-3">
-        <button onClick={onOpen} className="relative shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-[14px] overflow-hidden bg-ink ios-press" aria-label={`Open ${cafe.name}`}>
+        <button onClick={onOpen} className="relative shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-row overflow-hidden bg-ink ios-press" aria-label={`Open ${cafe.name}`}>
           <img src={cafe.images[0]} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
           <span className="absolute left-1.5 bottom-1.5 h-5.5 px-2 rounded-full ios-material-dark text-surface text-[11px] font-semibold flex items-center whitespace-nowrap">
             {label}

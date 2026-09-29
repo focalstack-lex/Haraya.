@@ -182,7 +182,7 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({ cafe, onClose, onDir
             </div>
 
             {active ? (
-              <div className="w-full rounded-[14px] bg-canvas px-4 py-3 text-left space-y-2">
+              <div className="w-full rounded-row bg-canvas px-4 py-3 text-left space-y-2">
                 <p className="text-[14px] text-ink">
                   You are already focusing at <span className="font-semibold">{active.cafeName}</span>. Finish that session first.
                 </p>
@@ -195,7 +195,7 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({ cafe, onClose, onDir
                 <button
                   onClick={startFocus}
                   disabled={busy}
-                  className="w-full min-h-14 px-4 py-3 rounded-[16px] bg-tint hover:bg-tint-ink text-surface text-left flex items-center gap-3 ios-press disabled:opacity-60"
+                  className="w-full min-h-14 px-4 py-3 rounded-row bg-tint hover:bg-tint-ink text-surface text-left flex items-center gap-3 ios-press disabled:opacity-60"
                 >
                   <FocusTimerIcon className="w-6 h-6 shrink-0" />
                   <span className="min-w-0">
@@ -206,7 +206,7 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({ cafe, onClose, onDir
                 <button
                   onClick={quickStamp}
                   disabled={busy}
-                  className="w-full min-h-14 px-4 py-3 rounded-[16px] ios-fill text-left flex items-center gap-3 text-ink ios-press disabled:opacity-60"
+                  className="w-full min-h-14 px-4 py-3 rounded-row ios-fill text-left flex items-center gap-3 text-ink ios-press disabled:opacity-60"
                 >
                   <RubberStampIcon className="w-6 h-6 shrink-0 text-tint-ink" />
                   <span className="min-w-0">

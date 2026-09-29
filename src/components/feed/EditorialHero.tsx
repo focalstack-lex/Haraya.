@@ -65,13 +65,13 @@ export const EditorialHero: React.FC<EditorialHeroProps> = ({ studySpots, hidden
 
   return (
     <section aria-label="Featured study spots and hidden gems" aria-roledescription="carousel" className="-mx-4 sm:mx-0">
-      <div ref={trackRef} onScroll={handleScroll} style={{ scrollPaddingInline: 0 }} className="ios-shelf sm:rounded-[20px] sm:overflow-hidden">
+      <div ref={trackRef} onScroll={handleScroll} style={{ scrollPaddingInline: 0 }} className="ios-shelf sm:rounded-card sm:overflow-hidden">
         {slides.map((slide, i) => (
           <div key={slide.id} className="w-full shrink-0 px-4 sm:px-0" aria-roledescription="slide" aria-label={`${i + 1} of ${slides.length}`}>
             <button
               type="button"
               onClick={slide.onOpen}
-              className="group relative block w-full aspect-[16/10] sm:aspect-[21/9] rounded-[20px] sm:rounded-none overflow-hidden bg-ink text-left ios-press active:scale-[0.985]"
+              className="group relative block w-full aspect-[16/10] sm:aspect-[21/9] rounded-card sm:rounded-none overflow-hidden bg-ink text-left ios-press active:scale-[0.985]"
             >
               <img
                 src={slide.image}

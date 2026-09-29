@@ -15,7 +15,7 @@
   --color-shade: #766046;
   --color-ok: #3E5C48;
   --color-danger: #8C3A2E;
-  /* Rating stars only, never text (2.4:1 on surface) */
+  /* Rating stars, and dots and focus rings on dark bands. Never text on light surfaces (2.4:1). */
   --color-star: #CA9C68;
   --color-steam: #E7AC67;
 

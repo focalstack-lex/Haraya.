@@ -23,7 +23,7 @@ const Placeholder: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 );
 
 const DraftNotice: React.FC = () => (
-  <p className="rounded-[14px] ios-fill px-4 py-3 text-[14px] text-ink-2">
+  <p className="rounded-row ios-fill px-4 py-3 text-[14px] text-ink-2">
     This page is being finalized. Items in brackets are still to be confirmed.
   </p>
 );

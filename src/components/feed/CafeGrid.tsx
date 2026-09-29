@@ -30,7 +30,7 @@ const CafeCard: React.FC<{
   const rating = userPrefsService.getRating(cafe.id);
 
   return (
-    <article className="group card-lift card-ambient bg-surface rounded-[20px] overflow-hidden flex flex-col">
+    <article className="group card-lift card-ambient bg-surface rounded-card overflow-hidden flex flex-col">
       {/* Photo */}
       <div className="relative aspect-[4/3] overflow-hidden bg-ink">
         <img

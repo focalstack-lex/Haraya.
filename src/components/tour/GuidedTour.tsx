@@ -247,7 +247,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ isOpen, onFinish }) => {
       {/* Callout */}
       <motion.div
         ref={calloutRef}
-        className="absolute left-0 top-0 pointer-events-auto bg-surface rounded-[20px] p-4 shadow-[0_12px_40px_-8px_rgba(19,25,31,0.45)]"
+        className="absolute left-0 top-0 pointer-events-auto bg-surface rounded-card p-4 shadow-[0_12px_40px_-8px_rgba(19,25,31,0.45)]"
         style={{ width: calloutWidth }}
         initial={false}
         animate={{ x: calloutLeft, y: calloutTop }}

@@ -77,7 +77,7 @@ export const ConfirmEmailView: React.FC<ConfirmEmailViewProps> = ({ email, onSig
               <ArrowUpRight className="w-4.5 h-4.5" strokeWidth={2.4} />
             </a>
           ) : (
-            <p className="mt-6 rounded-[14px] ios-fill px-4 py-3 text-[15px] leading-[1.45] text-ink">
+            <p className="mt-6 rounded-row ios-fill px-4 py-3 text-[15px] leading-[1.45] text-ink">
               Open your email app or webmail and look for the message from Haraya.
             </p>
           )}
@@ -89,7 +89,7 @@ export const ConfirmEmailView: React.FC<ConfirmEmailViewProps> = ({ email, onSig
           <div className="mt-6 space-y-2" aria-live="polite">
             {error && <ErrorNote message={error} />}
             {resent && !error && (
-              <p role="status" className="ios-footnote text-ok bg-ok/10 rounded-[12px] px-3.5 py-2.5">
+              <p role="status" className="ios-footnote text-ok bg-ok/10 rounded-row px-3.5 py-2.5">
                 Sent again to {email}.
               </p>
             )}

@@ -48,7 +48,7 @@ const PRICE_OPTIONS: { value: 1 | 2 | 3; label: string }[] = [
   { value: 3, label: 'Premium' },
 ];
 
-const CARD = 'rounded-[20px] bg-surface ios-card-shadow p-4 sm:p-5';
+const CARD = 'rounded-card bg-surface ios-card-shadow p-4 sm:p-5';
 const GROUP_LABEL = 'px-1 text-[13px] font-medium text-ink-2';
 
 const statusText: Record<SpotRow['status'], { label: string; tone: string }> = {
@@ -192,7 +192,7 @@ const SpotForm: React.FC<{ onSubmitted: () => void }> = ({ onSubmitted }) => {
                 type="button"
                 aria-pressed={active}
                 onClick={() => set('vibes', toggle<SpotVibe>(input.vibes, vibe.id))}
-                className={`text-left rounded-[14px] px-3.5 py-2.5 ios-press ${active ? 'bg-ink text-surface' : 'ios-fill text-ink'}`}
+                className={`text-left rounded-row px-3.5 py-2.5 ios-press ${active ? 'bg-ink text-surface' : 'ios-fill text-ink'}`}
               >
                 <span className="block text-[15px] font-semibold">{vibe.label}</span>
                 <span className={`block ios-footnote ${active ? 'text-surface/80' : 'text-ink-2'}`}>{vibe.hint}</span>
@@ -247,7 +247,7 @@ const SpotForm: React.FC<{ onSubmitted: () => void }> = ({ onSubmitted }) => {
         />
       </Field>
 
-      <label className="flex items-start gap-3 rounded-[14px] ios-fill px-3.5 py-3 cursor-pointer">
+      <label className="flex items-start gap-3 rounded-row ios-fill px-3.5 py-3 cursor-pointer">
         <input
           type="checkbox"
           checked={input.publicPlaceConfirmed}

@@ -18,7 +18,7 @@ interface LoginViewProps {
   onBrowse: () => void;
 }
 
-const CARD = 'rounded-[20px] bg-surface ios-card-shadow p-4 sm:p-5';
+const CARD = 'rounded-card bg-surface ios-card-shadow p-4 sm:p-5';
 const LINK = 'min-h-11 inline-flex items-center px-1 text-[14px] font-semibold text-tint-ink ios-press';
 
 const TITLES: Record<LoginMode, { title: string; subtitle: string }> = {
@@ -200,7 +200,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
       <LargeTitle title={heading.title} subtitle={heading.subtitle} />
 
       {showSegments && (
-        <div className="flex p-0.5 rounded-[10px] ios-fill" role="tablist" aria-label="Account">
+        <div className="flex p-0.5 rounded-control ios-fill" role="tablist" aria-label="Account">
           {modes.map((entry) => {
             const active = mode === entry.id;
             return (
@@ -249,7 +249,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
                 type="button"
                 onClick={() => void signInWithGoogle()}
                 disabled={busy}
-                className="w-full h-11 px-4 rounded-[12px] bg-surface hover:bg-[#F5EFE6] border border-[#E6DEC9] text-ink text-[15px] font-semibold font-sans flex items-center justify-center gap-3 shadow-[0_1px_2px_rgba(19,25,31,0.05)] ios-press transition-colors disabled:opacity-50"
+                className="w-full h-11 px-4 rounded-row bg-surface hover:bg-[#F5EFE6] border border-[#E6DEC9] text-ink text-[15px] font-semibold font-sans flex items-center justify-center gap-3 shadow-[0_1px_2px_rgba(19,25,31,0.05)] ios-press transition-colors disabled:opacity-50"
               >
                 <GoogleIcon className="w-5 h-5 shrink-0" />
                 <span>Continue with Google</span>

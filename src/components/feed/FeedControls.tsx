@@ -38,7 +38,7 @@ export const FeedControls: React.FC<FeedControlsProps> = ({
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
       {/* Segmented control: the white thumb slides between spot categories; scrolls on narrow phones */}
-      <div className="flex p-0.5 rounded-[10px] ios-fill sm:w-auto overflow-x-auto scrollbar-none" role="tablist" aria-label="Spot category">
+      <div className="flex p-0.5 rounded-control ios-fill sm:w-auto overflow-x-auto scrollbar-none" role="tablist" aria-label="Spot category">
         {modes.map((entry) => {
           const active = mode === entry.id;
           return (

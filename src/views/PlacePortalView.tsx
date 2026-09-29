@@ -30,7 +30,7 @@ interface PlacePortalViewProps {
   onBrowse: () => void;
 }
 
-const CARD = 'rounded-[20px] bg-surface ios-card-shadow p-4 sm:p-5';
+const CARD = 'rounded-card bg-surface ios-card-shadow p-4 sm:p-5';
 const GROUP_LABEL = 'px-1 text-[13px] font-medium text-ink-2';
 const MENU_CATEGORIES: MenuItem['category'][] = ['Espresso Bar', 'Filter', 'Signature', 'Pastry'];
 const PRICE_OPTIONS: { value: 1 | 2 | 3; label: string }[] = [
@@ -65,7 +65,7 @@ const Pitch: React.FC = () => (
       { icon: ShieldCheck, title: 'Reviewed by Haraya', body: 'We check the permit number before a listing goes live.' },
     ].map((item) => (
       <li key={item.title} className="flex items-start gap-3">
-        <span className="h-9 w-9 shrink-0 rounded-[10px] bg-tint/12 flex items-center justify-center text-tint">
+        <span className="h-9 w-9 shrink-0 rounded-control bg-tint/12 flex items-center justify-center text-tint">
           <item.icon className="w-4.5 h-4.5" />
         </span>
         <span className="min-w-0">
@@ -122,7 +122,7 @@ const ApplicationForm: React.FC<{ onSubmitted: () => void }> = ({ onSubmitted })
                   type="button"
                   aria-pressed={active}
                   onClick={() => set('placeType', type.id as PlaceType)}
-                  className={`text-left rounded-[14px] px-3.5 py-2.5 ios-press ${active ? 'bg-ink text-surface' : 'ios-fill text-ink'}`}
+                  className={`text-left rounded-row px-3.5 py-2.5 ios-press ${active ? 'bg-ink text-surface' : 'ios-fill text-ink'}`}
                 >
                   <span className="block text-[15px] font-semibold">{type.label}</span>
                   <span className={`block ios-footnote ${active ? 'text-surface/80' : 'text-ink-2'}`}>{type.hint}</span>
@@ -180,7 +180,7 @@ const ApplicationForm: React.FC<{ onSubmitted: () => void }> = ({ onSubmitted })
         </Field>
       </div>
 
-      <label className="flex items-start gap-3 rounded-[14px] ios-fill px-3.5 py-3 cursor-pointer">
+      <label className="flex items-start gap-3 rounded-row ios-fill px-3.5 py-3 cursor-pointer">
         <input
           type="checkbox"
           checked={input.ownerConfirmed}
@@ -291,7 +291,7 @@ const HoursEditor: React.FC<{ value: ListingInput['hours']; onChange: (hours: Li
                 value={entry.open ?? ''}
                 onChange={(event) => onChange({ ...value, [day]: { ...entry, open: event.target.value || null } })}
                 aria-label={`${day} opens`}
-                className="h-9 w-[6.5rem] ios-fill rounded-[10px] px-2.5 text-[14px] text-ink focus:outline-none focus:shadow-[0_0_0_2px_#906D4B]"
+                className="h-9 w-[6.5rem] ios-fill rounded-control px-2.5 text-[14px] text-ink focus:outline-none focus:focus-ring"
               />
               <span className="ios-footnote text-ink-2">to</span>
               <input
@@ -299,7 +299,7 @@ const HoursEditor: React.FC<{ value: ListingInput['hours']; onChange: (hours: Li
                 value={entry.close ?? ''}
                 onChange={(event) => onChange({ ...value, [day]: { ...entry, close: event.target.value || null } })}
                 aria-label={`${day} closes`}
-                className="h-9 w-[6.5rem] ios-fill rounded-[10px] px-2.5 text-[14px] text-ink focus:outline-none focus:shadow-[0_0_0_2px_#906D4B]"
+                className="h-9 w-[6.5rem] ios-fill rounded-control px-2.5 text-[14px] text-ink focus:outline-none focus:focus-ring"
               />
             </span>
           ) : (
@@ -436,7 +436,7 @@ const ListingEditor: React.FC<{ onViewPlace: (cafeId: string) => void }> = ({ on
       {/* Listing header */}
       <div className="ios-group ios-card-shadow">
         <div className="ios-group-row py-3.5">
-          <img src={cafe.logoUrl} alt="" className="h-12 w-12 rounded-[12px] object-cover shrink-0 bg-sunken" />
+          <img src={cafe.logoUrl} alt="" className="h-12 w-12 rounded-row object-cover shrink-0 bg-sunken" />
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5">
               <h2 className="ios-headline text-ink truncate">{cafe.name}</h2>
@@ -469,7 +469,7 @@ const ListingEditor: React.FC<{ onViewPlace: (cafeId: string) => void }> = ({ on
           <Field label="About" hint={`${input.description.length} of ${LISTING_LIMITS.description}`}>
             <TextArea value={input.description} onChange={(value) => set('description', value)} rows={4} maxLength={LISTING_LIMITS.description} />
           </Field>
-          <label className="flex items-center gap-3 rounded-[14px] ios-fill px-3.5 py-3 cursor-pointer">
+          <label className="flex items-center gap-3 rounded-row ios-fill px-3.5 py-3 cursor-pointer">
             <input
               type="checkbox"
               checked={input.isRoastery}
@@ -564,7 +564,7 @@ const ListingEditor: React.FC<{ onViewPlace: (cafeId: string) => void }> = ({ on
 
         {error && <ErrorNote message={error} />}
         {saved && !error && (
-          <p role="status" className="ios-footnote text-ok bg-ok/10 rounded-[12px] px-3.5 py-2.5">
+          <p role="status" className="ios-footnote text-ok bg-ok/10 rounded-row px-3.5 py-2.5">
             Saved. Your listing is updated for everyone.
           </p>
         )}

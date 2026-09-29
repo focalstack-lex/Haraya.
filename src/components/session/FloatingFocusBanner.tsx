@@ -97,7 +97,7 @@ export const SessionToast: React.FC<SessionToastProps> = ({ message, onDismiss, 
       {message && (
         <button
           onClick={onDismiss}
-          className="pointer-events-auto mx-auto max-w-md w-full min-h-11 px-4 py-2.5 rounded-[14px] bg-surface ios-card-shadow text-left text-[14px] text-ink flex items-center gap-2.5"
+          className="pointer-events-auto mx-auto max-w-md w-full min-h-11 px-4 py-2.5 rounded-row bg-surface ios-card-shadow text-left text-[14px] text-ink flex items-center gap-2.5"
         >
           <span
             className={`h-2 w-2 shrink-0 rounded-full ${message.tone === 'error' ? 'bg-danger' : 'bg-ok'}`}

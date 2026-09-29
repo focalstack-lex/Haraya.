@@ -93,7 +93,7 @@ const Benefit: React.FC<{ icon: React.ComponentType<{ className?: string; stroke
   align,
 }) => (
   <div className={`flex flex-col gap-3 ${align === 'right' ? 'lg:items-end lg:text-right' : ''}`}>
-    <span className="h-11 w-11 rounded-[14px] bg-tint/12 text-tint-ink flex items-center justify-center" aria-hidden="true">
+    <span className="h-11 w-11 rounded-row bg-tint/12 text-tint-ink flex items-center justify-center" aria-hidden="true">
       <Icon className="w-5 h-5" strokeWidth={2} />
     </span>
     <h3 className="text-[18px] font-semibold text-ink leading-snug">{title}</h3>
@@ -280,7 +280,7 @@ export const LandingView: React.FC<LandingViewProps> = ({ onEnter }) => {
                 <li key={city}>
                   <button
                     onClick={() => onEnter('feed', city)}
-                    className="group w-full min-h-14 px-4 rounded-[14px] bg-surface ios-card-shadow flex items-center gap-3 text-left ios-press focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tint"
+                    className="group w-full min-h-14 px-4 rounded-row bg-surface ios-card-shadow flex items-center gap-3 text-left ios-press focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tint"
                   >
                     <MapPin className="w-4.5 h-4.5 shrink-0 text-tint-ink" strokeWidth={2.2} />
                     <span className="flex-1 min-w-0 text-[16px] font-medium">{city}</span>
@@ -295,7 +295,7 @@ export const LandingView: React.FC<LandingViewProps> = ({ onEnter }) => {
         {/* Closing call to action */}
         <section className="pb-20 sm:pb-28">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="relative overflow-hidden rounded-[28px] bg-ink text-surface px-6 py-10 sm:px-12 sm:py-14 flex flex-col md:flex-row md:items-center gap-8">
+            <div className="relative overflow-hidden rounded-sheet bg-ink text-surface px-6 py-10 sm:px-12 sm:py-14 flex flex-col md:flex-row md:items-center gap-8">
               <div className="flex-1">
                 <h2 className="font-cooper text-[30px] sm:text-[40px] font-bold leading-[1.1] tracking-[-0.03em] text-balance">
                   Your next cup is close.

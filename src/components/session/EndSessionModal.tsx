@@ -46,7 +46,7 @@ function Segmented<T extends string>({
       <span className="block px-1 text-[13px] font-medium text-ink-2" id={`seg-${label}`}>
         {label}
       </span>
-      <div role="radiogroup" aria-labelledby={`seg-${label}`} className="flex p-0.5 rounded-[10px] ios-fill">
+      <div role="radiogroup" aria-labelledby={`seg-${label}`} className="flex p-0.5 rounded-control ios-fill">
         {options.map((option) => {
           const selected = value === option.id;
           return (

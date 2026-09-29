@@ -163,7 +163,7 @@ export const MoodFinderSheet: React.FC<MoodFinderSheetProps> = ({
         {/* Describe it */}
         <form onSubmit={applyText} className="space-y-1.5">
           <div className="flex items-center gap-2">
-            <label className="flex-1 flex items-center ios-fill rounded-[12px] h-11 px-3 focus-within:shadow-[0_0_0_1.5px_rgba(144,109,75,0.6)] transition-shadow">
+            <label className="flex-1 flex items-center ios-fill rounded-row h-11 px-3 focus-within:shadow-[0_0_0_1.5px_rgba(144,109,75,0.6)] transition-shadow">
               <Search className="w-[18px] h-[18px] text-ink-3 shrink-0 mr-2" strokeWidth={2.2} />
               <input
                 value={text}
@@ -286,7 +286,7 @@ export const MoodFinderSheet: React.FC<MoodFinderSheetProps> = ({
           )}
 
           {hasAsk && result.matches.length === 0 && (
-            <div className="bg-canvas rounded-[20px] px-4 py-5 text-center space-y-3">
+            <div className="bg-canvas rounded-card px-4 py-5 text-center space-y-3">
               <AyaMascot pose="empty" size={88} alt="" />
               <p className="text-[14px] text-ink-2">
                 {relax

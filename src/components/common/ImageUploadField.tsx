@@ -45,7 +45,7 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({ label, hint,
       <input ref={inputRef} type="file" accept="image/*" onChange={pick} className="hidden" />
 
       {value ? (
-        <div className={`relative rounded-[14px] overflow-hidden bg-ink ${aspect === 'square' ? 'aspect-square w-32' : 'aspect-video w-full'}`}>
+        <div className={`relative rounded-row overflow-hidden bg-ink ${aspect === 'square' ? 'aspect-square w-32' : 'aspect-video w-full'}`}>
           <img src={value} alt={`${label} preview`} className="w-full h-full object-cover" />
           <button
             type="button"
@@ -62,7 +62,7 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({ label, hint,
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className={`w-full rounded-[14px] ios-fill hover:bg-shade/20 text-tint-ink font-sans flex flex-col items-center justify-center gap-1.5 ios-press ${
+          className={`w-full rounded-row ios-fill hover:bg-shade/20 text-tint-ink font-sans flex flex-col items-center justify-center gap-1.5 ios-press ${
             aspect === 'wide' ? 'h-28' : 'h-24'
           }`}
         >

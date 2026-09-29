@@ -99,7 +99,7 @@ export const Modal: React.FC<{
         dragConstraints={{ top: 0, bottom: 0 }}
         dragElastic={{ top: 0, bottom: 0.9 }}
         onDragEnd={handleDragEnd}
-        className={`relative bg-surface w-full ${maxWidth} rounded-t-[28px] sm:rounded-[24px] max-h-[92dvh] overflow-y-auto overscroll-contain shadow-[0_-8px_40px_rgba(19,25,31,0.18)] sm:shadow-[0_24px_64px_-12px_rgba(19,25,31,0.35)] sheet-safe`}
+        className={`relative bg-surface w-full ${maxWidth} rounded-t-sheet sm:rounded-sheet max-h-[92dvh] overflow-y-auto overscroll-contain shadow-sheet sm:shadow-[0_24px_64px_-12px_rgba(19,25,31,0.35)] sheet-safe`}
       >
         {/* Grabber: the drag handle on phones */}
         <div
@@ -153,7 +153,7 @@ export const Field: React.FC<{
 );
 
 const inputClass =
-  'w-full ios-fill rounded-[12px] px-3.5 h-11 min-h-[40px] font-sans text-[15px] text-ink placeholder:text-ink-3 focus:outline-none focus:bg-surface focus:shadow-[0_0_0_2px_#906D4B] transition-[background-color,box-shadow]';
+  'w-full ios-fill rounded-row px-3.5 h-11 min-h-[40px] font-sans text-[15px] text-ink placeholder:text-ink-3 focus:outline-none focus:bg-surface focus:focus-ring transition-[background-color,box-shadow]';
 
 export const TextInput: React.FC<{
   value: string;
@@ -191,7 +191,7 @@ export const TextArea: React.FC<{
     maxLength={maxLength}
     placeholder={placeholder}
     onChange={(event) => onChange(event.target.value)}
-    className="w-full ios-fill rounded-[12px] px-3.5 py-3 font-sans text-[15px] text-ink placeholder:text-ink-3 focus:outline-none focus:bg-surface focus:shadow-[0_0_0_2px_#906D4B] transition-[background-color,box-shadow] resize-none"
+    className="w-full ios-fill rounded-row px-3.5 py-3 font-sans text-[15px] text-ink placeholder:text-ink-3 focus:outline-none focus:bg-surface focus:focus-ring transition-[background-color,box-shadow] resize-none"
   />
 );
 
@@ -203,7 +203,7 @@ export const SelectInput: React.FC<{
   <select
     value={value}
     onChange={(event) => onChange(event.target.value)}
-    className="w-full ios-fill rounded-[12px] px-3.5 h-11 min-h-[40px] font-sans text-[15px] text-ink focus:outline-none focus:shadow-[0_0_0_2px_#906D4B] transition-shadow"
+    className="w-full ios-fill rounded-row px-3.5 h-11 min-h-[40px] font-sans text-[15px] text-ink focus:outline-none focus:focus-ring transition-shadow"
   >
     {options.map((option) => (
       <option key={option.value} value={option.value}>
@@ -265,7 +265,7 @@ export const Chip: React.FC<{
 );
 
 export const ErrorNote: React.FC<{ message: string }> = ({ message }) => (
-  <p role="alert" className="ios-footnote text-danger bg-danger/10 rounded-[12px] px-3.5 py-2.5">
+  <p role="alert" className="ios-footnote text-danger bg-danger/10 rounded-row px-3.5 py-2.5">
     {message}
   </p>
 );

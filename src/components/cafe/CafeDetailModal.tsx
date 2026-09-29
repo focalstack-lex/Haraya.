@@ -165,7 +165,7 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
                 const el = event.currentTarget;
                 setActiveImage(Math.round(el.scrollLeft / Math.max(el.clientWidth, 1)));
               }}
-              className="flex overflow-x-auto snap-x snap-mandatory overscroll-x-contain scrollbar-none rounded-[20px] aspect-[16/10] bg-ink"
+              className="flex overflow-x-auto snap-x snap-mandatory overscroll-x-contain scrollbar-none rounded-card aspect-[16/10] bg-ink"
             >
               {cafe.images.map((src, index) => (
                 <img
@@ -222,7 +222,7 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
             </div>
             {cafe.description && <p className="text-[15px] font-sans text-ink/85 leading-relaxed">{cafe.description}</p>}
             {cafe.community?.tip && (
-              <p className="rounded-[14px] bg-canvas px-3.5 py-2.5 text-[15px] text-ink">
+              <p className="rounded-row bg-canvas px-3.5 py-2.5 text-[15px] text-ink">
                 <span className="font-semibold">Local tip: </span>
                 {cafe.community.tip}
               </p>

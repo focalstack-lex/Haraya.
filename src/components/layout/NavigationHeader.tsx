@@ -57,7 +57,7 @@ const TabButton: React.FC<TabButtonProps> = ({ id, label, count, active, onSelec
   >
     {label}
     {count !== undefined && count > 0 && (
-      <span className="h-4 min-w-4 px-1 rounded-full bg-tint text-surface text-[9px] font-bold flex items-center justify-center">
+      <span className="h-4 min-w-4 px-1 rounded-full bg-tint text-surface text-[11px] font-bold flex items-center justify-center">
         {count}
       </span>
     )}
@@ -128,7 +128,7 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
           {/* Right Actions */}
           <div className="flex items-center gap-2">
             {/* Unified Search & City Filter Capsule on Desktop */}
-            <div className={`${showBarSearch ? 'hidden md:flex' : 'hidden'} items-center ios-fill rounded-[10px] h-9 transition-colors overflow-hidden`}>
+            <div className={`${showBarSearch ? 'hidden md:flex' : 'hidden'} items-center ios-fill rounded-control h-9 transition-colors overflow-hidden`}>
               {showBarSearch && (
               <div className="relative flex items-center pl-2.5 pr-1">
                 <Search className="w-4 h-4 text-ink-3 shrink-0 pointer-events-none" />

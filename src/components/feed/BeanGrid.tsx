@@ -19,7 +19,7 @@ const BeanCard: React.FC<{
   onToggleSave: (bean: Bean) => void;
   onSelectBean: (beanId: string) => void;
 }> = ({ bean, saved, onToggleSave, onSelectBean }) => (
-  <article className="group card-lift card-ambient bg-surface rounded-[20px] overflow-hidden flex flex-col">
+  <article className="group card-lift card-ambient bg-surface rounded-card overflow-hidden flex flex-col">
     <div className="relative aspect-[4/3] overflow-hidden bg-ink">
       <img
         src={bean.images[0]}

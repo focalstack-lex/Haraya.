@@ -94,7 +94,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({ lat, lng, onChan
         <LocateFixed className="w-4 h-4" />
         {locating ? 'Finding you' : 'Use my current location'}
       </button>
-      <div className="relative isolate rounded-[16px] overflow-hidden ios-card-shadow">
+      <div className="relative isolate rounded-row overflow-hidden ios-card-shadow">
         <div ref={canvasRef} className="h-56 sm:h-64 z-0" role="application" aria-label="Tap to place the spot on the map" />
       </div>
       <p className="ios-footnote text-ink-2">

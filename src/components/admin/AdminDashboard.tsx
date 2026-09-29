@@ -20,7 +20,7 @@ interface AdminDashboardProps {
 
 type AdminTab = 'overview' | 'spots' | 'places' | 'users';
 
-const CARD = 'rounded-[20px] bg-surface ios-card-shadow p-4 sm:p-5';
+const CARD = 'rounded-card bg-surface ios-card-shadow p-4 sm:p-5';
 
 /** A public listing from the cafes table (not a curated, community or legacy browser-only cafe). */
 const isListedPlace = (cafe: { id: string }) => placeService.isListed(cafe.id);
@@ -114,7 +114,7 @@ const ApplicationQueue: React.FC<{ rows: PlaceApplicationRow[]; onViewCafe: (caf
                 maxLength={280}
                 placeholder="Note to the applicant (shown if rejected)"
                 aria-label={`Review note for ${row.business_name}`}
-                className="w-full h-11 ios-fill rounded-[12px] px-3.5 text-[14px] text-ink placeholder:text-ink-3 focus:outline-none focus:shadow-[0_0_0_2px_#906D4B]"
+                className="w-full h-11 ios-fill rounded-row px-3.5 text-[14px] text-ink placeholder:text-ink-3 focus:outline-none focus:focus-ring"
               />
               <div className="flex gap-2">
                 <button
@@ -204,7 +204,7 @@ const ListingsPanel: React.FC<{ onViewCafe: (cafeId: string) => void }> = ({ onV
         <ul className="ios-group ios-card-shadow">
           {listed.map((cafe) => (
             <li key={cafe.id} className="ios-group-row">
-              <img src={cafe.logoUrl} alt="" className="h-10 w-10 rounded-[10px] object-cover shrink-0 bg-sunken" />
+              <img src={cafe.logoUrl} alt="" className="h-10 w-10 rounded-control object-cover shrink-0 bg-sunken" />
               <span className="flex-1 min-w-0">
                 <span className="block text-[15px] text-ink truncate">{cafe.name}</span>
                 <span className="block ios-footnote text-ink-2 truncate">
@@ -267,7 +267,7 @@ const UsersPanel: React.FC<{ profiles: Profile[] }> = ({ profiles }) => {
         onChange={(event) => setQuery(event.target.value)}
         placeholder="Search by email or name"
         aria-label="Search accounts"
-        className="w-full h-11 ios-fill rounded-[12px] px-3.5 text-[15px] text-ink placeholder:text-ink-3 focus:outline-none focus:shadow-[0_0_0_2px_#906D4B]"
+        className="w-full h-11 ios-fill rounded-row px-3.5 text-[15px] text-ink placeholder:text-ink-3 focus:outline-none focus:focus-ring"
       />
       {error && <ErrorNote message={error} />}
       {adminService.getLoadError() && <ErrorNote message={adminService.getLoadError() ?? ''} />}
@@ -300,7 +300,7 @@ const UsersPanel: React.FC<{ profiles: Profile[] }> = ({ profiles }) => {
                     value={profile.role}
                     disabled={self || busyId === profile.id}
                     onChange={(event) => void changeRole(profile.id, event.target.value as ProfileRole)}
-                    className="h-9 ios-fill rounded-[10px] px-2.5 text-[13px] font-semibold text-ink focus:outline-none focus:shadow-[0_0_0_2px_#906D4B] disabled:opacity-60"
+                    className="h-9 ios-fill rounded-control px-2.5 text-[13px] font-semibold text-ink focus:outline-none focus:focus-ring disabled:opacity-60"
                   >
                     {(Object.keys(ROLE_LABELS) as ProfileRole[]).map((role) => (
                       <option key={role} value={role}>
@@ -406,7 +406,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewCafe, onOp
         }
       />
 
-      <div className="flex p-0.5 rounded-[10px] ios-fill" role="tablist" aria-label="Control Room sections">
+      <div className="flex p-0.5 rounded-control ios-fill" role="tablist" aria-label="Control Room sections">
         {tabs.map((entry) => {
           const active = tab === entry.id;
           return (

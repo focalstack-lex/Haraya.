@@ -98,7 +98,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
             transition={{ duration: 0.25 }}
           />
           <motion.div
-            className="absolute top-0 right-0 h-full w-80 max-w-[85vw] bg-canvas rounded-l-[24px] shadow-[-8px_0_40px_rgba(19,25,31,0.18)] flex flex-col overflow-hidden"
+            className="absolute top-0 right-0 h-full w-80 max-w-[85vw] bg-canvas rounded-l-sheet shadow-[-8px_0_40px_rgba(19,25,31,0.18)] flex flex-col overflow-hidden"
             initial={reduceMotion ? { opacity: 0 } : { x: '100%' }}
             animate={reduceMotion ? { opacity: 1 } : { x: 0 }}
             exit={reduceMotion ? { opacity: 0 } : { x: '100%' }}

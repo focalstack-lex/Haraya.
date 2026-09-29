@@ -89,7 +89,7 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
       <motion.div
         {...sheetMotion}
         transition={SHEET_SPRING}
-        className="relative w-full sm:max-w-md bg-surface text-ink rounded-t-[28px] sm:rounded-[28px] max-h-[92dvh] overflow-y-auto overscroll-contain shadow-[0_-8px_40px_rgba(19,25,31,0.18)] sm:shadow-[0_24px_64px_-12px_rgba(19,25,31,0.35)] sheet-safe"
+        className="relative w-full sm:max-w-md bg-surface text-ink rounded-t-sheet sm:rounded-sheet max-h-[92dvh] overflow-y-auto overscroll-contain shadow-sheet sm:shadow-[0_24px_64px_-12px_rgba(19,25,31,0.35)] sheet-safe"
       >
         {/* Grabber: visual sheet cue on phones */}
         <div className="sm:hidden flex justify-center pt-1.5" aria-hidden="true">
@@ -123,7 +123,7 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
           <ul className="space-y-4">
             {FEATURES.map((feature) => (
               <li key={feature.title} className="flex items-start gap-3.5">
-                <span className="h-10 w-10 shrink-0 rounded-[12px] bg-tint/12 flex items-center justify-center text-tint">
+                <span className="h-10 w-10 shrink-0 rounded-row bg-tint/12 flex items-center justify-center text-tint">
                   <feature.icon className="w-5 h-5" />
                 </span>
                 <span className="min-w-0">

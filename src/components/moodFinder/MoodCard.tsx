@@ -77,7 +77,7 @@ export const MoodCard: React.FC<MoodCardProps> = ({ onOpen, focusSession = null,
       {/* Portrait frame: starts 28px above the card so the ears break out whole, and clips at the card's bottom edge
           (same 20px corner) so Aya reads as standing behind it, like the photo in a profile card. Above the text
           layer so she stays tappable; the frame itself lets taps through. */}
-      <div className="absolute z-10 right-0 -top-[28px] bottom-0 w-[112px] overflow-hidden rounded-br-[20px] pointer-events-none">
+      <div className="absolute z-10 right-0 -top-[28px] bottom-0 w-[112px] overflow-hidden rounded-br-card pointer-events-none">
         <button
           type="button"
           onClick={act}

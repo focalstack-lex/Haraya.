@@ -99,7 +99,7 @@ const DiaryEntry: React.FC<{ visit: Visit; now: Date; onOpen?: () => void }> = (
     visit.outletsStatus ? `Outlets: ${OUTLET_LABEL[visit.outletsStatus].toLowerCase()}` : null,
   ].filter((value): value is string => Boolean(value));
   return (
-    <article className="bg-surface rounded-[20px] ios-card-shadow overflow-hidden">
+    <article className="bg-surface rounded-card ios-card-shadow overflow-hidden">
       <button onClick={onOpen} disabled={!onOpen} className="w-full p-4 pb-3 flex items-start gap-3 text-left ios-press disabled:active:scale-100">
         <span className="h-10 w-10 shrink-0 rounded-full bg-tint/15 text-tint-ink flex items-center justify-center">
           {visit.sessionType === 'focus' ? <FocusTimerIcon className="w-5 h-5" /> : <RubberStampIcon className="w-5 h-5" />}
@@ -353,7 +353,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       )}
 
       {/* Segmented control */}
-      <div className="flex p-0.5 rounded-[10px] ios-fill" role="tablist" aria-label="Passport sections">
+      <div className="flex p-0.5 rounded-control ios-fill" role="tablist" aria-label="Passport sections">
         {segments.map((entry) => {
           const active = section === entry.id;
           return (
@@ -406,7 +406,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       {/* Passport: stamps grouped by city */}
       {section === 'passport' && (
         <div className="space-y-6">
-          <div className="bg-surface rounded-[20px] ios-card-shadow p-4 flex items-center gap-3">
+          <div className="bg-surface rounded-card ios-card-shadow p-4 flex items-center gap-3">
             <AyaMascot pose="stamp" size={92} alt="" className="-my-2" />
             <div className="min-w-0 flex-1 space-y-1.5">
               <p className="ios-headline text-ink">
@@ -436,7 +436,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                       <span className="font-mono">{stamped}</span> of <span className="font-mono">{entry.stamps.length}</span>
                     </span>
                   </div>
-                  <ul className="grid grid-cols-3 sm:grid-cols-4 gap-x-2 gap-y-4 bg-surface rounded-[20px] ios-card-shadow px-2 py-4">
+                  <ul className="grid grid-cols-3 sm:grid-cols-4 gap-x-2 gap-y-4 bg-surface rounded-card ios-card-shadow px-2 py-4">
                     {entry.stamps.map((stamp) => (
                       <li key={stamp.id} className="min-w-0">
                         <button
@@ -492,7 +492,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 const openNow = isOpenNow(cafe.hours);
                 const hoursKnown = hasListedHours(cafe.hours);
                 return (
-                  <article key={cafe.id} className="bg-surface rounded-[20px] ios-card-shadow overflow-hidden">
+                  <article key={cafe.id} className="bg-surface rounded-card ios-card-shadow overflow-hidden">
                     <button
                       onClick={() => onSelectCafe(cafe.id)}
                       className="w-full flex items-center gap-3 p-3 text-left ios-press active:scale-[0.99]"
@@ -501,7 +501,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                         src={cafe.images[0]}
                         alt=""
                         loading="lazy"
-                        className="h-16 w-16 rounded-[12px] object-cover shrink-0 bg-ink"
+                        className="h-16 w-16 rounded-row object-cover shrink-0 bg-ink"
                       />
                       <span className="min-w-0 flex-1 space-y-0.5">
                         <span className="block ios-headline text-ink truncate">{cafe.name}</span>
@@ -560,7 +560,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                   const openNow = isOpenNow(cafe.hours);
                   const hoursKnown = hasListedHours(cafe.hours);
                   return (
-                    <article key={cafe.id} className="bg-surface rounded-[20px] ios-card-shadow overflow-hidden">
+                    <article key={cafe.id} className="bg-surface rounded-card ios-card-shadow overflow-hidden">
                       <button
                         onClick={() => onSelectCafe(cafe.id)}
                         className="w-full flex items-center gap-3 p-3 text-left ios-press active:scale-[0.99]"
@@ -569,7 +569,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                           src={cafe.images[0]}
                           alt=""
                           loading="lazy"
-                          className="h-16 w-16 rounded-[12px] object-cover shrink-0 bg-ink"
+                          className="h-16 w-16 rounded-row object-cover shrink-0 bg-ink"
                         />
                         <span className="min-w-0 flex-1 space-y-0.5">
                           <span className="flex items-center gap-2">
