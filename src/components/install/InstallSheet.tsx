@@ -38,9 +38,9 @@ export const InstallSheet: React.FC<InstallSheetProps> = ({ mode, onInstall, onC
 
   const isOpen = mode !== null;
 
-  // Fresh state each time the sheet opens
+  // Reset on close so reopening never flashes the previous done or copied state
   useEffect(() => {
-    if (isOpen) {
+    if (!isOpen) {
       setDone(false);
       setCopied(false);
       setBusy(false);

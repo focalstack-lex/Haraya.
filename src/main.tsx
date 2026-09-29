@@ -5,17 +5,28 @@ import 'leaflet/dist/leaflet.css'
 import './index.css'
 import App from './App.tsx'
 import { registerSW } from 'virtual:pwa-register'
+import { createBackgroundUpdate } from './utils/backgroundUpdate'
 import { installPrompt } from './components/install/installPromptStore'
 
-// A new version waits until the visitor leaves the app, then activates; the next open is fresh
+// A new version waits until the visitor has been away for a while, then activates; the next open is fresh
+const UPDATE_AFTER_HIDDEN_MS = 10 * 60 * 1000
+const UPDATE_CHECK_MS = 60 * 60 * 1000
 let updateQueued = false
 const updateSW = registerSW({
   onNeedRefresh() {
     if (updateQueued) return
     updateQueued = true
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') void updateSW(true)
+    const background = createBackgroundUpdate({
+      delayMs: UPDATE_AFTER_HIDDEN_MS,
+      apply: () => void updateSW(true),
+      setTimer: (fn, ms) => window.setTimeout(fn, ms),
+      clearTimer: (id) => window.clearTimeout(id as number),
     })
+    document.addEventListener('visibilitychange', () => background.onVisibility(document.visibilityState))
+  },
+  // Installed apps stay open for days, so look for a new version now and then
+  onRegisteredSW(_url, registration) {
+    if (registration) setInterval(() => void registration.update(), UPDATE_CHECK_MS)
   },
 })
 

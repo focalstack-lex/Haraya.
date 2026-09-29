@@ -76,12 +76,14 @@ export function isStandaloneDisplay(): boolean {
 
 /**
  * Whether this load should open on the landing page: only a bare URL. Deep links (#/tab/..., #/cafe/...), a
- * sign-in or reset return from Supabase (?code=, #access_token=), and the home-screen app all go straight in.
+ * sign-in or reset return from Supabase (?code=, #access_token=), the home-screen app, and an offline visit
+ * (OfflineNotice explains that state) all go straight in.
  */
 export function isLandingEntry(): boolean {
   const hash = window.location.hash;
   if (hash && hash !== '#' && hash !== '#/') return false;
   const params = new URLSearchParams(window.location.search);
   if (params.has('code') || params.has('error') || params.has('token_hash')) return false;
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) return false;
   return !isStandaloneDisplay();
 }

@@ -30,6 +30,7 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html}'],
         navigateFallback: 'index.html',
+        navigateFallbackDenylist: [/\/[^/?]+\.[a-z0-9]+$/i], // real files (images, robots.txt) are not the app shell
         cleanupOutdatedCaches: true,
         runtimeCaching: [], // app shell only; Supabase, tiles, routing and weather always go to the network
       },

@@ -59,6 +59,23 @@ describe('detectInstallPlatform', () => {
     });
   });
 
+  describe('More in-app browsers', () => {
+    it('TikTok Android (BytedanceWebview) gives in-app', () => {
+      const ua = 'Mozilla/5.0 (Linux; Android 13; Pixel 6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.5938.149 Mobile Safari/537.36 BytedanceWebview/d8a21c6';
+      expect(detectInstallPlatform(ua, 5)).toBe('in-app');
+    });
+
+    it('LINE in-app gives in-app', () => {
+      const ua = 'Mozilla/5.0 (Linux; Android 13; Pixel 6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.5938.149 Mobile Safari/537.36 Line/13.1.0';
+      expect(detectInstallPlatform(ua, 5)).toBe('in-app');
+    });
+
+    it('desktop Chrome is not caught by the Line pattern', () => {
+      const ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.5938.149 Safari/537.36';
+      expect(detectInstallPlatform(ua, 0)).not.toBe('in-app');
+    });
+  });
+
   describe('Desktop detection', () => {
     it('Windows Chrome gives desktop', () => {
       const ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.5938.149 Safari/537.36';
@@ -185,5 +202,11 @@ describe('shouldOfferAfterTour', () => {
         mode: 'open-in-browser',
       })
     ).toBe(true);
+  });
+
+  it('android with unavailable mode gives false', () => {
+    expect(
+      shouldOfferAfterTour({ outcome: 'done', alreadyOffered: false, platform: 'android', mode: 'unavailable' })
+    ).toBe(false);
   });
 });

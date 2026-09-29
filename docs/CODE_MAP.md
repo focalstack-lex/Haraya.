@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-29 : commit ee45310 : fingerprint 907a071a045acb76
+Generated 2026-09-29 : commit bfc6e4c : fingerprint 1d224138ba1fd0be
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -12,12 +12,12 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `index.html` (30 lines) : . module: index.html
 - `scripts/generate-code-map.mjs` (212 lines) : One-line purpose per file, inferred from its path and leading doc comment.
 - `scripts/verify-google-auth.mjs` (109 lines) : scripts module: verify-google-auth
-- `src/App.tsx` (828 lines) : Older links: the roaster portal is now the Place Portal.
+- `src/App.tsx` (829 lines) : Older links: the roaster portal is now the Place Portal.
   - L69 : SharedList
   - L95 : App
 - `src/index.css` (825 lines) : src entry point
-- `src/main.tsx` (30 lines) : src entry point
-- `vite.config.ts` (42 lines) : . module: vite.config
+- `src/main.tsx` (41 lines) : src entry point
+- `vite.config.ts` (43 lines) : . module: vite.config
 
 ## src/components/admin/
 
@@ -85,7 +85,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/install/
 
-- `src/components/install/installPlatform.test.ts` (190 lines) : src/components/install module: installPlatform.test
+- `src/components/install/installPlatform.test.ts` (213 lines) : src/components/install module: installPlatform.test
 - `src/components/install/installPlatform.ts` (27 lines) : src/components/install module: installPlatform
 - `src/components/install/installPromptStore.test.ts` (91 lines) : src/components/install module: installPromptStore.test
 - `src/components/install/installPromptStore.ts` (62 lines) : Captures the browser's install prompt so Aya can offer it at the right moment. The event can
@@ -263,13 +263,15 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/utils/
 
+- `src/utils/backgroundUpdate.test.ts` (68 lines) : src/utils module: backgroundUpdate.test
+- `src/utils/backgroundUpdate.ts` (30 lines) : Applies a waiting service worker update only after the page has been hidden for a while, so a quick
 - `src/utils/calendar.test.ts` (57 lines) : src/utils module: calendar.test
 - `src/utils/calendar.ts` (161 lines) : Calendar and clock helpers shared by roast drops, cafe hours, and the
 - `src/utils/geo.test.ts` (53 lines) : Meters per degree of latitude on the 6,371 km sphere.
 - `src/utils/geo.ts` (74 lines) : Distance and directions helpers for the coffee map and trails.
 - `src/utils/inbox.test.ts` (21 lines) : src/utils module: inbox.test
 - `src/utils/inbox.ts` (25 lines) : Where a visitor reads their mail, from the address they signed up with. Only providers with a stable web
-- `src/utils/router.ts` (88 lines) : Hash routes so cafes, beans, roasteries, drops, and shared lists have shareable
+- `src/utils/router.ts` (90 lines) : Hash routes so cafes, beans, roasteries, drops, and shared lists have shareable
 - `src/utils/weekdays.ts` (13 lines) : Canonical weekday iteration order for hours tables.
 
 ## src/views/

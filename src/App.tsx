@@ -129,6 +129,7 @@ export const App: React.FC = () => {
   const [isTourOpen, setIsTourOpen] = useState(false);
   const install = useInstallPrompt();
   const [installSheetMode, setInstallSheetMode] = useState<InstallMode | null>(null);
+  const canOfferInstall = install.mode !== 'installed' && install.mode !== 'unavailable';
 
   // Mood finder sheet, the directions picker, and live walking navigation on the map
   const [moodSheet, setMoodSheet] = useState<{ open: boolean; mood: MoodId | null }>({ open: false, mood: null });
@@ -696,7 +697,7 @@ export const App: React.FC = () => {
             onOpenAdmin={openAdmin}
             onSignOut={handleSignOut}
             onStartTour={startTour}
-            onInstallApp={install.mode === 'installed' || install.mode === 'unavailable' ? undefined : () => setInstallSheetMode(install.mode)}
+            onInstallApp={canOfferInstall ? () => setInstallSheetMode(install.mode) : undefined}
             sectionRequest={activeTab === 'saved' ? SAVED_SECTION_REQUEST : profileRequest}
           />
         )}
