@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-29 : commit 6777193 : fingerprint e37768ff6884b687
+Generated 2026-09-29 : commit aa2ec18 : fingerprint 365439608f7d553a
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -16,8 +16,8 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L63 : SharedList
   - L89 : App
 - `src/index.css` (825 lines) : src entry point
-- `src/main.tsx` (13 lines) : src entry point
-- `vite.config.ts` (15 lines) : . module: vite.config
+- `src/main.tsx` (26 lines) : src entry point
+- `vite.config.ts` (42 lines) : . module: vite.config
 
 ## src/components/admin/
 
