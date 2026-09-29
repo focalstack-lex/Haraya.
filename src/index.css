@@ -1,5 +1,39 @@
 @import "tailwindcss";
 
+/* Haraya tokens (see DESIGN.md). One layer: components use these names, never raw hex. */
+@theme {
+  --color-canvas: #FAF5EB;
+  --color-surface: #FFFDF9;
+  --color-sunken: #F2EAE0;
+  --color-hairline: #E4D9C8;
+  --color-ink: #13191F;
+  --color-ink-2: #594C3D;
+  --color-ink-3: #6E6150;
+  --color-tint: #906D4B;
+  --color-tint-ink: #7D5C3D;
+  /* Only with an opacity modifier (bg-shade/20): hover and pressed fills */
+  --color-shade: #766046;
+  --color-ok: #3E5C48;
+  --color-danger: #8C3A2E;
+  /* Rating stars only, never text (2.4:1 on surface) */
+  --color-star: #CA9C68;
+  --color-steam: #E7AC67;
+
+  --radius-control: 10px;
+  --radius-row: 14px;
+  --radius-card: 20px;
+  --radius-sheet: 28px;
+
+  --shadow-card: 0 0.5px 1px rgba(19, 25, 31, 0.06), 0 6px 20px -6px rgba(19, 25, 31, 0.14);
+  --shadow-float: 0 4px 24px -4px rgba(19, 25, 31, 0.12), 0 1px 3px rgba(19, 25, 31, 0.04);
+  --shadow-sheet: 0 -8px 40px rgba(19, 25, 31, 0.18);
+}
+
+/* Keyboard and field focus ring in the tint */
+@utility focus-ring {
+  box-shadow: 0 0 0 2px var(--color-tint);
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
