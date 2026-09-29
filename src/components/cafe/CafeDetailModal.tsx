@@ -71,28 +71,27 @@ export const AmenityBadges: React.FC<{ amenities: AmenityKey[]; wifiMbps: number
 
 export const MenuSheet: React.FC<{ menu: Cafe['menu'] }> = ({ menu }) => {
   const categories = ['Espresso Bar', 'Filter', 'Signature', 'Pastry'] as const;
+  const filled = categories
+    .map((category) => ({ category, items: menu.filter((item) => item.category === category) }))
+    .filter((entry) => entry.items.length > 0);
+  if (filled.length === 0) return null;
   return (
-    <div className="space-y-4">
-      {categories.map((category) => {
-        const items = menu.filter((item) => item.category === category);
-        if (items.length === 0) return null;
-        return (
-          <div key={category} className="space-y-1.5">
-            <h4 className={SECTION_LABEL}>{category}</h4>
-            <div className={GROUP}>
-              {items.map((item) => (
-                <div key={item.name} className="ios-group-row min-h-11 justify-between items-baseline">
-                  <div className="min-w-0">
-                    <span className="block text-[15px] font-sans text-[#13191F]">{item.name}</span>
-                    {item.description && <span className="block ios-footnote text-[#594C3D] mt-0.5">{item.description}</span>}
-                  </div>
-                  <span className="text-[15px] font-mono font-medium text-[#13191F] shrink-0">₱{item.price}</span>
-                </div>
-              ))}
+    <div className={GROUP}>
+      {/* One list: each category is a subhead row, then its items, so the hairlines separate every row */}
+      {filled.map(({ category, items }) => (
+        <React.Fragment key={category}>
+          <h4 className="px-4 pt-3 pb-1.5 ios-footnote font-semibold text-ink-2">{category}</h4>
+          {items.map((item) => (
+            <div key={item.name} className="ios-group-row min-h-11 justify-between items-baseline">
+              <div className="min-w-0">
+                <span className="block text-[15px] font-sans text-ink">{item.name}</span>
+                {item.description && <span className="block ios-footnote text-ink-2 mt-0.5">{item.description}</span>}
+              </div>
+              <span className="text-[15px] font-mono font-medium text-ink shrink-0">₱{item.price}</span>
             </div>
-          </div>
-        );
-      })}
+          ))}
+        </React.Fragment>
+      ))}
     </div>
   );
 };
