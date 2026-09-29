@@ -19,7 +19,7 @@ export const NAV_TABS: { id: string; label: string; icon: React.ComponentType<{ 
   { id: 'feed', label: 'Discover', icon: FeedIcon },
   { id: 'map', label: 'Map & Spots', icon: MapIcon },
   { id: SUBMIT_TAB_ID, label: 'Add a Spot', icon: AddSpotIcon },
-  { id: 'profile', label: 'Saved Spots', icon: SavedIcon },
+  { id: 'profile', label: 'Passport', icon: SavedIcon },
 ];
 
 interface NavigationHeaderProps {
@@ -187,7 +187,7 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
                 )}
               </>
             ) : (
-              /* Account avatar: opens Saved Spots, where the account rows live */
+              /* Account avatar: opens Passport, where the account rows live */
               <button
                 onClick={() => setActiveTab('profile')}
                 aria-label={`Account: ${accountName ?? 'signed in'}`}

@@ -41,7 +41,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     target: 'tab-profile',
-    text: 'Everything you save lives in Saved Spots.',
+    text: 'Your saves, stamps and diary live in Passport.',
     advance: 'next',
     aya: 'holding-cup',
   },
