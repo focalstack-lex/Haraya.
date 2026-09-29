@@ -80,8 +80,9 @@ const same = (open: string, close: string): Record<Weekday, Window> =>
 /**
  * Weekly hours by spot id, read on 2026-09-29 from the restaurantguru.com listing for each shop (Google Business
  * data, updated within the last two months), and checked against the "Open, closes at" line Lex's Google Maps
- * screenshots showed the same day. A spot with no source found is not listed here and keeps "Hours not listed":
- * Lil' Ben Coffee House, Cely's Cafe, Infinitea, Cool Brews. Hours change; re-check before trusting them long term.
+ * screenshots showed the same day; Cool Brews and Lil' Ben were stated by Lex on the same day. A spot with no source
+ * found is not listed here and keeps "Hours not listed": Cely's Cafe, Infinitea. Hours change; re-check before
+ * trusting them long term.
  */
 const HOURS: Record<string, WeeklyHours> = {
   // G&Co. Cafe: daily 10AM-10PM (screenshot: Closes 10 PM)
@@ -94,6 +95,10 @@ const HOURS: Record<string, WeeklyHours> = {
   'digos-kaffeeneology': week({ ...same('10:00', '01:00'), Sunday: ['13:00', '22:00'] }),
   // The Nook: Mon-Sat 10AM-10PM, Sun 1PM-10PM (also stated in mid-2025 posts; screenshot: Closes 10 PM)
   'digos-the-nook': week({ ...same('10:00', '22:00'), Sunday: ['13:00', '22:00'] }),
+  // Cool Brews: 3PM-10PM, as stated by Lex; no days were named, so it is applied to every day
+  'digos-cool-brews': week(same('15:00', '22:00')),
+  // Lil' Ben Coffee House: 1PM-10PM, as stated by Lex; no days were named, so it is applied to every day
+  'osm-n13308179172': week(same('13:00', '22:00')),
 };
 
 /** Stable URL handle from the name and the id, so two branches of one shop never collide. */

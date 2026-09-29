@@ -37,7 +37,7 @@ describe('Digos cafes', () => {
   });
 
   it('leaves the hours empty for shops with no source', () => {
-    for (const name of ["Lil' Ben Coffee House", "Cely's Cafe", 'Infinitea', 'Cool Brews']) {
+    for (const name of ["Cely's Cafe", 'Infinitea']) {
       expect(hasListedHours(byName(name).hours)).toBe(false);
     }
   });
@@ -56,6 +56,17 @@ describe('Digos cafes', () => {
     expect(minutesUntilClose(kaffeeneology.hours, at(26, 23, 30))).toBe(90);
     expect(isOpenNow(kaffeeneology.hours, at(27, 11, 0))).toBe(false); // Sunday opens at 1 PM
     expect(isOpenNow(kaffeeneology.hours, at(27, 13, 0))).toBe(true);
+  });
+
+  it("opens Cool Brews at 3 PM and Lil' Ben at 1 PM, both until 10 PM", () => {
+    const coolBrews = byName('Cool Brews');
+    expect(isOpenNow(coolBrews.hours, at(28, 14, 30))).toBe(false);
+    expect(isOpenNow(coolBrews.hours, at(28, 15, 0))).toBe(true);
+    expect(isOpenNow(coolBrews.hours, at(28, 22, 0))).toBe(false);
+    const lilBen = byName("Lil' Ben Coffee House");
+    expect(isOpenNow(lilBen.hours, at(28, 12, 59))).toBe(false);
+    expect(isOpenNow(lilBen.hours, at(28, 13, 0))).toBe(true);
+    expect(isOpenNow(lilBen.hours, at(28, 21, 59))).toBe(true);
   });
 
   it('opens The Nook late on Sundays and G&Co. every day', () => {
