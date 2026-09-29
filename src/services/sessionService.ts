@@ -13,6 +13,23 @@ const AFTER_SIGN_IN_KEY = 'haraya_after_sign_in';
 /** Return tab stored before a password-reset email so the app opens the new-password form on return. */
 export const RESET_RETURN_TAB = 'reset';
 
+/** A return tab older than this is stale (the link was never opened, or opened days later). */
+const RETURN_TAB_MAX_AGE_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Whether this page load is the landing of an email link or OAuth redirect (?code=, ?token_hash=, #access_token=).
+ * Read at import, before start() cleans the URL. Only such a load may act on a stored return tab, so a leftover
+ * one never moves a visitor who simply opens the app.
+ */
+const arrivedFromAuthRedirect = (() => {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    return params.has('code') || params.has('token_hash') || window.location.hash.includes('access_token=');
+  } catch {
+    return false;
+  }
+})();
+
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const PASSWORD_MIN_LENGTH = 8;
 
@@ -28,11 +45,29 @@ function notify(): void {
   listeners.forEach((listener) => listener());
 }
 
+/**
+ * Remembers where to land after an email link or OAuth sign-in. localStorage, not sessionStorage: a confirmation
+ * link opens in a new tab, and sessionStorage belongs to the tab that sent the email, so it was always empty there.
+ */
 function rememberReturnTab(tab: string): void {
   try {
-    sessionStorage.setItem(AFTER_SIGN_IN_KEY, tab);
+    localStorage.setItem(AFTER_SIGN_IN_KEY, JSON.stringify({ tab, at: Date.now() }));
   } catch (error) {
     console.warn('Haraya: could not remember the return tab', error);
+  }
+}
+
+/** The stored return tab, only on an auth redirect landing and only while fresh. */
+function readReturnTab(): string | null {
+  if (!arrivedFromAuthRedirect) return null;
+  try {
+    const raw = localStorage.getItem(AFTER_SIGN_IN_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { tab?: unknown; at?: unknown };
+    if (typeof parsed.tab !== 'string' || typeof parsed.at !== 'number') return null;
+    return Date.now() - parsed.at <= RETURN_TAB_MAX_AGE_MS ? parsed.tab : null;
+  } catch {
+    return null;
   }
 }
 
@@ -190,7 +225,7 @@ export const sessionService = {
    * Creates an account. When the project requires email confirmation there is no session yet, and the
    * caller shows a "check your email" note instead.
    */
-  async signUpWithPassword(email: string, password: string, name: string): Promise<{ needsConfirmation: boolean }> {
+  async signUpWithPassword(email: string, password: string, name: string, returnTab: string = 'profile'): Promise<{ needsConfirmation: boolean }> {
     if (!supabase) throw new Error('Accounts are not available right now.');
     const trimmed = email.trim().toLowerCase();
     const displayName = name.trim();
@@ -198,6 +233,8 @@ export const sessionService = {
     if (displayName.length > 80) throw new Error('Keep your name under 80 characters.');
     if (!EMAIL_PATTERN.test(trimmed)) throw new Error('Enter a valid email address.');
     if (password.length < PASSWORD_MIN_LENGTH) throw new Error(`Use a password of at least ${PASSWORD_MIN_LENGTH} characters.`);
+    // Opening the confirmation link signs the visitor in and lands them here, not on Discover
+    rememberReturnTab(returnTab);
     const { data, error } = await supabase.auth.signUp({
       email: trimmed,
       password,
@@ -343,22 +380,18 @@ export const sessionService = {
 
   /** The tab to open after returning from an email link or OAuth sign in, read once. */
   takeReturnTab(): string | null {
+    const tab = readReturnTab();
     try {
-      const tab = sessionStorage.getItem(AFTER_SIGN_IN_KEY);
-      sessionStorage.removeItem(AFTER_SIGN_IN_KEY);
-      return tab;
-    } catch {
-      return null;
+      if (tab) localStorage.removeItem(AFTER_SIGN_IN_KEY);
+    } catch (error) {
+      console.warn('Haraya: could not clear the return tab', error);
     }
+    return tab;
   },
 
   /** Inspect the pending return tab without clearing it. */
   peekReturnTab(): string | null {
-    try {
-      return sessionStorage.getItem(AFTER_SIGN_IN_KEY);
-    } catch {
-      return null;
-    }
+    return readReturnTab();
   },
 
   async signOut(): Promise<void> {
