@@ -5,7 +5,7 @@ import { BottomTabBar } from './components/layout/BottomTabBar';
 import { FooterSection } from './components/layout/FooterSection';
 
 import { EditorialHero } from './components/feed/EditorialHero';
-import { FeedControls, type FeedMode, type SortKey } from './components/feed/FeedControls';
+import { DEFAULT_SORT, FeedControls, type FeedMode, type SortKey } from './components/feed/FeedControls';
 import { VibeFilterBar, type VibeFilterId } from './components/feed/VibeFilterBar';
 import { PopularPicksSection } from './components/feed/PopularPicksSection';
 import { FeedSearchBar } from './components/feed/FeedSearchBar';
@@ -475,7 +475,7 @@ export const App: React.FC = () => {
   }, [allCafes, selectedCity]);
 
   const hasActiveFilters =
-    vibeFilters.size > 0 || Boolean(searchQuery) || priceRangeId !== 'any' || selectedCity !== 'All Davao Region';
+    vibeFilters.size > 0 || Boolean(searchQuery) || priceRangeId !== 'any' || sortKey !== DEFAULT_SORT || selectedCity !== 'All Davao Region';
 
   const scrollToCatalog = () => {
     document.getElementById('full-catalog-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -485,6 +485,7 @@ export const App: React.FC = () => {
     setSelectedCity('All Davao Region');
     setSearchQuery('');
     setPriceRangeId('any');
+    setSortKey(DEFAULT_SORT);
     setVibeFilters(new Set());
   };
 
@@ -546,25 +547,29 @@ export const App: React.FC = () => {
           <FeedControls
             mode={feedMode}
             onModeChange={setFeedMode}
+            itemCount={cafes.length}
+            isFiltersOpen={isFiltersOpen}
+            onToggleFilters={() => setIsFiltersOpen(!isFiltersOpen)}
+            activeFilterCount={vibeFilters.size + (priceRangeId !== 'any' ? 1 : 0) + (sortKey !== DEFAULT_SORT ? 1 : 0)}
+            onClearFilters={hasActiveFilters ? resetFilters : undefined}
+          />
+
+          <VibeFilterBar
+            mode="cafes"
+            active={vibeFilters}
+            onToggle={toggleVibe}
+            isOpen={isFiltersOpen}
             sortKey={sortKey}
             onSortChange={setSortKey}
             priceRange={priceRangeId}
             onPriceRangeChange={setPriceRangeId}
-            itemCount={cafes.length}
-            isFiltersOpen={isFiltersOpen}
-            onToggleFilters={() => setIsFiltersOpen(!isFiltersOpen)}
-            activeFilterCount={vibeFilters.size}
-            onClearFilters={hasActiveFilters ? resetFilters : undefined}
           />
-
-          <VibeFilterBar mode="cafes" active={vibeFilters} onToggle={toggleVibe} isOpen={isFiltersOpen} />
 
           <CafeGrid
             cafes={cafes}
             savedCafeIds={savedCafeIds}
             onToggleSave={toggleSaveCafe}
             onSelectCafe={openCafe}
-            onDirections={openDirections}
             emptyTitle={allCafes.length === 0 ? 'No spots yet' : 'No spots match'}
             emptyBody={
               allCafes.length === 0
