@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-28 : commit c89f6f8 : fingerprint ec42b6b41f5f00fb
+Generated 2026-09-29 : commit f79c5cb : fingerprint be95e03b9703947d
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -11,10 +11,11 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 - `index.html` (30 lines) : . module: index.html
 - `scripts/generate-code-map.mjs` (212 lines) : One-line purpose per file, inferred from its path and leading doc comment.
-- `src/App.tsx` (704 lines) : Older links: the roaster portal is now the Place Portal.
-  - L58 : SharedList
-  - L84 : App
-- `src/index.css` (765 lines) : src entry point
+- `scripts/verify-google-auth.mjs` (90 lines) : scripts module: verify-google-auth
+- `src/App.tsx` (741 lines) : Older links: the roaster portal is now the Place Portal.
+  - L60 : SharedList
+  - L86 : App
+- `src/index.css` (800 lines) : src entry point
 - `src/main.tsx` (13 lines) : src entry point
 - `vite.config.ts` (15 lines) : . module: vite.config
 
@@ -47,9 +48,9 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L103 : Lids
   - L244 : AyaMascot
 - `src/components/common/BrandLogo.tsx` (36 lines) : Haraya logo cut from the brand master (Haraya Files/LOGO.webp) with the background keyed out,
-- `src/components/common/CustomIcons.tsx` (219 lines) : Haraya Custom Icon Set: high-precision vector icons tailored for the Davao
-- `src/components/common/FormControls.tsx` (254 lines) : Shared form primitives for Haraya: an iOS-style sheet (bottom sheet with a
-- `src/components/common/ImageUploadField.tsx` (81 lines) : File input that stores the image as a dataURL with type and size validation.
+- `src/components/common/CustomIcons.tsx` (242 lines) : Haraya Custom Icon Set: high-precision vector icons tailored for the Davao
+- `src/components/common/FormControls.tsx` (268 lines) : Shared form primitives for Haraya: an iOS-style sheet (bottom sheet with a
+- `src/components/common/ImageUploadField.tsx` (83 lines) : File input that stores the image as a dataURL with type and size validation.
 - `src/components/common/LargeTitle.tsx` (46 lines) : iOS large title: the first thing on every primary page, left aligned.
 - `src/components/common/WelcomeModal.tsx` (160 lines) : What the app does, stated plainly: one row per real surface.
 
@@ -74,7 +75,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/components/feed/BeanGrid.tsx` (113 lines) : src/components/feed module: BeanGrid
 - `src/components/feed/CafeGrid.tsx` (163 lines) : src/components/feed module: CafeGrid
 - `src/components/feed/EditorialHero.tsx` (126 lines) : Spotlight shelf built only from real listings: the top study spots, then the newest hidden gems added
-- `src/components/feed/FeedControls.tsx` (146 lines) : src/components/feed module: FeedControls
+- `src/components/feed/FeedControls.tsx` (150 lines) : src/components/feed module: FeedControls
 - `src/components/feed/FeedSearchBar.tsx` (38 lines) : iOS search field: filled, borderless, with the round clear button once text is entered.
 - `src/components/feed/PopularPicksSection.tsx` (73 lines) : "Most saved" shelf: the venues Haraya users bookmark most, from real save counts.
 - `src/components/feed/spotCategories.test.ts` (79 lines) : src/components/feed module: spotCategories.test
@@ -84,13 +85,13 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 ## src/components/layout/
 
 - `src/components/layout/BottomTabBar.tsx` (75 lines) : Persistent mobile bottom navigation (hidden while a detail modal is open).
-- `src/components/layout/FooterSection.tsx` (151 lines) : Global footer: Responsive layout tailored for both mobile and desktop.
-- `src/components/layout/NavigationDrawer.tsx` (213 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
+- `src/components/layout/FooterSection.tsx` (152 lines) : Global footer: Responsive layout tailored for both mobile and desktop.
+- `src/components/layout/NavigationDrawer.tsx` (223 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
 - `src/components/layout/NavigationHeader.tsx` (217 lines) : Tab ids reachable by hash route but not shown in the primary navigation.
 
 ## src/components/map/
 
-- `src/components/map/DavaoCoffeeMap.tsx` (601 lines) : Escapes catalog text before it is placed into Leaflet tooltip HTML.
+- `src/components/map/DavaoCoffeeMap.tsx` (606 lines) : Escapes catalog text before it is placed into Leaflet tooltip HTML.
   - L34 : DavaoCoffeeMapProps
   - L50 : DavaoCoffeeMap
 - `src/components/map/DirectionsActionSheet.tsx` (58 lines) : External map apps. Apple Maps uses its https form so the link also works outside Apple devices.
@@ -163,16 +164,16 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 ## src/services/
 
 - `src/services/adminService.ts` (66 lines) : Control Room account management: the list of profiles (readable by admins only, per Row Level
-- `src/services/catalogService.ts` (356 lines) : Catalog layer over roaster-created and admin-moderated records kept in
-  - L29 : CafeMetrics
-  - L36 : MetricsStore
-  - L50 : readJson
-  - L59 : writeJson
-  - L63 : notify
-  - L68 : makeCatalogId
-  - L76 : deriveStatus
-  - L81 : catalogService
-- `src/services/communityService.ts` (149 lines) : Cup Check community layer: browser-created posts, likes, and comments. Likes are stored per browser (no accounts needed to
+- `src/services/catalogService.ts` (363 lines) : Catalog layer over roaster-created and admin-moderated records kept in
+  - L30 : CafeMetrics
+  - L37 : MetricsStore
+  - L52 : readJson
+  - L61 : writeJson
+  - L70 : notify
+  - L75 : makeCatalogId
+  - L83 : deriveStatus
+  - L88 : catalogService
+- `src/services/communityService.ts` (154 lines) : Cup Check community layer: browser-created posts, likes, and comments. Likes are stored per browser (no accounts needed to
 - `src/services/placeMapping.test.ts` (155 lines) : src/services module: placeMapping.test
 - `src/services/placeMapping.ts` (368 lines) : Place Portal data: the application a place owner sends (place_applications), the public listing row
   - L12 : PLACE_TYPES
@@ -199,19 +200,27 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L358 : describePlaceError
 - `src/services/placeService.ts` (206 lines) : Public listings (table cafes) and Place Portal applications (table place_applications). Listings are
 - `src/services/roasterService.ts` (115 lines) : Roaster-facing facade over the catalog: everything an approved roaster or
-- `src/services/sessionService.ts` (279 lines) : The signed-in account: Supabase Auth session plus the caller's row in public.profiles (role, status,
+- `src/services/sessionService.ts` (321 lines) : The signed-in account: Supabase Auth session plus the caller's row in public.profiles (role, status,
+  - L14 : RESET_RETURN_TAB
+  - L17 : PASSWORD_MIN_LENGTH
+  - L26 : notify
+  - L31 : rememberReturnTab
+  - L40 : describeAuthError
+  - L59 : loadProfile
+  - L81 : setUser
+  - L87 : sessionService
 - `src/services/spotMapping.test.ts` (116 lines) : src/services module: spotMapping.test
 - `src/services/spotMapping.ts` (178 lines) : Community spot submissions: the row shape stored in Supabase (spot_submissions), the form input, the
 - `src/services/spotService.ts` (169 lines) : Add a Spot backed by Supabase (table spot_submissions). Row Level Security decides what each caller can
-- `src/services/userPrefsService.ts` (367 lines) : Buyer-side preferences kept per browser: saved cafes and beans, custom coffee
+- `src/services/userPrefsService.ts` (372 lines) : Buyer-side preferences kept per browser: saved cafes and beans, custom coffee
   - L20 : CafeRating
   - L27 : CustomList
   - L35 : SharedList
   - L45 : readJson
   - L54 : writeJson
-  - L58 : notify
-  - L63 : makeListId
-  - L67 : userPrefsService
+  - L63 : notify
+  - L68 : makeListId
+  - L72 : userPrefsService
 - `src/services/visitMapping.ts` (290 lines) : Sanctuary visits (focus sessions and Quick Stamps): the row shape stored in Supabase (sanctuary_visits),
 - `src/services/visitService.test.ts` (253 lines) : Records every builder call so the query shape can be asserted without a network. The chain's last call
 - `src/services/visitService.ts` (333 lines) : The sanctuary ledger. Local first: every visit is written to this device (localStorage) so the diary and
@@ -235,8 +244,8 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/utils/
 
-- `src/utils/calendar.test.ts` (40 lines) : src/utils module: calendar.test
-- `src/utils/calendar.ts` (157 lines) : Calendar and clock helpers shared by roast drops, cafe hours, and the
+- `src/utils/calendar.test.ts` (57 lines) : src/utils module: calendar.test
+- `src/utils/calendar.ts` (161 lines) : Calendar and clock helpers shared by roast drops, cafe hours, and the
 - `src/utils/geo.test.ts` (53 lines) : Meters per degree of latitude on the 6,371 km sphere.
 - `src/utils/geo.ts` (74 lines) : Distance and directions helpers for the coffee map and trails.
 - `src/utils/router.ts` (68 lines) : Hash routes so cafes, beans, roasteries, drops, and shared lists have shareable
@@ -249,7 +258,10 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L305 : AddSpotView
 - `src/views/CommunityView.tsx` (74 lines) : Cup Check community feed: one-to-three column masonry of today's brews.
 - `src/views/LegalView.tsx` (206 lines) : Privacy Notice and Terms. Statements of fact describe what the code does today; anything that needs a
-- `src/views/LoginView.tsx` (296 lines) : What the page is doing: the two account modes, the two email-link flows, and the new-password form.
+- `src/views/LoginView.tsx` (325 lines) : What the page is doing: the two account modes, the two email-link flows, and the new-password form.
+  - L12 : LoginMode
+  - L14 : LoginViewProps
+  - L54 : LoginView
 - `src/views/PlacePortalView.tsx` (680 lines) : What the portal offers, for visitors who are not signed in or have not applied.
   - L27 : PlacePortalViewProps
   - L583 : PlacePortalView

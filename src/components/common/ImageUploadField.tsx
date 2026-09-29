@@ -17,6 +17,8 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({ label, hint,
 
   const pick = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    // Clear the input so choosing the same file again (after Remove or an error) still fires change
+    event.target.value = '';
     if (!file) return;
     if (!file.type.startsWith('image/')) {
       setError('Only image files (JPG, PNG) are accepted.');

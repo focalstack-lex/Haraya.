@@ -44,7 +44,7 @@ export const FeedControls: React.FC<FeedControlsProps> = ({
   const modes = SPOT_CATEGORIES;
 
   const menuClass =
-    'flex items-center gap-1 h-8 pl-3 pr-2 rounded-full ios-fill text-[13px] font-medium font-sans text-[#13191F] hover:bg-[#766046]/20 transition-colors';
+    'relative flex items-center gap-1 h-8 pl-3 pr-2 rounded-full ios-fill focus-within:ring-2 focus-within:ring-[#906D4B]/50 text-[13px] font-medium font-sans text-[#13191F] hover:bg-[#766046]/20 transition-colors';
 
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
@@ -73,19 +73,22 @@ export const FeedControls: React.FC<FeedControlsProps> = ({
         })}
       </div>
 
-      <div className="flex items-center justify-between sm:justify-end gap-2">
+      <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2">
         <span className="ios-footnote text-[#594C3D] font-mono">
           {itemCount} {itemCount === 1 ? 'spot' : 'spots'}
         </span>
 
-        <div className="flex items-center gap-1.5">
+        {/* Wraps under the count on a 320px phone once Reset joins the row, instead of running off the edge */}
+        <div className="flex flex-wrap items-center justify-end gap-1.5">
           <label className={menuClass}>
             <ArrowUpDown className="w-3.5 h-3.5 text-[#594C3D]" />
+            {/* The select lies transparently over the whole pill, so the icon and chevron open it too */}
+            <span aria-hidden="true">{SORT_LABELS[sortKey]}</span>
             <select
               value={sortKey}
               onChange={(e) => onSortChange(e.target.value as SortKey)}
               aria-label="Sort feed"
-              className="bg-transparent focus:outline-none cursor-pointer appearance-none pr-0.5"
+              className="select-overlay"
             >
               {(Object.keys(SORT_LABELS) as SortKey[]).map((key) => (
                 <option key={key} value={key}>
@@ -97,11 +100,12 @@ export const FeedControls: React.FC<FeedControlsProps> = ({
           </label>
 
           <label className={menuClass}>
+            <span aria-hidden="true">{PRICE_RANGES.find((range) => range.id === priceRange)?.label}</span>
             <select
               value={priceRange}
               onChange={(e) => onPriceRangeChange(e.target.value as PriceRange['id'])}
               aria-label="Filter price"
-              className="bg-transparent focus:outline-none cursor-pointer appearance-none pr-0.5"
+              className="select-overlay"
             >
               {PRICE_RANGES.map((range) => (
                 <option key={range.id} value={range.id}>

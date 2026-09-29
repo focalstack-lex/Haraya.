@@ -54,6 +54,8 @@ import type { Cafe } from './types/coffee';
 const TAB_IDS = new Set(['feed', 'map', SUBMIT_TAB_ID, 'profile', 'saved', 'privacy', 'terms', LOGIN_TAB_ID, PORTAL_TAB_ID, ADMIN_TAB_ID]);
 /** Older links: the roaster portal is now the Place Portal. */
 const TAB_ALIASES: Record<string, string> = { roaster: PORTAL_TAB_ID };
+/** #/tab/saved opens the passport on its Saved section rather than the Diary. */
+const SAVED_SECTION_REQUEST = { section: 'saved', at: 0 } as const;
 
 interface SharedList {
   name: string;
@@ -85,7 +87,7 @@ export const App: React.FC = () => {
   const catalogVersion = useCatalogVersion();
   usePrefsVersion();
   useCommunityVersion();
-  useSessionVersion();
+  const sessionVersion = useSessionVersion();
   useSpotVersion();
   usePlaceVersion();
   useVisitVersion();
@@ -131,9 +133,13 @@ export const App: React.FC = () => {
   useFocusBoundaryWatch((outcome) => setSessionToast({ text: outcome.message, tone: outcome.kind === 'failed' ? 'error' : 'success' }));
 
   const baseHashRef = useRef(buildHash('/tab/feed'));
+  /** A #/cafe/ link that arrived before community spots and listings loaded; opened once they have. */
+  const pendingCafeIdRef = useRef<string | null>(null);
 
   const setActiveTab = useCallback((tab: string) => {
     const resolved = TAB_ALIASES[tab] ?? tab;
+    // Leaving through the tab bar also leaves a shared list, so Discover shows the catalog again
+    setSharedList(null);
     setActiveTabState(resolved);
     if (TAB_IDS.has(resolved)) {
       baseHashRef.current = buildHash(`/tab/${resolved}`);
@@ -163,17 +169,42 @@ export const App: React.FC = () => {
       .then(() => {
         // A failed load skips pruning rather than deleting saves on a flaky connection
         if (!spotService.getLoadError() && !placeService.getLoadError()) prune();
-        // Back from an email link: a reset link opens the new-password form, a sign-in link its origin tab
-        const returnTab = sessionService.takeReturnTab();
+        // A shared link to a community spot or listed place can resolve now that those records are loaded
+        const pendingId = pendingCafeIdRef.current;
+        pendingCafeIdRef.current = null;
+        const pendingCafe = pendingId ? catalogService.getCafeById(pendingId) : undefined;
+        if (pendingCafe && parseHash().kind === 'cafe') {
+          setSelectedCafeId(pendingCafe.id);
+          catalogService.recordView(pendingCafe.id);
+          userPrefsService.pushRecentView(pendingCafe.id);
+        }
+        // Back from an email link or OAuth sign-in: a reset link opens the new-password form, a sign-in link its origin tab
+        const returnTab = sessionService.peekReturnTab();
         if (returnTab === RESET_RETURN_TAB) {
+          sessionService.takeReturnTab();
           setLoginIntent({ mode: 'reset', returnTab: 'profile' });
           setActiveTab(LOGIN_TAB_ID);
         } else if (returnTab && sessionService.getUser()) {
+          sessionService.takeReturnTab();
           setActiveTab(returnTab);
         }
       })
       .catch((error) => console.warn('Haraya: could not start the session', error));
   }, [setActiveTab]);
+
+  // Handle return tab from Google OAuth or email link once user is loaded
+  useEffect(() => {
+    const returnTab = sessionService.peekReturnTab();
+    if (returnTab && sessionService.getUser()) {
+      sessionService.takeReturnTab();
+      if (returnTab === RESET_RETURN_TAB) {
+        setLoginIntent({ mode: 'reset', returnTab: 'profile' });
+        setActiveTab(LOGIN_TAB_ID);
+      } else {
+        setActiveTab(returnTab);
+      }
+    }
+  }, [sessionVersion, setActiveTab]);
 
   // Hash routes: deep links on load, back and forward navigation
   useEffect(() => {
@@ -186,6 +217,7 @@ export const App: React.FC = () => {
             setActiveTabState(id);
             baseHashRef.current = buildHash(`/tab/${id}`);
           }
+          setSharedList(null);
           setSelectedCafeId(null);
           break;
         }
@@ -195,6 +227,8 @@ export const App: React.FC = () => {
             setSelectedCafeId(cafe.id);
             catalogService.recordView(cafe.id);
             userPrefsService.pushRecentView(cafe.id);
+          } else {
+            pendingCafeIdRef.current = route.id;
           }
           break;
         }
@@ -403,7 +437,8 @@ export const App: React.FC = () => {
   // "Most saved" shelf: real save counts within the chosen city
   const mostSavedCafes = useMemo(() => {
     const scoped = selectedCity === 'All Davao Region' ? allCafes : allCafes.filter((cafe) => cafe.city === selectedCity);
-    return [...scoped].sort((a, b) => b.saveCount - a.saveCount).slice(0, 6);
+    // A spot nobody has saved is not "most saved"; the shelf hides itself when none qualify
+    return scoped.filter((cafe) => cafe.saveCount > 0).sort((a, b) => b.saveCount - a.saveCount).slice(0, 6);
   }, [allCafes, selectedCity]);
 
   const hasActiveFilters =
@@ -439,6 +474,8 @@ export const App: React.FC = () => {
           beanIds={sharedList.beanIds}
           onBack={() => {
             setSharedList(null);
+            // The list route stored its own hash as the base; Back returns to Discover so a refresh stays there
+            baseHashRef.current = buildHash('/tab/feed');
             setHash(baseHashRef.current);
           }}
           onSelectCafe={openCafe}
@@ -579,7 +616,7 @@ export const App: React.FC = () => {
             onOpenAdmin={openAdmin}
             onSignOut={handleSignOut}
             onStartTour={startTour}
-            sectionRequest={profileRequest}
+            sectionRequest={activeTab === 'saved' ? SAVED_SECTION_REQUEST : profileRequest}
           />
         )}
 

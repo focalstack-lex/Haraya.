@@ -7,6 +7,7 @@ import type {
   BeanReservation,
 } from '../types/coffee';
 import { CURATED_CAFES } from '../data/spots';
+import { localDayKey } from '../utils/calendar';
 
 /**
  * Catalog layer over roaster-created and admin-moderated records kept in
@@ -38,7 +39,8 @@ type MetricsStore = Record<
   { views: number; saves: number; daily?: Record<string, { views: number; saves: number }> }
 >;
 
-const dayKey = (date: Date) => date.toISOString().split('T')[0];
+// Local calendar day, not UTC: in Davao (UTC+8) a UTC key files everything before 08:00 under yesterday
+const dayKey = (date: Date) => localDayKey(date);
 
 const listeners = new Set<() => void>();
 let version = 0;
@@ -57,7 +59,12 @@ function readJson<T>(key: string, fallback: T): T {
 }
 
 function writeJson(key: string, value: unknown): void {
-  localStorage.setItem(key, JSON.stringify(value));
+  // Storage can be full or blocked (private windows); log it instead of throwing out of a tap handler
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {
+    console.warn(`Haraya: could not persist ${key}`, error);
+  }
 }
 
 function notify(): void {
@@ -135,7 +142,7 @@ export const catalogService = {
       id: makeCatalogId('cafe'),
       saveCount: 0,
       viewCount: 0,
-      dateAdded: new Date().toISOString().split('T')[0],
+      dateAdded: localDayKey(new Date()),
     };
     const cafes = this.getCustomCafes();
     cafes.push(cafe);
@@ -189,7 +196,7 @@ export const catalogService = {
     const bean: Bean = {
       ...input,
       id: makeCatalogId('bean'),
-      dateAdded: new Date().toISOString().split('T')[0],
+      dateAdded: localDayKey(new Date()),
     };
     const beans = this.getCustomBeans();
     beans.push(bean);

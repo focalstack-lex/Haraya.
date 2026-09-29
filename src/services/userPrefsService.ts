@@ -52,7 +52,12 @@ function readJson<T>(key: string, fallback: T): T {
 }
 
 function writeJson(key: string, value: unknown): void {
-  localStorage.setItem(key, JSON.stringify(value));
+  // Storage can be full or blocked (private windows); log it instead of throwing out of a tap handler
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {
+    console.warn(`Haraya: could not persist ${key}`, error);
+  }
 }
 
 function notify(): void {

@@ -68,6 +68,14 @@ async function loadProfile(): Promise<void> {
     return;
   }
   profile = (data as Profile | null) ?? null;
+
+  // If the profile has no name, hydrate it from OAuth metadata if provided (e.g. Google full_name)
+  const metaName = (user.user_metadata?.full_name as string) || (user.user_metadata?.name as string);
+  if (profile && !profile.name && metaName) {
+    const trimmed = metaName.trim().slice(0, 80);
+    profile.name = trimmed;
+    void supabase.from('profiles').update({ name: trimmed }).eq('id', user.id);
+  }
 }
 
 async function setUser(next: User | null): Promise<void> {
@@ -98,9 +106,11 @@ export const sessionService = {
     return profile;
   },
 
-  /** Display name: the profile name, or the part of the email before @. */
+  /** Display name: the profile name, OAuth metadata name, or the part of the email before @. */
   getDisplayName(): string {
     if (profile?.name) return profile.name;
+    const metaName = (user?.user_metadata?.full_name as string) || (user?.user_metadata?.name as string);
+    if (metaName) return metaName.trim();
     const email = user?.email ?? '';
     return email.includes('@') ? email.slice(0, email.indexOf('@')) : email;
   },
@@ -200,6 +210,29 @@ export const sessionService = {
     return { needsConfirmation: false };
   },
 
+  /** Signs in or creates an account with Google via Supabase OAuth. */
+  async signInWithGoogle(returnTab: string = 'profile'): Promise<void> {
+    if (!supabase) throw new Error('Accounts are not available right now.');
+    rememberReturnTab(returnTab);
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/`,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      },
+    });
+    if (error) {
+      console.warn('Haraya: Google sign-in failed', error.message);
+      throw new Error(describeAuthError(error.message, 'Could not start Google sign in. Try again.'));
+    }
+    if (data?.url) {
+      window.location.href = data.url;
+    }
+  },
+
   /** Sends a one-time sign-in link. After it is opened, the app returns to `returnTab`. */
   async sendMagicLink(email: string, returnTab: string): Promise<void> {
     if (!supabase) throw new Error('Accounts are not available right now.');
@@ -257,12 +290,21 @@ export const sessionService = {
     notify();
   },
 
-  /** The tab to open after returning from an email link, read once. */
+  /** The tab to open after returning from an email link or OAuth sign in, read once. */
   takeReturnTab(): string | null {
     try {
       const tab = sessionStorage.getItem(AFTER_SIGN_IN_KEY);
       sessionStorage.removeItem(AFTER_SIGN_IN_KEY);
       return tab;
+    } catch {
+      return null;
+    }
+  },
+
+  /** Inspect the pending return tab without clearing it. */
+  peekReturnTab(): string | null {
+    try {
+      return sessionStorage.getItem(AFTER_SIGN_IN_KEY);
     } catch {
       return null;
     }

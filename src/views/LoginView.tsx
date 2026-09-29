@@ -3,6 +3,7 @@ import { KeyRound, LogOut, Mail, Store } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { LargeTitle } from '../components/common/LargeTitle';
 import { AyaMascot } from '../components/common/AyaMascot';
+import { GoogleIcon } from '../components/common/CustomIcons';
 import { ErrorNote, Field, PrimaryButton, SecondaryButton, TextInput } from '../components/common/FormControls';
 import { PASSWORD_MIN_LENGTH, sessionService } from '../services/sessionService';
 import { useSessionVersion } from '../hooks/useServiceVersions';
@@ -96,6 +97,11 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
       await sessionService.signInWithPassword(email, password);
       onSignedIn();
     }, 'Could not sign in.');
+
+  const signInWithGoogle = () =>
+    run(async () => {
+      await sessionService.signInWithGoogle('profile');
+    }, 'Could not start Google sign in.');
 
   const signUp = () =>
     run(async () => {
@@ -214,6 +220,29 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
             else void savePassword();
           }}
         >
+          {showSegments && (
+            <div className="space-y-3 pb-1">
+              <button
+                type="button"
+                onClick={() => void signInWithGoogle()}
+                disabled={busy}
+                className="w-full h-11 px-4 rounded-[12px] bg-[#FFFDF9] hover:bg-[#F5EFE6] border border-[#E6DEC9] text-[#13191F] text-[15px] font-semibold font-sans flex items-center justify-center gap-3 shadow-[0_1px_2px_rgba(19,25,31,0.05)] ios-press transition-colors disabled:opacity-50"
+              >
+                <GoogleIcon className="w-5 h-5 shrink-0" />
+                <span>Continue with Google</span>
+              </button>
+
+              <div className="relative flex items-center justify-center pt-1 pb-0.5">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-[#E6DEC9]" />
+                </div>
+                <span className="relative bg-[#FFFDF9] px-2.5 text-[12px] font-medium text-[#7D7060]">
+                  or with email
+                </span>
+              </div>
+            </div>
+          )}
+
           {mode === 'signup' && (
             <Field label="Your name">
               <TextInput value={name} onChange={setName} placeholder="How Haraya greets you" />

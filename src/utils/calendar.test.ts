@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { minutesUntilClose } from './calendar';
+import { isOpenNow, minutesUntilClose } from './calendar';
 import type { WeeklyHours } from '../types/coffee';
 
 const week = (open: string | null, close: string | null): WeeklyHours => ({
@@ -35,5 +35,22 @@ describe('minutesUntilClose', () => {
 
   it('counts the previous day window after midnight', () => {
     expect(minutesUntilClose(week('18:00', '01:00'), at(0, 30, 29))).toBe(30);
+  });
+});
+
+describe('isOpenNow', () => {
+  it('is open inside a same-day window and closed outside it', () => {
+    expect(isOpenNow(week('07:00', '22:00'), at(20, 30))).toBe(true);
+    expect(isOpenNow(week('07:00', '22:00'), at(22, 0))).toBe(false);
+  });
+
+  it('stays open through the evening of a window that closes after midnight', () => {
+    expect(isOpenNow(week('18:00', '01:00'), at(20, 0))).toBe(true);
+    expect(isOpenNow(week('07:00', '00:00'), at(23, 30))).toBe(true);
+  });
+
+  it('counts the part after midnight against the previous day', () => {
+    expect(isOpenNow(week('18:00', '01:00'), at(0, 30, 29))).toBe(true);
+    expect(isOpenNow(week('18:00', '01:00'), at(1, 0, 29))).toBe(false);
   });
 });

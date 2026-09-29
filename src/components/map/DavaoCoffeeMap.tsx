@@ -51,6 +51,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
   const mapRef = useRef<L.Map | null>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
   const [activeTrail, setActiveTrail] = useState<Trail | null>(null);
+  const lastTrailIdRef = useRef<string | null>(null);
   const nav = useLiveNavigation();
   const [followMe, setFollowMe] = useState(true);
   const navLayers = useRef<{ you: L.Marker; accuracy: L.Circle; casing: L.Polyline; line: L.Polyline } | null>(null);
@@ -129,6 +130,8 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
           iconAnchor: [13, 26],
         }),
       }).addTo(layer);
+      // The pin is a keyboard-focusable role=button with no text; name it for screen readers
+      marker.getElement()?.setAttribute('aria-label', `${cafe.name}, ${cafe.district}, ${cafe.city}`);
       marker.bindTooltip(
         `<strong>${escapeHtml(cafe.name)}</strong><br/>${escapeHtml(`${cafe.district}, ${cafe.city}`)}${cafe.isRoastery ? ', Roastery' : ''}`,
         { direction: 'top', offset: [0, -24] }
@@ -166,9 +169,11 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
         const bounds = L.latLngBounds(stops.map((cafe) => [cafe.lat, cafe.lng] as [number, number]));
         map.fitBounds(bounds.pad(0.25));
       }
-    } else {
+    } else if (lastTrailIdRef.current) {
+      // Only clearing a trail zooms back out; a catalog refresh (a save, a filter) keeps the visitor's view
       map.setView(DAVAO_CENTER, REGION_ZOOM);
     }
+    lastTrailIdRef.current = activeTrail?.id ?? null;
 
     return () => {
       layer.remove();

@@ -263,6 +263,41 @@ html {
   }
 }
 
+/* Touch floor. The phone density scale above shrinks rem sizing ~10%, so an h-11 control renders at ~35px
+   and chips at ~28px, under the 40px touch target. On touch screens every control gets an invisible hit
+   area grown just enough to reach 40px in each axis (min() leaves larger controls untouched), so the
+   visual density stays as designed. In the base layer so position utilities (absolute, fixed) still win.
+   Controls that hold other controls (a card with a save button) are skipped so the overlay never covers them. */
+@layer base {
+  @media (pointer: coarse) {
+    :where(button, a[href], [role='button'], [role='tab']):not(:has(button, a[href], input, select, textarea, [role='button'])) {
+      position: relative;
+    }
+
+    :where(button, a[href], [role='button'], [role='tab']):not(:has(button, a[href], input, select, textarea, [role='button']))::after {
+      content: '';
+      position: absolute;
+      top: min(0px, calc((100% - 40px) / 2));
+      bottom: min(0px, calc((100% - 40px) / 2));
+      left: min(0px, calc((100% - 40px) / 2));
+      right: min(0px, calc((100% - 40px) / 2));
+    }
+  }
+}
+
+/* A native select laid transparently over its pill: the whole pill opens the picker, and the hit area
+   grows to 40px tall when the pill is shorter. The pill (its label) must be position: relative. */
+.select-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: min(0px, calc((100% - 40px) / 2));
+  bottom: min(0px, calc((100% - 40px) / 2));
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
 /* iOS Safari zooms the page when a focused field is under 16px, so iOS alone keeps 16px */
 @supports (-webkit-touch-callout: none) {
   @media (max-width: 639px) {

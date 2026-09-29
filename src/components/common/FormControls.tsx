@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import { motion, useDragControls, useReducedMotion, type PanInfo } from 'framer-motion';
 
@@ -7,6 +7,9 @@ import { motion, useDragControls, useReducedMotion, type PanInfo } from 'framer-
  * drag-to-dismiss grabber on phones, centered card on desktop), labeled inputs,
  * selects, textareas, and filter chips. Every interactive control meets the 44px touch floor.
  */
+
+/** Open sheets, oldest first: the body scroll lock and Escape both follow this stack. */
+const openSheets: symbol[] = [];
 
 /** Lets ModalHeader take the id that Modal's aria-labelledby points at. */
 const ModalLabelContext = createContext<string | undefined>(undefined);
@@ -36,20 +39,31 @@ export const Modal: React.FC<{
   const reduceMotion = useReducedMotion();
   const dragControls = useDragControls();
 
+  // Parents pass inline closures; a ref keeps the effect keyed on isOpen alone so a re-render
+  // does not tear down and re-take the scroll lock
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
   useEffect(() => {
     if (!isOpen) return;
+    const token = Symbol('sheet');
+    // Escape closes only the topmost sheet, not every sheet in the stack
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
+      if (event.key === 'Escape' && openSheets[openSheets.length - 1] === token) onCloseRef.current();
     };
     window.addEventListener('keydown', onKey);
-    // Lock the page behind the sheet so only the sheet scrolls
-    const previousOverflow = document.body.style.overflow;
+    // Lock the page behind the sheet so only the sheet scrolls. Sheets can stack (cafe, then check-in),
+    // so the lock is released only when the last one closes.
+    openSheets.push(token);
     document.body.style.overflow = 'hidden';
     return () => {
       window.removeEventListener('keydown', onKey);
-      document.body.style.overflow = previousOverflow;
+      openSheets.splice(openSheets.indexOf(token), 1);
+      if (openSheets.length === 0) document.body.style.overflow = '';
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -139,7 +153,7 @@ export const Field: React.FC<{
 );
 
 const inputClass =
-  'w-full ios-fill rounded-[12px] px-3.5 h-11 font-sans text-[15px] text-[#13191F] placeholder:text-[#6E6150] focus:outline-none focus:bg-[#FFFDF9] focus:shadow-[0_0_0_2px_#906D4B] transition-[background-color,box-shadow]';
+  'w-full ios-fill rounded-[12px] px-3.5 h-11 min-h-[40px] font-sans text-[15px] text-[#13191F] placeholder:text-[#6E6150] focus:outline-none focus:bg-[#FFFDF9] focus:shadow-[0_0_0_2px_#906D4B] transition-[background-color,box-shadow]';
 
 export const TextInput: React.FC<{
   value: string;
@@ -187,7 +201,7 @@ export const SelectInput: React.FC<{
   <select
     value={value}
     onChange={(event) => onChange(event.target.value)}
-    className="w-full ios-fill rounded-[12px] px-3.5 h-11 font-sans text-[15px] text-[#13191F] focus:outline-none focus:shadow-[0_0_0_2px_#906D4B] transition-shadow"
+    className="w-full ios-fill rounded-[12px] px-3.5 h-11 min-h-[40px] font-sans text-[15px] text-[#13191F] focus:outline-none focus:shadow-[0_0_0_2px_#906D4B] transition-shadow"
   >
     {options.map((option) => (
       <option key={option.value} value={option.value}>

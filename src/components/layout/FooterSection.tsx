@@ -138,8 +138,9 @@ export const FooterSection: React.FC<FooterSectionProps> = ({ setActiveTab, setS
             <button onClick={() => setActiveTab('terms')} className="min-h-9 text-[#7D5C3D] font-medium ios-press">
               Terms of Use
             </button>
-            <span className="text-[#6E6150]/40 select-none">·</span>
-            <span>
+            {/* On phones the tagline takes its own line, so this dot would dangle at the end of the row */}
+            <span className="hidden sm:inline text-[#6E6150]/40 select-none">·</span>
+            <span className="w-full sm:w-auto">
               Local Roasts. Your Cup. <span className="font-mono">2026</span>
             </span>
           </span>

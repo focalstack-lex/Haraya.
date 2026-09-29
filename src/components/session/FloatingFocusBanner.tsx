@@ -33,8 +33,8 @@ export const FloatingFocusBanner: React.FC<FloatingFocusBannerProps> = ({ onFini
       <div className="relative mx-auto max-w-md pointer-events-auto">
         <AyaMascot pose="focus" size={48} alt="" className="absolute left-2 -top-5 z-10 pointer-events-none" />
         <div
-          role="status"
-          aria-label={`Focus session at ${session.cafeName}, ${clock} elapsed`}
+          role="group"
+          aria-label={`Focus session at ${session.cafeName}`}
           className="h-[44px] rounded-full bg-[#13191F] text-[#FFFDF9] shadow-[0_4px_16px_rgba(0,0,0,0.2)] flex items-center"
         >
           <button

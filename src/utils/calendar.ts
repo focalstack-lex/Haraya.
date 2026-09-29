@@ -106,8 +106,12 @@ export function isOpenNow(hours: WeeklyHours, now: Date = new Date()): boolean {
   const minutesNow = now.getHours() * 60 + now.getMinutes();
 
   const today = hours[todayName];
-  if (today.open && today.close && toMinutes(today.open) <= minutesNow && minutesNow < toMinutes(today.close)) {
-    return true;
+  if (today.open && today.close) {
+    const open = toMinutes(today.open);
+    let close = toMinutes(today.close);
+    // An 18:00 to 02:00 day is open all evening; the part after midnight is checked against yesterday below
+    if (close <= open) close += 24 * 60;
+    if (open <= minutesNow && minutesNow < close) return true;
   }
 
   const yesterday = hours[yesterdayName];

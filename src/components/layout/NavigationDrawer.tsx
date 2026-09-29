@@ -45,6 +45,16 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
 }) => {
   const reduceMotion = useReducedMotion();
 
+  // A modal drawer answers Escape like every other sheet in the app
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isOpen, onClose]);
+
   const go = (id: string) => {
     setActiveTab(id);
     onClose();
