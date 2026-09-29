@@ -18,9 +18,15 @@ interface LandingViewProps {
 
 const SCREEN = { width: 750, height: 1624 };
 
+/**
+ * Line-art iPhone traced from the brand mockup (Haraya Files/Haraya Coffee Spots/Green Coffee Digos/iphone mockup.png,
+ * a 147x293 outline): 5-unit stroke, 19-unit corners, a 41x11 Dynamic Island 13 units from the top. The source is
+ * too small to scale up as a bitmap, so it is redrawn as SVG in the same units and stays sharp at any size.
+ */
 const Phone: React.FC<{ src: string; alt: string; className?: string; eager?: boolean }> = ({ src, alt, className = '', eager = false }) => (
-  <div className={`rounded-[40px] bg-[#13191F] p-[7px] shadow-[0_28px_56px_-18px_rgba(19,25,31,0.45)] ${className}`}>
-    <div className="rounded-[33px] overflow-hidden bg-[#FAF5EB] aspect-[375/812]">
+  <div className={`relative aspect-[147/293] drop-shadow-[0_24px_28px_rgba(19,25,31,0.22)] ${className}`}>
+    {/* Screen: inset to the stroke's inner edge, with the matching inner corner radius */}
+    <div className="absolute inset-[1.7%_3.4%] overflow-hidden rounded-[10%/5%] bg-[#FAF5EB]">
       <img
         src={src}
         alt={alt}
@@ -31,6 +37,10 @@ const Phone: React.FC<{ src: string; alt: string; className?: string; eager?: bo
         className="w-full h-full object-cover object-top"
       />
     </div>
+    <svg viewBox="0 0 147 293" className="absolute inset-0 w-full h-full" aria-hidden="true">
+      <rect x="2.5" y="2.5" width="142" height="288" rx="19" fill="none" stroke="#13191F" strokeWidth="5" />
+      <rect x="53" y="13" width="41" height="11" rx="5.5" fill="#13191F" />
+    </svg>
   </div>
 );
 
@@ -159,15 +169,16 @@ export const LandingView: React.FC<LandingViewProps> = ({ onEnter }) => {
               aria-hidden="true"
               className="absolute left-1/2 bottom-0 -translate-x-1/2 w-[min(118vw,820px)] aspect-[2/1] rounded-t-full bg-[#906D4B]"
             />
+            {/* Below sm the phones scale with the screen (29vw, 44vw, 29vw minus the overlaps) so all three fit at 320px */}
             <div className="relative flex items-end justify-center">
-              <motion.div {...rise(0.25)} className="relative z-0 -mr-10 sm:-mr-8 mb-6 sm:mb-10 -rotate-6 origin-bottom-right">
-                <Phone src="/landing/map.jpg" alt="Map and Spots: every spot pinned across the Davao Region" className="w-[128px] sm:w-[200px] lg:w-[230px]" eager />
+              <motion.div {...rise(0.25)} className="relative z-0 -mr-[6vw] sm:-mr-8 mb-4 sm:mb-10 -rotate-6 origin-bottom-right">
+                <Phone src="/landing/map.jpg" alt="Map and Spots: every spot pinned across the Davao Region" className="w-[29vw] sm:w-[200px] lg:w-[230px]" eager />
               </motion.div>
               <motion.div {...rise(0.1)} className="relative z-10">
-                <Phone src="/landing/discover.jpg" alt="Discover: the mood card with Aya, spot categories and the spot list" className="w-[176px] sm:w-[250px] lg:w-[280px]" eager />
+                <Phone src="/landing/discover.jpg" alt="Discover: the mood card with Aya, spot categories and the spot list" className="w-[44vw] sm:w-[250px] lg:w-[280px]" eager />
               </motion.div>
-              <motion.div {...rise(0.4)} className="relative z-0 -ml-10 sm:-ml-8 mb-6 sm:mb-10 rotate-6 origin-bottom-left">
-                <Phone src="/landing/spot.jpg" alt="A spot sheet: photo, open now, directions, check in and hours" className="w-[128px] sm:w-[200px] lg:w-[230px]" eager />
+              <motion.div {...rise(0.4)} className="relative z-0 -ml-[6vw] sm:-ml-8 mb-4 sm:mb-10 rotate-6 origin-bottom-left">
+                <Phone src="/landing/spot.jpg" alt="A spot sheet: photo, open now, directions, check in and hours" className="w-[29vw] sm:w-[200px] lg:w-[230px]" eager />
               </motion.div>
             </div>
             {/* Aya stands just outside the arch's left foot, clear of the phones; there is no room for her below lg */}
@@ -227,7 +238,7 @@ export const LandingView: React.FC<LandingViewProps> = ({ onEnter }) => {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid gap-14 lg:grid-cols-2 lg:items-center">
             <div className="relative flex justify-center lg:order-2">
               <Phone src="/landing/passport.jpg" alt="Your Passport: focus hours, sanctuaries visited, and your diary" className="w-[230px] sm:w-[260px]" />
-              <AyaMascot pose="stamp" size={120} alt="" className="absolute -bottom-6 left-[calc(50%-190px)] sm:left-[calc(50%-210px)]" />
+              <AyaMascot pose="stamp" size={120} alt="" className="absolute -bottom-6 left-[max(0px,calc(50%-190px))] sm:left-[calc(50%-210px)]" />
             </div>
             <div className="lg:order-1">
               <h2 className="font-cooper text-[30px] sm:text-[40px] font-bold leading-[1.1] tracking-[-0.03em] text-balance">
@@ -264,7 +275,7 @@ export const LandingView: React.FC<LandingViewProps> = ({ onEnter }) => {
             <p className="mt-4 max-w-[52ch] text-[17px] leading-[1.55] text-[#594C3D]">
               Pick a city and Discover opens there. Locals add the quiet corners, and Haraya reviews every spot before it goes up.
             </p>
-            <ul className="mt-10 grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <ul className="mt-10 grid grid-cols-1 min-[360px]:grid-cols-2 sm:grid-cols-3 gap-3">
               {CITIES.map((city) => (
                 <li key={city}>
                   <button

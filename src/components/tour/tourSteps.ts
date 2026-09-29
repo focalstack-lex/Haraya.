@@ -27,7 +27,7 @@ export const TOUR_STEPS: TourStep[] = [
   },
   {
     target: 'mood',
-    text: 'Not sure where to go? Tap how you feel and Haraya suggests a cafe that fits, near you.',
+    text: 'Not sure where to go? Tell Aya how you feel and she suggests a cafe that fits, near you.',
     advance: 'next',
     aya: 'mood',
   },

@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-29 : commit 343150d : fingerprint 9b1619fb85ee1131
+Generated 2026-09-29 : commit ea88337 : fingerprint 3e3268d2283395d9
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -12,7 +12,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `index.html` (30 lines) : . module: index.html
 - `scripts/generate-code-map.mjs` (212 lines) : One-line purpose per file, inferred from its path and leading doc comment.
 - `scripts/verify-google-auth.mjs` (90 lines) : scripts module: verify-google-auth
-- `src/App.tsx` (780 lines) : Older links: the roaster portal is now the Place Portal.
+- `src/App.tsx` (779 lines) : Older links: the roaster portal is now the Place Portal.
   - L61 : SharedList
   - L87 : App
 - `src/index.css` (825 lines) : src entry point
@@ -104,7 +104,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/moodFinder/
 
-- `src/components/moodFinder/MoodCard.tsx` (159 lines) : Late evening, when "open late" matters: 8 PM to 4 AM on the device clock.
+- `src/components/moodFinder/MoodCard.tsx` (106 lines) : Late evening, when "open late" matters: 8 PM to 4 AM on the device clock.
 - `src/components/moodFinder/moodCardState.test.ts` (34 lines) : src/components/moodFinder module: moodCardState.test
 - `src/components/moodFinder/MoodFinderSheet.tsx` (352 lines) : The mood finder: say how you feel and what you need, get three explained picks and a route.
   - L16 : MoodFinderSheetProps
@@ -257,9 +257,9 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L21 : AddSpotViewProps
   - L305 : AddSpotView
 - `src/views/CommunityView.tsx` (74 lines) : Cup Check community feed: one-to-three column masonry of today's brews.
-- `src/views/LandingView.tsx` (319 lines) : Landing page shown at the bare URL (see `isLandingEntry` in utils/router.ts). It showcases the app with real
+- `src/views/LandingView.tsx` (330 lines) : Landing page shown at the bare URL (see `isLandingEntry` in utils/router.ts). It showcases the app with real
   - L14 : LandingViewProps
-  - L94 : LandingView
+  - L104 : LandingView
 - `src/views/LegalView.tsx` (206 lines) : Privacy Notice and Terms. Statements of fact describe what the code does today; anything that needs a
 - `src/views/LoginView.tsx` (325 lines) : What the page is doing: the two account modes, the two email-link flows, and the new-password form.
   - L12 : LoginMode

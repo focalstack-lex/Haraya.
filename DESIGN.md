@@ -37,10 +37,11 @@ The tokens live in `src/index.css`; this file is the contract behind them.
 - Mascot: Aya, drawn from the official master art (`Haraya Files/MASCOT/FULL BODY.png`) as flat SVG in
   `AyaMascot`, using only the master palette (roast #574835, tan #997247, cream #FFF6EE, steam #E7AC67, coffee
   #FFC183, ink #1D1203). No outlines, gradients or mouth. One pose per surface so she reads as a character, not a
-  sticker: `welcome` (WelcomeModal, first tour step), `mood` (Discover mood card, where she rises out of the
-  card's top edge on a soft cream glow so her roast body reads on the tint card, and Mood Finder idle; tapping her
-  opens the finder. The card follows real state, one at a time: a running focus session shows `focus` with Finish
-  and View spot, late evening (8 PM to 4 AM) shows `content` with late moods first, an empty passport shows `wander`), `empty` (cafe, bean, saved, visited and mood
+  sticker: `welcome` (WelcomeModal, first tour step), `mood` (Discover mood card, a profile-style card on `--ios-surface`: title, one line and a single tint pill
+  that opens the finder, no mood chips; Aya stands at the right like a portrait, clipped by the card's bottom edge with
+  her ears breaking out above its top, no glow, and she keeps this one pose in every card state while the copy and
+  button follow real state: focus session in progress (Finish session), late evening, empty passport; tapping her
+  opens the finder too; also Mood Finder idle), `empty` (cafe, bean, saved, visited and mood
   no-match empty states, Add a Spot title), `welcome` again on the live navigation arrival card; `drops` belongs to the
   hidden Roast Drops view. The sanctuary passport adds six poses, one emotion each: `focus` (calm, half-lidded
   over an open book; peeks over the floating focus banner), `arrive` (delight, both paws up with steam sparkles;
@@ -146,6 +147,9 @@ Color is information. The tint marks the one active or primary thing in a region
   because the order matters), six city buttons that open Discover scoped to that city, a River Styx closing card
   with Aya `clink`, then the shared footer. Aya poses: `welcome` beside the hero arch (lg and up), `stamp` by the
   passport phone, `clink` in the closing card.
+- Phone frame: the brand's line-art iPhone (`Haraya Files/Haraya Coffee Spots/Green Coffee Digos/iphone mockup.png`),
+  redrawn as SVG in its own 147x293 units (5-unit River Styx stroke, 19-unit corners, 41x11 Dynamic Island) because
+  the 504x360 source blurs when scaled; a soft drop shadow lifts it off the arch.
 - Phone screens are real captures from the running app (`public/landing/*.jpg`, 375x812 at 2x, JPEG 78). Re-capture
   them when those screens change. No store badges (there is no native app), no eyebrow labels, no counts, no
   testimonials. In-page links scroll with buttons, never `#anchors`, because the hash is the app's router.

@@ -510,7 +510,6 @@ export const App: React.FC = () => {
           onOpen={(mood) => setMoodSheet({ open: true, mood })}
           focusSession={activeFocus}
           onFinishFocus={() => setIsEndSessionOpen(true)}
-          onViewFocusSpot={openCafe}
           passportEmpty={allCafes.length > 0 && visitService.getUserVisits().length === 0}
         />
 
