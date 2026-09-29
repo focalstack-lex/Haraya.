@@ -353,31 +353,10 @@ html {
   padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
 }
 
-/* Tab dock: a flush, minimalist floating navigation bar.
-   --dock-i is the active index, --dock-n the tab count; cqw keeps
-   the micro-indicator and tab centers on one axis. */
-.dock {
-  container-type: inline-size;
-  --dock-pad: 8px;
-  --dock-cell: calc((100cqw - 2 * var(--dock-pad)) / var(--dock-n));
-  --dock-x: calc(var(--dock-pad) + (var(--dock-i) + 0.5) * var(--dock-cell));
-}
-
+/* Tab dock: a floating bar on a solid surface, so page content never reads through the labels. */
 .dock-bar {
-  background-color: rgba(255, 253, 249, 0.94);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(89, 76, 61, 0.12);
-  box-shadow: 0 4px 24px -4px rgba(19, 25, 31, 0.12), 0 1px 3px rgba(19, 25, 31, 0.04);
-}
-
-.dock-indicator {
-  width: 16px;
-  height: 2.5px;
-  background-color: var(--ios-tint);
-  border-radius: 9999px;
-  transform: translateX(calc(var(--dock-x) - 50%));
-  transition: transform 0.4s var(--ios-ease);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-float);
 }
 
 /* Focus session banner and its toast: just above the 58px tab dock on phones with a 12px gap (the toast

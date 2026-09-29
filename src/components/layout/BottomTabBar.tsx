@@ -16,20 +16,11 @@ interface BottomTabBarProps {
 export const BottomTabBar: React.FC<BottomTabBarProps> = ({ activeTab, setActiveTab, savedCount, isHidden }) => {
   if (isHidden) return null;
 
-  const activeIndex = NAV_TABS.findIndex((tab) => tab.id === activeTab);
-  const dockVars = { '--dock-i': Math.max(activeIndex, 0), '--dock-n': NAV_TABS.length } as React.CSSProperties;
 
   return (
     <nav aria-label="Bottom navigation" className="fixed bottom-0 inset-x-0 z-50 lg:hidden px-4 tabbar-safe pointer-events-none">
-      <div className="dock relative mx-auto max-w-md pointer-events-auto" style={dockVars}>
+      <div className="dock relative mx-auto max-w-md pointer-events-auto">
         <div aria-hidden="true" className="dock-bar absolute inset-0 rounded-full" />
-        
-        {activeIndex >= 0 && (
-          <span
-            aria-hidden="true"
-            className="dock-indicator absolute bottom-[6px] left-0 pointer-events-none"
-          />
-        )}
 
         <div className="relative flex h-[58px] px-2 items-center">
           {NAV_TABS.map((tab) => {
@@ -45,20 +36,20 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({ activeTab, setActive
                 <span className="relative w-6 h-6 flex items-center justify-center">
                   <tab.icon
                     className={`w-[22px] h-[22px] transition-colors duration-200 ${
-                      active ? 'text-[#906D4B]' : 'text-[#8C7E70] hover:text-[#594C3D]'
+                      active ? 'text-tint' : 'text-ink-3 hover:text-ink-2'
                     }`}
                   />
                   {tab.id === 'profile' && savedCount > 0 && (
                     <span
-                      className="absolute -top-1 -right-2 h-4 min-w-4 px-1 rounded-full bg-[#8C3A2E] text-[#FFFDF9] text-[9.5px] font-semibold font-mono flex items-center justify-center ring-2 ring-[#FFFDF9]"
+                      className="absolute -top-1 -right-2 h-4 min-w-4 px-1 rounded-full bg-danger text-surface text-[11px] font-semibold font-mono flex items-center justify-center ring-2 ring-surface"
                     >
                       {savedCount > 9 ? '9+' : savedCount}
                     </span>
                   )}
                 </span>
                 <span
-                  className={`ios-caption text-[10.5px] leading-[13px] max-w-full truncate px-1 transition-colors duration-200 ${
-                    active ? 'font-semibold text-[#7D5C3D]' : 'font-medium text-[#8C7E70]'
+                  className={`ios-caption leading-[13px] max-w-full truncate px-1 transition-colors duration-200 ${
+                    active ? 'font-semibold text-tint-ink' : 'font-medium text-ink-3'
                   }`}
                 >
                   {tab.label}
