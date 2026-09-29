@@ -72,30 +72,30 @@ export const MoodCard: React.FC<MoodCardProps> = ({ onOpen, focusSession = null,
     <section
       aria-labelledby="mood-card-title"
       data-tour="mood"
-      className="relative mt-[46px] min-h-[136px] bg-[#FFFDF9] rounded-[20px] ios-card-shadow"
+      className="relative mt-[30px] min-h-[104px] bg-surface rounded-card ios-card-shadow"
     >
-      {/* Portrait frame: starts 42px above the card so the ears break out whole, and clips at the card's bottom edge
+      {/* Portrait frame: starts 28px above the card so the ears break out whole, and clips at the card's bottom edge
           (same 20px corner) so Aya reads as standing behind it, like the photo in a profile card. Above the text
           layer so she stays tappable; the frame itself lets taps through. */}
-      <div className="absolute z-10 right-0 -top-[42px] bottom-0 w-[160px] overflow-hidden rounded-br-[20px] pointer-events-none">
+      <div className="absolute z-10 right-0 -top-[28px] bottom-0 w-[112px] overflow-hidden rounded-br-[20px] pointer-events-none">
         <button
           type="button"
           onClick={act}
           aria-label={copy.aya}
-          className="absolute -left-[8px] top-0 w-[176px] h-[176px] pointer-events-auto aya-rise aya-tap"
+          className="absolute -left-[6px] top-0 w-[124px] h-[124px] pointer-events-auto aya-rise aya-tap"
         >
-          <AyaMascot pose="mood" size={176} alt="" />
+          <AyaMascot pose="mood" size={124} alt="" />
         </button>
       </div>
 
-      <div className="relative pl-4 pr-[148px] pt-4 pb-4">
-        <h2 id="mood-card-title" className="ios-headline text-[#13191F] leading-snug">
+      <div className="relative pl-4 pr-[108px] py-3.5">
+        <h2 id="mood-card-title" className="ios-headline text-ink leading-snug">
           {copy.title}
         </h2>
-        <p className="mt-1 text-[13px] leading-snug text-[#594C3D]">{copy.line}</p>
+        <p className="mt-0.5 text-[13px] leading-snug text-ink-2">{copy.line}</p>
         <button
           onClick={act}
-          className="mt-3 h-[36px] px-4 rounded-full bg-[#906D4B] text-[14px] font-semibold text-[#FFFDF9] hover:bg-[#7D5C3D] ios-press"
+          className="mt-2.5 h-[36px] px-4 rounded-full bg-tint text-[14px] font-semibold text-surface hover:bg-tint-ink ios-press"
         >
           {copy.action}
         </button>
