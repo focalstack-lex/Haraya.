@@ -26,6 +26,7 @@ import { SharedListView } from './views/SharedListView';
 import { LegalView } from './views/LegalView';
 import { RateCafeModal } from './components/cafe/RateCafeModal';
 import { WelcomeModal } from './components/common/WelcomeModal';
+import { LandingView } from './views/LandingView';
 import { LargeTitle, CityMenu } from './components/common/LargeTitle';
 import { GuidedTour } from './components/tour/GuidedTour';
 import { isTourDone, markTourDone } from './components/tour/tourStorage';
@@ -45,7 +46,7 @@ import { spotService } from './services/spotService';
 import { placeService } from './services/placeService';
 import { visitService } from './services/visitService';
 import { useCatalogVersion, usePrefsVersion, useCommunityVersion, useSessionVersion, useSpotVersion, usePlaceVersion, useVisitVersion } from './hooks/useServiceVersions';
-import { buildHash, parseHash, setHash } from './utils/router';
+import { buildHash, isLandingEntry, parseHash, setHash } from './utils/router';
 import { distanceKm } from './utils/geo';
 import { PRICE_RANGES } from './types/coffee';
 import type { Cafe } from './types/coffee';
@@ -111,6 +112,8 @@ export const App: React.FC = () => {
 
   // Welcome modal state for new visitors
   const [isWelcomeOpen, setIsWelcomeOpen] = useState<boolean>(() => !readWelcomed());
+  // The bare URL opens on the landing page; deep links and sign-in returns go straight into the app
+  const [isLanding, setIsLanding] = useState<boolean>(() => isLandingEntry());
 
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [isTourOpen, setIsTourOpen] = useState(false);
@@ -140,6 +143,7 @@ export const App: React.FC = () => {
     const resolved = TAB_ALIASES[tab] ?? tab;
     // Leaving through the tab bar also leaves a shared list, so Discover shows the catalog again
     setSharedList(null);
+    setIsLanding(false);
     setActiveTabState(resolved);
     if (TAB_IDS.has(resolved)) {
       baseHashRef.current = buildHash(`/tab/${resolved}`);
@@ -260,12 +264,22 @@ export const App: React.FC = () => {
           break;
         }
         default:
+          // Back from the app to the bare URL returns to the landing page
+          if (isLandingEntry()) setIsLanding(true);
           break;
       }
     };
     apply();
     window.addEventListener('hashchange', apply);
-    return () => window.removeEventListener('hashchange', apply);
+    // Traversing back to the bare URL does not always fire hashchange
+    const onPop = () => {
+      if (isLandingEntry()) setIsLanding(true);
+    };
+    window.addEventListener('popstate', onPop);
+    return () => {
+      window.removeEventListener('hashchange', apply);
+      window.removeEventListener('popstate', onPop);
+    };
   }, []);
 
   const openCafe = useCallback((cafeId: string) => {
@@ -557,6 +571,31 @@ export const App: React.FC = () => {
       </div>
     );
   };
+
+  /**
+   * From the landing page into the app. The entry is pushed, so browser Back returns to the landing. The landing
+   * already says what the app does, so a first visit skips the welcome sheet and goes to the guided tour.
+   */
+  const enterApp = (tab: string, city?: string) => {
+    if (city) setSelectedCity(city);
+    setHash(buildHash(`/tab/${tab}`), 'push');
+    setActiveTab(tab);
+    window.scrollTo({ top: 0 });
+    if (!readWelcomed()) {
+      setIsWelcomeOpen(false);
+      markWelcomed();
+      if (tab === 'feed' && !isTourDone()) startTour();
+    }
+  };
+
+  if (isLanding) {
+    return (
+      <>
+        <LandingView onEnter={enterApp} />
+        <FooterSection setActiveTab={enterApp} setSelectedCity={setSelectedCity} onAddSpot={() => enterApp(SUBMIT_TAB_ID)} />
+      </>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF5EB] text-[#13191F] font-sans">

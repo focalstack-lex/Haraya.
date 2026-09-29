@@ -786,6 +786,31 @@ html {
   }
 }
 
+/* Landing band: the filter list drifts left on a loop; two copies make the seam invisible at -50% */
+.landing-marquee {
+  animation: landing-marquee 48s linear infinite;
+}
+
+.landing-band:hover .landing-marquee {
+  animation-play-state: paused;
+}
+
+@keyframes landing-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* Reduced motion: the band stands still and scrolls by hand instead */
+@media (prefers-reduced-motion: reduce) {
+  .landing-marquee {
+    animation: none;
+  }
+
+  .landing-band {
+    overflow-x: auto;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

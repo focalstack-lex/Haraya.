@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-29 : commit 23ff54c : fingerprint ef7c1e3e586047dc
+Generated 2026-09-29 : commit 343150d : fingerprint 9b1619fb85ee1131
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -12,10 +12,10 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `index.html` (30 lines) : . module: index.html
 - `scripts/generate-code-map.mjs` (212 lines) : One-line purpose per file, inferred from its path and leading doc comment.
 - `scripts/verify-google-auth.mjs` (90 lines) : scripts module: verify-google-auth
-- `src/App.tsx` (741 lines) : Older links: the roaster portal is now the Place Portal.
-  - L60 : SharedList
-  - L86 : App
-- `src/index.css` (800 lines) : src entry point
+- `src/App.tsx` (780 lines) : Older links: the roaster portal is now the Place Portal.
+  - L61 : SharedList
+  - L87 : App
+- `src/index.css` (825 lines) : src entry point
 - `src/main.tsx` (13 lines) : src entry point
 - `vite.config.ts` (15 lines) : . module: vite.config
 
@@ -248,7 +248,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/utils/calendar.ts` (161 lines) : Calendar and clock helpers shared by roast drops, cafe hours, and the
 - `src/utils/geo.test.ts` (53 lines) : Meters per degree of latitude on the 6,371 km sphere.
 - `src/utils/geo.ts` (74 lines) : Distance and directions helpers for the coffee map and trails.
-- `src/utils/router.ts` (68 lines) : Hash routes so cafes, beans, roasteries, drops, and shared lists have shareable
+- `src/utils/router.ts` (83 lines) : Hash routes so cafes, beans, roasteries, drops, and shared lists have shareable
 - `src/utils/weekdays.ts` (13 lines) : Canonical weekday iteration order for hours tables.
 
 ## src/views/
@@ -257,6 +257,9 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L21 : AddSpotViewProps
   - L305 : AddSpotView
 - `src/views/CommunityView.tsx` (74 lines) : Cup Check community feed: one-to-three column masonry of today's brews.
+- `src/views/LandingView.tsx` (319 lines) : Landing page shown at the bare URL (see `isLandingEntry` in utils/router.ts). It showcases the app with real
+  - L14 : LandingViewProps
+  - L94 : LandingView
 - `src/views/LegalView.tsx` (206 lines) : Privacy Notice and Terms. Statements of fact describe what the code does today; anything that needs a
 - `src/views/LoginView.tsx` (325 lines) : What the page is doing: the two account modes, the two email-link flows, and the new-password form.
   - L12 : LoginMode

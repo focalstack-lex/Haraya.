@@ -133,3 +133,19 @@ Color is information. The tint marks the one active or primary thing in a region
 - Safe areas respected on the tab bar, sheets and the nav bar.
 - No horizontal page overflow; horizontal shelves scroll inside their own container with
   scroll snapping.
+
+## Landing page
+
+- `src/views/LandingView.tsx`, shown only at the bare URL (`isLandingEntry` in `src/utils/router.ts`). Deep links,
+  Supabase sign-in returns (`?code=`, `#access_token=`) and the home-screen app skip it. Every call to action enters
+  the app through `enterApp` in `App.tsx`, which pushes a history entry so browser Back returns to the landing; a
+  first visit skips the welcome sheet (the landing already explains the app) and starts the guided tour.
+- Structure follows a classic app showcase in Haraya's own world: large centered headline, Open Haraya and See the
+  map, three phones on a tint (#906D4B) arch, a River Styx band of what the app filters for (a slow marquee that
+  stands still under reduced motion), four benefits around the mood finder phone, three numbered steps (numbers
+  because the order matters), six city buttons that open Discover scoped to that city, a River Styx closing card
+  with Aya `clink`, then the shared footer. Aya poses: `welcome` beside the hero arch (lg and up), `stamp` by the
+  passport phone, `clink` in the closing card.
+- Phone screens are real captures from the running app (`public/landing/*.jpg`, 375x812 at 2x, JPEG 78). Re-capture
+  them when those screens change. No store badges (there is no native app), no eyebrow labels, no counts, no
+  testimonials. In-page links scroll with buttons, never `#anchors`, because the hash is the app's router.
