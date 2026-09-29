@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-29 : commit ce36459 : fingerprint f386bbd2c906da59
+Generated 2026-09-29 : commit 376a2fd : fingerprint d39457c7396facb7
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -16,7 +16,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L63 : SharedList
   - L89 : App
 - `src/index.css` (825 lines) : src entry point
-- `src/main.tsx` (26 lines) : src entry point
+- `src/main.tsx` (30 lines) : src entry point
 - `vite.config.ts` (42 lines) : . module: vite.config
 
 ## src/components/admin/
@@ -85,8 +85,12 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/install/
 
-- `src/components/install/installPlatform.test.ts` (183 lines) : src/components/install module: installPlatform.test
+- `src/components/install/installPlatform.test.ts` (190 lines) : src/components/install module: installPlatform.test
 - `src/components/install/installPlatform.ts` (27 lines) : src/components/install module: installPlatform
+- `src/components/install/installPromptStore.test.ts` (91 lines) : src/components/install module: installPromptStore.test
+- `src/components/install/installPromptStore.ts` (62 lines) : Captures the browser's install prompt so Aya can offer it at the right moment. The event can
+- `src/components/install/installStorage.ts` (20 lines) : Remembers that Aya already offered to install Haraya. Storage can throw in private
+- `src/components/install/useInstallPrompt.ts` (19 lines) : src/components/install module: useInstallPrompt
 
 ## src/components/layout/
 
