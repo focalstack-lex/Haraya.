@@ -82,7 +82,7 @@ export const MoodCard: React.FC<MoodCardProps> = ({ onOpen, focusSession = null,
           type="button"
           onClick={act}
           aria-label={copy.aya}
-          className="absolute -left-[6px] top-0 w-[124px] h-[124px] pointer-events-auto aya-rise aya-tap"
+          className="absolute -left-[6px] -bottom-[12px] w-[124px] h-[124px] pointer-events-auto aya-rise aya-tap"
         >
           <AyaMascot pose="mood" size={124} alt="" />
         </button>
