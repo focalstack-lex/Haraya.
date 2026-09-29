@@ -22,7 +22,7 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({ activeTab, setActive
       <div className="dock relative mx-auto max-w-md pointer-events-auto">
         <div aria-hidden="true" className="dock-bar absolute inset-0 rounded-full" />
 
-        <div className="relative flex h-[58px] px-2 items-center">
+        <div className="relative flex h-[58px] px-1 items-center">
           {NAV_TABS.map((tab) => {
             const active = activeTab === tab.id;
             return (
@@ -48,7 +48,7 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({ activeTab, setActive
                   )}
                 </span>
                 <span
-                  className={`ios-caption leading-[13px] max-w-full truncate px-1 transition-colors duration-200 ${
+                  className={`ios-caption leading-[13px] max-w-full truncate transition-colors duration-200 ${
                     active ? 'font-semibold text-tint-ink' : 'font-medium text-ink-3'
                   }`}
                 >
