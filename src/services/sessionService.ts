@@ -67,6 +67,8 @@ let ready = false;
 let user: User | null = null;
 let profile: Profile | null = null;
 let recovering = false;
+/** Why an opened confirmation link did not sign the visitor in, until the app shows it once. */
+let linkError: string | null = null;
 let pendingConfirmation: PendingConfirmation | null = loadPendingConfirmation();
 
 function notify(): void {
@@ -166,6 +168,29 @@ export class UnconfirmedEmailError extends Error {
     super('Confirm your email first: open the link we sent you, then sign in.');
     this.name = 'UnconfirmedEmailError';
   }
+}
+
+/** Link types the app verifies itself: the sign-up confirmation (Supabase names it both ways). */
+const CONFIRMATION_LINK_TYPES = ['email', 'signup'] as const;
+type ConfirmationLinkType = (typeof CONFIRMATION_LINK_TYPES)[number];
+
+function isConfirmationLinkType(value: string | null): value is ConfirmationLinkType {
+  return CONFIRMATION_LINK_TYPES.some((type) => type === value);
+}
+
+/** Removes the one-time sign-in parameters from the address bar, keeping the hash route. */
+function cleanAuthParams(): void {
+  const params = new URLSearchParams(window.location.search);
+  let changed = false;
+  for (const key of ['code', 'token_hash', 'type']) {
+    if (params.has(key)) {
+      params.delete(key);
+      changed = true;
+    }
+  }
+  if (!changed) return;
+  const query = params.toString();
+  window.history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`);
 }
 
 /** Friendly wording for Supabase Auth errors; the raw message goes to the console only. */
@@ -285,12 +310,23 @@ export const sessionService = {
       return;
     }
 
+    // A confirmation email links to this site as ?token_hash=...&type=email, so the link shows Haraya's own
+    // domain and works on any device (no PKCE verifier needed). Verified before the session is read.
+    const params = new URLSearchParams(window.location.search);
+    const tokenHash = params.get('token_hash');
+    const linkType = params.get('type');
+    if (tokenHash && isConfirmationLinkType(linkType)) {
+      const { error: verifyError } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: linkType });
+      if (verifyError) {
+        console.warn('Haraya: confirmation link failed', verifyError.message);
+        linkError = 'That confirmation link has expired or was already used. Sign in, or send a new link.';
+      }
+    }
+
     const { data, error } = await supabase.auth.getSession();
     if (error) console.warn('Haraya: could not restore the sign-in session', error.message);
-    // A sign-in or reset link lands with ?code=...; the client exchanges it, then the URL is cleaned
-    if (new URLSearchParams(window.location.search).has('code')) {
-      window.history.replaceState(null, '', `${window.location.pathname}${window.location.hash}`);
-    }
+    // A sign-in or reset link lands with ?code=... (the client exchanges it); either way the URL is cleaned
+    cleanAuthParams();
     ready = true;
     await setUser(data.session?.user ?? null);
 
@@ -400,6 +436,13 @@ export const sessionService = {
   cancelPendingConfirmation(): void {
     clearPendingConfirmation();
     notify();
+  },
+
+  /** The reason an opened confirmation link failed, read once so the app can show it. */
+  takeLinkError(): string | null {
+    const message = linkError;
+    linkError = null;
+    return message;
   },
 
   /** This load is an email link or OAuth return whose session has not resolved yet. */
