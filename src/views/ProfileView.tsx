@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Star, Navigation, Edit3, ChevronRight, LogOut, LogIn, Compass, Store, ShieldCheck, Globe2, Lock, Smartphone } from 'lucide-react';
+import { Star, Navigation, Edit3, ChevronRight, LogOut, LogIn, Compass, Store, ShieldCheck, Globe2, Lock, Smartphone, SquarePlus } from 'lucide-react';
 import {
   TopoTrailIcon,
   AddSpotIcon,
@@ -38,6 +38,7 @@ interface ProfileViewProps {
   onSignOut: () => void;
   /** Replays the first-visit guided tour on Discover. */
   onStartTour?: () => void;
+  onInstallApp?: () => void;
   /** Opens a given tab, for example the passport after a Quick Stamp. `at` makes repeat requests distinct. */
   sectionRequest?: { section: ProfileSection; at: number } | null;
 }
@@ -158,6 +159,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   onOpenAdmin,
   onSignOut,
   onStartTour,
+  onInstallApp,
   sectionRequest,
 }) => {
   useCatalogVersion();
@@ -657,6 +659,19 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 <span className="flex-1 min-w-0">
                   <span className="block text-[15px] text-[#13191F]">Take the tour again</span>
                   <span className="block ios-footnote text-[#594C3D] truncate">A quick walk through Discover</span>
+                </span>
+                <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]/60" strokeWidth={2.5} />
+              </button>
+            )}
+
+            {onInstallApp && (
+              <button onClick={onInstallApp} className="ios-group-row ios-press">
+                <RowIcon>
+                  <SquarePlus className="w-4 h-4" strokeWidth={2} />
+                </RowIcon>
+                <span className="flex-1 min-w-0">
+                  <span className="block text-[15px] text-[#13191F]">Add Haraya to your home screen</span>
+                  <span className="block ios-footnote text-[#594C3D] truncate">Open me like an app, no app store</span>
                 </span>
                 <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]/60" strokeWidth={2.5} />
               </button>

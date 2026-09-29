@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-29 : commit 7df3de5 : fingerprint 5244c665b8b5c561
+Generated 2026-09-29 : commit c25b955 : fingerprint 907a071a045acb76
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -12,9 +12,9 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `index.html` (30 lines) : . module: index.html
 - `scripts/generate-code-map.mjs` (212 lines) : One-line purpose per file, inferred from its path and leading doc comment.
 - `scripts/verify-google-auth.mjs` (109 lines) : scripts module: verify-google-auth
-- `src/App.tsx` (810 lines) : Older links: the roaster portal is now the Place Portal.
-  - L63 : SharedList
-  - L89 : App
+- `src/App.tsx` (828 lines) : Older links: the roaster portal is now the Place Portal.
+  - L69 : SharedList
+  - L95 : App
 - `src/index.css` (825 lines) : src entry point
 - `src/main.tsx` (30 lines) : src entry point
 - `vite.config.ts` (42 lines) : . module: vite.config
@@ -91,6 +91,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/components/install/installPromptStore.ts` (62 lines) : Captures the browser's install prompt so Aya can offer it at the right moment. The event can
 - `src/components/install/InstallSheet.tsx` (150 lines) : Aya offers to put Haraya on the home screen. The variant follows the platform mode snapshot: a real
 - `src/components/install/installStorage.ts` (20 lines) : Remembers that Aya already offered to install Haraya. Storage can throw in private
+- `src/components/install/OfflineNotice.tsx` (31 lines) : src/components/install module: OfflineNotice
 - `src/components/install/useInstallPrompt.ts` (19 lines) : src/components/install module: useInstallPrompt
 
 ## src/components/layout/
@@ -289,11 +290,11 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/views/PlacePortalView.tsx` (680 lines) : What the portal offers, for visitors who are not signed in or have not applied.
   - L27 : PlacePortalViewProps
   - L583 : PlacePortalView
-- `src/views/ProfileView.tsx` (721 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
+- `src/views/ProfileView.tsx` (736 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
   - L27 : ProfileSection
   - L29 : ProfileViewProps
-  - L139 : StampEntry
-  - L150 : ProfileView
+  - L140 : StampEntry
+  - L151 : ProfileView
 - `src/views/SavedView.tsx` (319 lines) : Tasting journal: bookmarked cafes and beans, drop alerts, custom shareable lists.
   - L13 : SavedTab
   - L15 : SavedViewProps

@@ -32,6 +32,12 @@ import { ConfirmEmailView } from './views/ConfirmEmailView';
 import { LargeTitle, CityMenu } from './components/common/LargeTitle';
 import { GuidedTour } from './components/tour/GuidedTour';
 import { isTourDone, markTourDone } from './components/tour/tourStorage';
+import type { TourOutcome } from './components/tour/tourSteps';
+import { useInstallPrompt } from './components/install/useInstallPrompt';
+import { shouldOfferAfterTour, type InstallMode } from './components/install/installPlatform';
+import { hasOfferedInstall, markInstallOffered } from './components/install/installStorage';
+import { InstallSheet } from './components/install/InstallSheet';
+import { OfflineNotice } from './components/install/OfflineNotice';
 import { MoodCard } from './components/moodFinder/MoodCard';
 import { MoodFinderSheet } from './components/moodFinder/MoodFinderSheet';
 import type { MoodId } from './components/moodFinder/moods';
@@ -121,6 +127,8 @@ export const App: React.FC = () => {
 
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [isTourOpen, setIsTourOpen] = useState(false);
+  const install = useInstallPrompt();
+  const [installSheetMode, setInstallSheetMode] = useState<InstallMode | null>(null);
 
   // Mood finder sheet, the directions picker, and live walking navigation on the map
   const [moodSheet, setMoodSheet] = useState<{ open: boolean; mood: MoodId | null }>({ open: false, mood: null });
@@ -349,9 +357,15 @@ export const App: React.FC = () => {
     window.setTimeout(() => setIsTourOpen(true), 500);
   };
 
-  const finishTour = () => {
+  const finishTour = (outcome: TourOutcome) => {
     setIsTourOpen(false);
     markTourDone();
+    if (shouldOfferAfterTour({ outcome, alreadyOffered: hasOfferedInstall(), platform: install.platform, mode: install.mode })) {
+      markInstallOffered();
+      const mode = install.mode;
+      // Let the tour's dim layer clear before Aya's card slides up
+      window.setTimeout(() => setInstallSheetMode(mode), 400);
+    }
   };
 
   // Directions: the picker offers Haraya live navigation or a maps app
@@ -640,6 +654,8 @@ export const App: React.FC = () => {
         onOpenLogin={() => openLogin('profile')}
       />
 
+      <OfflineNotice />
+
       <NavigationDrawer
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
@@ -680,6 +696,7 @@ export const App: React.FC = () => {
             onOpenAdmin={openAdmin}
             onSignOut={handleSignOut}
             onStartTour={startTour}
+            onInstallApp={install.mode === 'installed' || install.mode === 'unavailable' ? undefined : () => setInstallSheetMode(install.mode)}
             sectionRequest={activeTab === 'saved' ? SAVED_SECTION_REQUEST : profileRequest}
           />
         )}
@@ -787,6 +804,7 @@ export const App: React.FC = () => {
       />
 
       <GuidedTour isOpen={isTourOpen} onFinish={finishTour} />
+      <InstallSheet mode={installSheetMode} onInstall={install.promptInstall} onClose={() => setInstallSheetMode(null)} />
 
       <FooterSection setActiveTab={setActiveTab} setSelectedCity={setSelectedCity} onAddSpot={openAddSpot} />
 
@@ -800,7 +818,7 @@ export const App: React.FC = () => {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         savedCount={savedCount}
-        isHidden={Boolean(selectedCafe || directionsFor || ratingCafe || isWelcomeOpen || moodSheet.open || checkInCafe || isEndSessionOpen)}
+        isHidden={Boolean(installSheetMode !== null || selectedCafe || directionsFor || ratingCafe || isWelcomeOpen || moodSheet.open || checkInCafe || isEndSessionOpen)}
       />
     </div>
   );
