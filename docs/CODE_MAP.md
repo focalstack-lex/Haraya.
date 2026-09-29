@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-29 : commit a4d9634 : fingerprint 9af3a508086329d1
+Generated 2026-09-29 : commit 1385621 : fingerprint 1d48198267ce26be
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -202,17 +202,17 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/services/placeService.ts` (206 lines) : Public listings (table cafes) and Place Portal applications (table place_applications). Listings are
 - `src/services/roasterService.ts` (115 lines) : Roaster-facing facade over the catalog: everything an approved roaster or
 - `src/services/sessionService.test.ts` (35 lines) : src/services module: sessionService.test
-- `src/services/sessionService.ts` (449 lines) : The signed-in account: Supabase Auth session plus the caller's row in public.profiles (role, status,
+- `src/services/sessionService.ts` (478 lines) : The signed-in account: Supabase Auth session plus the caller's row in public.profiles (role, status,
   - L14 : RESET_RETURN_TAB
   - L37 : PASSWORD_MIN_LENGTH
   - L46 : notify
   - L55 : rememberReturnTab
   - L64 : readReturnTab
   - L86 : getAuthRedirectUrl
-  - L119 : describeAuthError
-  - L144 : loadProfile
-  - L166 : setUser
-  - L172 : sessionService
+  - L127 : describeAuthError
+  - L152 : loadProfile
+  - L174 : setUser
+  - L180 : sessionService
 - `src/services/spotMapping.test.ts` (116 lines) : src/services module: spotMapping.test
 - `src/services/spotMapping.ts` (178 lines) : Community spot submissions: the row shape stored in Supabase (spot_submissions), the form input, the
 - `src/services/spotService.ts` (169 lines) : Add a Spot backed by Supabase (table spot_submissions). Row Level Security decides what each caller can
@@ -265,10 +265,10 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L14 : LandingViewProps
   - L104 : LandingView
 - `src/views/LegalView.tsx` (206 lines) : Privacy Notice and Terms. Statements of fact describe what the code does today; anything that needs a
-- `src/views/LoginView.tsx` (364 lines) : What the page is doing: the two account modes, the two email-link flows, and the new-password form.
+- `src/views/LoginView.tsx` (417 lines) : What the page is doing: the two account modes, the two email-link flows, and the new-password form.
   - L12 : LoginMode
   - L14 : LoginViewProps
-  - L63 : LoginView
+  - L85 : LoginView
 - `src/views/PlacePortalView.tsx` (680 lines) : What the portal offers, for visitors who are not signed in or have not applied.
   - L27 : PlacePortalViewProps
   - L583 : PlacePortalView

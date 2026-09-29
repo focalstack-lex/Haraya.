@@ -115,6 +115,14 @@ export function getAuthRedirectUrl(originOverride?: string): string {
   return 'https://www.haraya.space/';
 }
 
+/** Sign-in refused because the address was never confirmed; the caller can offer to resend the link. */
+export class UnconfirmedEmailError extends Error {
+  constructor() {
+    super('Confirm your email first: open the link we sent you, then sign in.');
+    this.name = 'UnconfirmedEmailError';
+  }
+}
+
 /** Friendly wording for Supabase Auth errors; the raw message goes to the console only. */
 function describeAuthError(message: string, fallback: string): string {
   const text = message.toLowerCase();
@@ -260,6 +268,7 @@ export const sessionService = {
     const { data, error } = await supabase.auth.signInWithPassword({ email: trimmed, password });
     if (error) {
       console.warn('Haraya: sign in failed', error.message);
+      if (error.message.toLowerCase().includes('email not confirmed')) throw new UnconfirmedEmailError();
       throw new Error(describeAuthError(error.message, 'Could not sign in. Check the email and password and try again.'));
     }
     await setUser(data.user);
@@ -295,6 +304,26 @@ export const sessionService = {
     if (!data.session) return { needsConfirmation: true };
     await setUser(data.user);
     return { needsConfirmation: false };
+  },
+
+  /**
+   * Sends the confirmation email again for an account that never opened the first one. Supabase rate-limits
+   * this per address, and answers the same way whether or not the address exists.
+   */
+  async resendConfirmation(email: string, returnTab: string = 'profile'): Promise<void> {
+    if (!supabase) throw new Error('Accounts are not available right now.');
+    const trimmed = email.trim().toLowerCase();
+    if (!EMAIL_PATTERN.test(trimmed)) throw new Error('Enter a valid email address.');
+    rememberReturnTab(returnTab);
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: trimmed,
+      options: { emailRedirectTo: getAuthRedirectUrl() },
+    });
+    if (error) {
+      console.warn('Haraya: resend confirmation failed', error.message);
+      throw new Error(describeAuthError(error.message, 'Could not resend the confirmation email. Try again.'));
+    }
   },
 
   /** Signs in or creates an account with Google via Supabase OAuth. */
