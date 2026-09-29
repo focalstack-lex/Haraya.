@@ -17,14 +17,12 @@ const desktopLinkClass =
 const activeCities = DAVAO_CITIES.filter((city) => city !== 'All Davao Region');
 
 /**
- * Global footer: Responsive layout tailored for both mobile and desktop.
- * On mobile (< lg), streamlines navigation by removing redundant tab links,
- * presents cities as comfortable touch-friendly filter chips, and elevates the
- * "Add a Spot" community callout into a prominent inset card.
+ * Footer for the landing page and the desktop app shell. Phones see the brand line and the legal row
+ * (landing only); the link columns appear from lg up. Inside the app on phones there is no footer.
  */
 export const FooterSection: React.FC<FooterSectionProps> = ({ setActiveTab, setSelectedCity, onAddSpot }) => {
   return (
-    <footer className="bg-[#FAF5EB] ios-hairline-t mt-12 pb-24 lg:pb-8" role="contentinfo">
+    <footer className="bg-[#FAF5EB] ios-hairline-t mt-12 pb-8" role="contentinfo">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 space-y-8 lg:space-y-0 lg:grid lg:grid-cols-4 lg:gap-10">
         
         {/* Brand Information */}
@@ -34,45 +32,6 @@ export const FooterSection: React.FC<FooterSectionProps> = ({ setActiveTab, setS
             Coffee, study spots and hidden gems across the Davao Region.
           </p>
         </div>
-
-        {/* Mobile Community Card (< lg) */}
-        <div className="lg:hidden bg-[#FFFDF9] rounded-2xl p-5 border border-[#594C3D]/10 ios-card-shadow space-y-3">
-          <div>
-            <h3 className="text-[15px] font-semibold text-[#13191F]">Know a hidden spot?</h3>
-            <p className="text-[13.5px] text-[#594C3D] leading-relaxed mt-1">
-              Share a quiet corner or study cafe not on the map yet. Haraya reviews every spot first.
-            </p>
-          </div>
-          <button
-            onClick={onAddSpot}
-            className="w-full h-11 px-5 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[15px] font-semibold hover:bg-[#7D5C3D] flex items-center justify-center gap-1.5 ios-press"
-          >
-            Add a Spot
-            <ArrowUpRight className="w-4 h-4" strokeWidth={2.2} />
-          </button>
-        </div>
-
-        {/* Mobile City Directory (< lg) */}
-        <nav aria-label="Cities directory" className="lg:hidden space-y-3">
-          <h3 className="text-[12px] font-semibold text-[#13191F] tracking-wider uppercase font-sans">
-            Browse by City
-          </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-1">
-            {activeCities.map((city) => (
-              <button
-                key={city}
-                onClick={() => {
-                  setSelectedCity(city);
-                  setActiveTab('feed');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                className="min-h-10 text-left text-[14px] text-[#594C3D] hover:text-[#13191F] active:text-[#13191F] transition-colors ios-press flex items-center"
-              >
-                {city}
-              </button>
-            ))}
-          </div>
-        </nav>
 
         {/* Desktop Navigation Links (>= lg only) */}
         <nav aria-label="Explore pages" className="hidden lg:block">

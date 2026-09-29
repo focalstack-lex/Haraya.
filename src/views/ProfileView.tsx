@@ -267,7 +267,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-4 sm:py-6 space-y-6">
-      <LargeTitle title="Your Passport" />
+      <LargeTitle title="Passport" />
 
       {/* Account, ledger totals and privacy */}
       <div className="ios-group ios-card-shadow">
@@ -709,6 +709,20 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]/60" strokeWidth={2.5} />
               </button>
             )}
+          </div>
+        </section>
+
+        <section className="space-y-1.5">
+          <h3 className="px-4 text-[13px] text-ink-2">About</h3>
+          <div className="ios-group">
+            <a href="#/tab/privacy" className="ios-group-row ios-press">
+              <span className="flex-1 min-w-0 text-[15px] text-ink">Privacy Notice</span>
+              <ChevronRight className="w-4 h-4 shrink-0 text-ink-3/60" strokeWidth={2.5} />
+            </a>
+            <a href="#/tab/terms" className="ios-group-row ios-press">
+              <span className="flex-1 min-w-0 text-[15px] text-ink">Terms of Use</span>
+              <ChevronRight className="w-4 h-4 shrink-0 text-ink-3/60" strokeWidth={2.5} />
+            </a>
           </div>
         </section>
 

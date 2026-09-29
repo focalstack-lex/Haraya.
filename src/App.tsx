@@ -807,9 +807,11 @@ export const App: React.FC = () => {
       <GuidedTour isOpen={isTourOpen} onFinish={finishTour} />
       <InstallSheet mode={installSheetMode} onInstall={install.promptInstall} onClose={() => setInstallSheetMode(null)} />
 
-      <FooterSection setActiveTab={setActiveTab} setSelectedCity={setSelectedCity} onAddSpot={openAddSpot} />
+      {/* Desktop only: on phones the dock navigates and Passport carries the legal links */}
+      <div className="hidden lg:block">
+        <FooterSection setActiveTab={setActiveTab} setSelectedCity={setSelectedCity} onAddSpot={openAddSpot} />
+      </div>
 
-      <div className="h-[92px] lg:hidden" aria-hidden="true" />
       {activeFocus && <div className="h-14" aria-hidden="true" />}
 
       <FloatingFocusBanner onFinish={() => setIsEndSessionOpen(true)} isHidden={isWelcomeOpen} />
