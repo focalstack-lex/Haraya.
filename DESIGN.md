@@ -175,8 +175,10 @@ Color is information. The tint marks the one active or primary thing in a region
 
 ## Catalog spots without a full record
 
-- `src/data/digosCafes.ts`: 27 Digos City coffee shops from OpenStreetMap (ODbL), carrying only what the source
-  states: name, map position and street. The card and sheet say "Hours not listed", use the no-photo placeholder
+- `src/data/digosCafes.ts`: 14 Digos City coffee shops chosen by Lex from Google Maps (2026-09-29), carrying only
+  what the sources state: name, street as listed and an exact map position (OpenStreetMap, or decoded from the plus
+  code on the listing with `reports/digos-cafes/decode-plus-code.py`, or a listing page's stated coordinates).
+  Poblacion Coffee and Kofhi wait for a position. The card and sheet say "Hours not listed", use the no-photo placeholder
   and show no price (`priceLevel: 0`, which the mood finder never treats as cheap and never filters out). Nothing is
   guessed: no description, hours, menu, Wi-Fi or barangay. When a spot is checked, move it to `spots.ts` with the
-  full record. Rebuild with `reports/digos-cafes/build-digos-cafes.py`.
+  full record.

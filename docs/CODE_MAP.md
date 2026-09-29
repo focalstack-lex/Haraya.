@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-29 : commit e7bcbb6 : fingerprint 9d56d06002e91706
+Generated 2026-09-29 : commit 003b253 : fingerprint b5769cf5f09e05e8
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -153,7 +153,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/data/
 
-- `src/data/digosCafes.ts` (91 lines) : Coffee shops in Digos City found on OpenStreetMap (ODbL, (c) OpenStreetMap contributors), searched on
+- `src/data/digosCafes.ts` (82 lines) : Digos City coffee shops chosen by Lex from Google Maps on 2026-09-29 (names and streets as that listing shows
 - `src/data/spots.ts` (61 lines) : Curated spots listed by the Haraya team, shown ahead of roaster and community listings. Every field comes
 - `src/data/trails.ts` (8 lines) : Curated coffee trails. Empty until real trails are set up: each entry lists at least two cafe ids that
 
