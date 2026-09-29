@@ -1,11 +1,12 @@
-import type { Cafe, WeeklyHours } from '../types/coffee';
+import type { Cafe, Weekday, WeeklyHours } from '../types/coffee';
 
 /**
  * Digos City coffee shops chosen by Lex from Google Maps on 2026-09-29 (names and streets as that listing shows
  * them). Map positions are exact: from OpenStreetMap, or decoded from the plus code printed on the Google listing
  * (`reports/digos-cafes/decode-plus-code.py`). The sources state a name, a street and a position, so that is all
- * these listings carry: no hours, price, menu, Wi-Fi or description. The app shows what is missing as missing:
- * "Hours not listed", no price, and the no-photo placeholder for a spot without photos. Photos are the ones Lex
+ * these listings carry: no price, menu, Wi-Fi or description, and hours only where a source states them (below).
+ * The app shows what is missing as missing: "Hours not listed", no price, and the no-photo placeholder for a spot
+ * without photos. Photos are the ones Lex
  * collected into `Haraya Files/Haraya Coffee Spots/<Shop> Digos/`, converted to WebP by
  * `reports/digos-cafes/convert-photos.py` into `public/spots/<slug>/`. Kofhi's photo is converted and waiting. When a spot's facts are checked (a Google
  * Business listing, the owner, a visit), move it to `spots.ts` with the full record.
@@ -66,6 +67,35 @@ const NO_HOURS: WeeklyHours = {
   Sunday: { open: null, close: null },
 };
 
+type Window = [open: string, close: string];
+const WEEKDAYS: Weekday[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+/** One window per day; a close at or before the open runs past midnight (10:00 to 01:00). */
+const week = (windows: Record<Weekday, Window>): WeeklyHours =>
+  Object.fromEntries(WEEKDAYS.map((day) => [day, { open: windows[day][0], close: windows[day][1] }])) as WeeklyHours;
+
+const same = (open: string, close: string): Record<Weekday, Window> =>
+  Object.fromEntries(WEEKDAYS.map((day) => [day, [open, close] as Window])) as Record<Weekday, Window>;
+
+/**
+ * Weekly hours by spot id, read on 2026-09-29 from the restaurantguru.com listing for each shop (Google Business
+ * data, updated within the last two months), and checked against the "Open, closes at" line Lex's Google Maps
+ * screenshots showed the same day. A spot with no source found is not listed here and keeps "Hours not listed":
+ * Lil' Ben Coffee House, Cely's Cafe, Infinitea, Cool Brews. Hours change; re-check before trusting them long term.
+ */
+const HOURS: Record<string, WeeklyHours> = {
+  // G&Co. Cafe: daily 10AM-10PM (screenshot: Closes 10 PM)
+  'osm-w1431054042': week(same('10:00', '22:00')),
+  // Café Vicente: Sun-Thu 10AM-8PM, Fri-Sat 8:30AM-9PM (screenshot: Closes 8 PM)
+  'osm-n13168672184': week({ ...same('10:00', '20:00'), Friday: ['08:30', '21:00'], Saturday: ['08:30', '21:00'] }),
+  // The Tipsy Butter: Mon-Sat 9AM-7PM, Sun 9AM-5PM (a single listing; the screenshot showed no status)
+  'digos-the-tipsy-butter': week({ ...same('09:00', '19:00'), Sunday: ['09:00', '17:00'] }),
+  // Kaffeeneology: Mon-Sat 10AM-1AM, Sun 1PM-10PM (screenshot: Closes 1 AM)
+  'digos-kaffeeneology': week({ ...same('10:00', '01:00'), Sunday: ['13:00', '22:00'] }),
+  // The Nook: Mon-Sat 10AM-10PM, Sun 1PM-10PM (also stated in mid-2025 posts; screenshot: Closes 10 PM)
+  'digos-the-nook': week({ ...same('10:00', '22:00'), Sunday: ['13:00', '22:00'] }),
+};
+
 /** Stable URL handle from the name and the id, so two branches of one shop never collide. */
 const handleFor = (spot: ListedCafe) =>
   `${spot.name.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}-${spot.id}`;
@@ -89,7 +119,7 @@ export const DIGOS_CAFES: Cafe[] = DIGOS_LISTED_CAFES.map((spot) => ({
   wifiMbps: 0,
   brewMethods: [],
   priceLevel: 0,
-  hours: NO_HOURS,
+  hours: HOURS[spot.id] ?? NO_HOURS,
   vibeTags: [],
   verified: false,
   saveCount: 0,
