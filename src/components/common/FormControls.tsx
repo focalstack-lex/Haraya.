@@ -219,8 +219,10 @@ export const PrimaryButton: React.FC<{
   type?: 'button' | 'submit';
   disabled?: boolean;
   className?: string;
-}> = ({ children, onClick, type = 'button', disabled, className = '' }) => (
+  ref?: React.Ref<HTMLButtonElement>;
+}> = ({ children, onClick, type = 'button', disabled, className = '', ref }) => (
   <button
+    ref={ref}
     type={type}
     onClick={onClick}
     disabled={disabled}

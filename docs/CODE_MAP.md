@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-29 : commit 6dac360 : fingerprint c1e1cca344622ef2
+Generated 2026-09-29 : commit 7df3de5 : fingerprint 5244c665b8b5c561
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -50,7 +50,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L244 : AyaMascot
 - `src/components/common/BrandLogo.tsx` (36 lines) : Haraya logo cut from the brand master (Haraya Files/LOGO.webp) with the background keyed out,
 - `src/components/common/CustomIcons.tsx` (242 lines) : Haraya Custom Icon Set: high-precision vector icons tailored for the Davao
-- `src/components/common/FormControls.tsx` (270 lines) : Shared form primitives for Haraya: an iOS-style sheet (bottom sheet with a
+- `src/components/common/FormControls.tsx` (272 lines) : Shared form primitives for Haraya: an iOS-style sheet (bottom sheet with a
 - `src/components/common/ImageUploadField.tsx` (83 lines) : File input that stores the image as a dataURL with type and size validation.
 - `src/components/common/LargeTitle.tsx` (46 lines) : iOS large title: the first thing on every primary page, left aligned.
 - `src/components/common/WelcomeModal.tsx` (160 lines) : What the app does, stated plainly: one row per real surface.
@@ -89,6 +89,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/components/install/installPlatform.ts` (27 lines) : src/components/install module: installPlatform
 - `src/components/install/installPromptStore.test.ts` (91 lines) : src/components/install module: installPromptStore.test
 - `src/components/install/installPromptStore.ts` (62 lines) : Captures the browser's install prompt so Aya can offer it at the right moment. The event can
+- `src/components/install/InstallSheet.tsx` (150 lines) : Aya offers to put Haraya on the home screen. The variant follows the platform mode snapshot: a real
 - `src/components/install/installStorage.ts` (20 lines) : Remembers that Aya already offered to install Haraya. Storage can throw in private
 - `src/components/install/useInstallPrompt.ts` (19 lines) : src/components/install module: useInstallPrompt
 
