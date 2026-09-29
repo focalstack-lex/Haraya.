@@ -186,6 +186,9 @@ export const App: React.FC = () => {
           catalogService.recordView(pendingCafe.id);
           userPrefsService.pushRecentView(pendingCafe.id);
         }
+        // An expired or reused confirmation link says so, instead of landing silently as a guest
+        const linkError = sessionService.takeLinkError();
+        if (linkError) setSessionToast({ text: linkError, tone: 'error' });
         // Back from an email link or OAuth sign-in: a reset link opens the new-password form, a sign-in link its origin tab
         const returnTab = sessionService.peekReturnTab();
         if (returnTab === RESET_RETURN_TAB) {

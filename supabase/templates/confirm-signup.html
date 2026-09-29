@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Confirm your email</title>
+</head>
+<body style="margin:0; padding:0; background-color:#FAF5EB;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#FAF5EB;">
+    <tr>
+      <td align="center" style="padding:32px 16px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:480px;">
+          <tr>
+            <td align="center" style="padding:0 0 20px 0;">
+              <img src="{{ .SiteURL }}/brand/haraya-wordmark.png" width="120" height="67" alt="Haraya" style="display:block; width:120px; height:auto; border:0;">
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color:#FFFDF9; border-radius:20px; padding:32px 28px; font-family:Arial, Helvetica, sans-serif;">
+              <h1 style="margin:0 0 12px 0; font-size:24px; line-height:1.25; font-weight:700; color:#13191F;">Confirm your email</h1>
+              <p style="margin:0 0 24px 0; font-size:16px; line-height:1.55; color:#594C3D;">
+                You created a Haraya account with this address. Confirm it to save spots, keep your passport and add hidden gems around Davao.
+              </p>
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td align="center" bgcolor="#906D4B" style="border-radius:9999px;">
+                    <a href="{{ .SiteURL }}/?token_hash={{ .TokenHash }}&type=email" style="display:inline-block; padding:14px 28px; font-size:16px; line-height:1; font-weight:700; color:#FFFDF9; text-decoration:none;">Confirm email address</a>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin:24px 0 0 0; font-size:13px; line-height:1.5; color:#6E6150;">
+                If the button does not work, copy this link into your browser:<br>
+                <a href="{{ .SiteURL }}/?token_hash={{ .TokenHash }}&type=email" style="color:#7D5C3D; word-break:break-all;">{{ .SiteURL }}/?token_hash={{ .TokenHash }}&type=email</a>
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding:20px 16px 0 16px; font-family:Arial, Helvetica, sans-serif; font-size:12px; line-height:1.5; color:#6E6150;">
+              You are receiving this because someone signed up at haraya.space with this address. If that was not you, ignore this email and no account is created.<br>
+              Haraya: Davao Coffee and Study Spot Guide
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
