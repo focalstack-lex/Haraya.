@@ -23,6 +23,7 @@ import {
 import type { Cafe, AmenityKey, Bean } from '../../types/coffee';
 import { AMENITY_LABELS } from '../../types/coffee';
 import { Modal, ModalHeader } from '../common/FormControls';
+import { GROUP, SECTION_LABEL } from '../common/sheetStyles';
 import { isOpenNow, hoursTodayLabel, hasListedHours } from '../../utils/calendar';
 import { catalogService } from '../../services/catalogService';
 import { useCatalogVersion } from '../../hooks/useServiceVersions';
@@ -43,9 +44,6 @@ const AMENITY_ICONS: Record<AmenityKey, React.ComponentType<{ className?: string
   oatMilk: Milk,
 };
 
-/** Grouped list on the white sheet: the linen canvas tone lets the inset group read as a group. */
-const GROUP = 'ios-group bg-[#FAF5EB]';
-const SECTION_LABEL = 'px-4 text-[13px] text-[#594C3D] font-sans';
 const SECONDARY_ACTION =
   'h-11 px-3 rounded-full ios-fill text-[#7D5C3D] text-[15px] font-semibold font-sans inline-flex items-center justify-center gap-2 hover:bg-[#766046]/20 ios-press';
 

@@ -122,7 +122,7 @@ export const ModalHeader: React.FC<{
 }> = ({ title, subtitle, onClose }) => {
   const labelId = useContext(ModalLabelContext);
   return (
-    <div className="sticky top-0 z-10 ios-material-bar ios-hairline-b px-4 sm:px-6 pt-5 sm:pt-4 pb-3 flex items-start justify-between gap-3">
+    <div className="sticky top-0 z-10 bg-surface ios-hairline-b px-4 sm:px-6 pt-5 sm:pt-4 pb-3 flex items-start justify-between gap-3">
       <div className="min-w-0 pt-1">
         <h2 id={labelId} className="font-cooper text-[19px] sm:text-xl font-bold text-[#13191F] leading-tight truncate">{title}</h2>
         {subtitle && <p className="ios-footnote text-[#594C3D] mt-0.5 truncate">{subtitle}</p>}

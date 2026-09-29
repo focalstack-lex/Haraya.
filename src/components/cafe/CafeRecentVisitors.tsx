@@ -6,6 +6,7 @@ import { sessionService } from '../../services/sessionService';
 import { useVisitVersion, useSessionVersion } from '../../hooks/useServiceVersions';
 import { communityPulse, formatDuration, NOISE_LEVELS, timeAgo, type Visit } from '../../services/visitMapping';
 import { CupClinkIcon } from '../common/CustomIcons';
+import { GROUP, SECTION_LABEL } from '../common/sheetStyles';
 
 const NOISE_WORD: Record<string, string> = Object.fromEntries(NOISE_LEVELS.map((level) => [level.id, level.label.toLowerCase()]));
 
@@ -64,10 +65,10 @@ export const CafeRecentVisitors: React.FC<{ cafe: Cafe }> = ({ cafe }) => {
 
   return (
     <section className="space-y-1.5" aria-labelledby={`scouts-${cafe.id}`}>
-      <h3 id={`scouts-${cafe.id}`} className="px-4 text-[13px] text-[#594C3D] font-sans">
+      <h3 id={`scouts-${cafe.id}`} className={SECTION_LABEL}>
         Recent scouts and students
       </h3>
-      <div className="ios-group bg-[#FAF5EB]">
+      <div className={GROUP}>
         {pulse && (
           <div className="ios-group-row">
             <Volume1 className="w-4.5 h-4.5 text-[#906D4B] shrink-0" />
