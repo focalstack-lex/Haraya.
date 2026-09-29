@@ -5,6 +5,7 @@ import type { GeoPoint } from '../../utils/geo';
 import { formatKm } from '../../utils/geo';
 import { Chip, Modal, ModalHeader } from '../common/FormControls';
 import { AyaMascot } from '../common/AyaMascot';
+import { LocationHelp } from '../common/LocationHelp';
 import { EMPTY_REQUEST, MOODS, MUST_HAVES, type MoodId, type MoodRequest, type MustHaveId } from './moods';
 import { interpretRequest } from './parseQuery';
 import { scoreCafes, type Match, type Weather } from './scoreCafes';
@@ -150,6 +151,8 @@ export const MoodFinderSheet: React.FC<MoodFinderSheetProps> = ({
         return `Location is off. Distances from ${cityLabel} center.`;
       case 'unavailable':
         return `Location unavailable. Distances from ${cityLabel} center.`;
+      case 'insecure':
+        return `Location can't be used here. Distances from ${cityLabel} center.`;
       default:
         return `Distances from ${cityLabel} center`;
     }
@@ -251,17 +254,25 @@ export const MoodFinderSheet: React.FC<MoodFinderSheetProps> = ({
             </span>
             {location.status === 'granted' ? (
               <Check className="w-5 h-5 text-[#3E5C48]" aria-hidden="true" />
-            ) : (
+            ) : location.status === 'insecure' ? null : (
+              // Tapping brings up the browser's own "allow location" prompt the first time
               <button
                 onClick={location.request}
                 disabled={location.status === 'locating'}
-                className="h-9 px-3.5 rounded-full ios-fill text-[14px] font-semibold text-[#7D5C3D] inline-flex items-center gap-1.5 ios-press disabled:opacity-60"
+                className="h-9 px-3.5 shrink-0 rounded-full ios-fill text-[14px] font-semibold text-[#7D5C3D] inline-flex items-center gap-1.5 ios-press disabled:opacity-60"
               >
                 {location.status === 'locating' && <Loader2 className="w-4 h-4 animate-spin" />}
-                Near me
+                {location.status === 'denied' || location.status === 'unavailable' ? 'Try again' : 'Turn on location'}
               </button>
             )}
           </div>
+          {(location.status === 'denied' || location.status === 'unavailable' || location.status === 'insecure') && (
+            <div className="ios-group-row">
+              {/* Lines the steps up with the text above, past the icon */}
+              <span className="w-4.5 shrink-0" aria-hidden="true" />
+              <LocationHelp problem={location.status} />
+            </div>
+          )}
           {weather && (
             <div className="ios-group-row">
               <CloudRain className="w-4.5 h-4.5 shrink-0 text-[#906D4B]" />

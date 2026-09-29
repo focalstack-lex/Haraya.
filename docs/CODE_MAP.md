@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-29 : commit a177197 : fingerprint afa433d3a2a5698e
+Generated 2026-09-29 : commit 4a809b0 : fingerprint 7a4e10967dd6bed3
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -54,6 +54,9 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/components/common/FormControls.tsx` (272 lines) : Shared form primitives for Haraya: an iOS-style sheet (bottom sheet with a
 - `src/components/common/ImageUploadField.tsx` (83 lines) : File input that stores the image as a dataURL with type and size validation.
 - `src/components/common/LargeTitle.tsx` (46 lines) : iOS large title: the first thing on every primary page, left aligned.
+- `src/components/common/locationFix.test.ts` (37 lines) : src/components/common module: locationFix.test
+- `src/components/common/locationFix.ts` (46 lines) : Which set of steps fits the visitor's device.
+- `src/components/common/LocationHelp.tsx` (34 lines) : Why Haraya cannot see the visitor's location, with the steps for their device to turn it on.
 - `src/components/common/WelcomeModal.tsx` (160 lines) : What the app does, stated plainly: one row per real surface.
 
 ## src/components/community/
@@ -104,10 +107,10 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/map/
 
-- `src/components/map/DavaoCoffeeMap.tsx` (966 lines) : Floating map control: a round bar-material button inside a 44px hit area.
-  - L54 : RowHandlers
-  - L127 : DavaoCoffeeMapProps
-  - L145 : DavaoCoffeeMap
+- `src/components/map/DavaoCoffeeMap.tsx` (962 lines) : Floating map control: a round bar-material button inside a 44px hit area.
+  - L55 : RowHandlers
+  - L128 : DavaoCoffeeMapProps
+  - L146 : DavaoCoffeeMap
 - `src/components/map/DirectionsActionSheet.tsx` (58 lines) : External map apps. Apple Maps uses its https form so the link also works outside Apple devices.
 - `src/components/map/liveNavMath.test.ts` (71 lines) : src/components/map module: liveNavMath.test
 - `src/components/map/liveNavMath.ts` (63 lines) : Pure math for in-app walking navigation. These straight-line figures are the fallback when no street route
@@ -127,9 +130,9 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 - `src/components/moodFinder/MoodCard.tsx` (106 lines) : Late evening, when "open late" matters: 8 PM to 4 AM on the device clock.
 - `src/components/moodFinder/moodCardState.test.ts` (34 lines) : src/components/moodFinder module: moodCardState.test
-- `src/components/moodFinder/MoodFinderSheet.tsx` (352 lines) : The mood finder: say how you feel and what you need, get three explained picks and a route.
-  - L16 : MoodFinderSheetProps
-  - L39 : MoodFinderSheet
+- `src/components/moodFinder/MoodFinderSheet.tsx` (363 lines) : The mood finder: say how you feel and what you need, get three explained picks and a route.
+  - L17 : MoodFinderSheetProps
+  - L40 : MoodFinderSheet
 - `src/components/moodFinder/MoodResultCard.tsx` (83 lines) : One suggestion: why it fits (real catalog facts), how far, how long it stays open, what to order.
 - `src/components/moodFinder/moods.ts` (44 lines) : Moods rank cafes softly; must-haves filter strictly. See docs/superpowers/specs/2026-09-28-mood-finder-design.md.
 - `src/components/moodFinder/moodStorage.ts` (25 lines) : Remembers the last chosen must-haves. Storage can throw or hold stale values, so reads validate.
@@ -137,7 +140,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/components/moodFinder/parseQuery.ts` (85 lines) : Deterministic reading of a typed request ("quiet place to study, not too pricey, near Matina").
 - `src/components/moodFinder/scoreCafes.test.ts` (167 lines) : src/components/moodFinder module: scoreCafes.test
 - `src/components/moodFinder/scoreCafes.ts` (236 lines) : The mood finder's matcher. Pure: the same catalog, request and context always give the same
-- `src/components/moodFinder/useLocation.ts` (37 lines) : Asks for the visitor's position only when request() is called (the "Near me" tap).
+- `src/components/moodFinder/useLocation.ts` (70 lines) : insecure: the page is not https (or localhost), so the browser refuses location before asking anyone.
 - `src/components/moodFinder/weather.ts` (63 lines) : Current Davao weather from Open-Meteo (free, no key). Fixed city coordinates, never the
 
 ## src/components/passport/

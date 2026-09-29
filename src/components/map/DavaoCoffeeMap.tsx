@@ -30,6 +30,7 @@ import { ROUTE_ATTRIBUTION, useWalkingRoute } from './walkingRoute';
 import { externalMapLinks } from './DirectionsActionSheet';
 import { AyaMascot } from '../common/AyaMascot';
 import { Chip } from '../common/FormControls';
+import { LocationHelp } from '../common/LocationHelp';
 import { LargeTitle } from '../common/LargeTitle';
 
 const DAVAO_CENTER: [number, number] = [7.19, 125.55];
@@ -682,7 +683,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({
           </div>
 
           {/* Why the nearby spots are not showing yet, kept small under the map */}
-          {!navTarget && (!online || locationStatus === 'locating' || locationStatus === 'denied' || locationStatus === 'unavailable') && (
+          {!navTarget && (!online || locationStatus !== 'idle' && locationStatus !== 'granted') && (
             <div role="status" className="ios-group flex items-center gap-2.5 px-4 py-2.5 text-[14px] leading-snug text-[#594C3D]">
               {!online ? (
                 <>
@@ -691,15 +692,10 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({
                 </>
               ) : locationStatus === 'locating' ? (
                 <span>Finding the cafes near you</span>
-              ) : locationStatus === 'denied' ? (
-                <span>Location is off for Haraya. Allow it in your browser settings to see the cafes near you.</span>
               ) : (
-                <>
-                  <span className="flex-1">Haraya couldn't find your location.</span>
-                  <button onClick={showNearMe} className="shrink-0 h-8 px-3 rounded-full ios-fill text-[14px] font-semibold text-[#7D5C3D] ios-press">
-                    Try again
-                  </button>
-                </>
+                (locationStatus === 'denied' || locationStatus === 'unavailable' || locationStatus === 'insecure') && (
+                  <LocationHelp problem={locationStatus} onRetry={showNearMe} />
+                )
               )}
             </div>
           )}
