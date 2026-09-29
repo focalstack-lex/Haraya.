@@ -5,7 +5,7 @@ import { LargeTitle } from '../components/common/LargeTitle';
 import { AyaMascot } from '../components/common/AyaMascot';
 import { GoogleIcon } from '../components/common/CustomIcons';
 import { ErrorNote, Field, PrimaryButton, SecondaryButton, TextInput } from '../components/common/FormControls';
-import { PASSWORD_MIN_LENGTH, UnconfirmedEmailError, sessionService } from '../services/sessionService';
+import { PASSWORD_MIN_LENGTH, sessionService } from '../services/sessionService';
 import { useSessionVersion } from '../hooks/useServiceVersions';
 
 /** What the page is doing: the two account modes, the two email-link flows, and the new-password form. */
@@ -29,16 +29,8 @@ const TITLES: Record<LoginMode, { title: string; subtitle: string }> = {
   reset: { title: 'New password', subtitle: 'Choose a password you will remember.' },
 };
 
-/** Sent-email confirmation shown after a magic link, a reset link or an unconfirmed sign-up. */
-const SentCard: React.FC<{
-  email: string;
-  body: string;
-  onSignIn?: () => void;
-  /** Sign-up only: sends the confirmation link again for an inbox that never got it. */
-  onResend?: () => void;
-  resent?: boolean;
-  busy?: boolean;
-}> = ({ email, body, onSignIn, onResend, resent = false, busy = false }) => (
+/** Sent-email note shown after a magic link or a reset link. An unconfirmed sign-up gets ConfirmEmailView instead. */
+const SentCard: React.FC<{ email: string; body: string; onSignIn?: () => void }> = ({ email, body, onSignIn }) => (
   <div className={`${CARD} space-y-4`} role="status">
     <div className="flex items-start gap-3">
       <div className="w-10 h-10 rounded-full bg-[#906D4B]/10 flex items-center justify-center shrink-0">
@@ -49,20 +41,6 @@ const SentCard: React.FC<{
         <p className="text-[14px] text-[#594C3D] leading-relaxed">
           We sent a verification link to <span className="font-semibold text-[#13191F]">{email}</span>. {body}
         </p>
-        {onResend && (
-          <p className="text-[13px] text-[#594C3D] pt-1">
-            {resent ? (
-              'Sent again. Check your spam folder too.'
-            ) : (
-              <>
-                Nothing there after a minute?{' '}
-                <button type="button" onClick={onResend} disabled={busy} className={`${LINK} min-h-9 disabled:opacity-50`}>
-                  Send the link again
-                </button>
-              </>
-            )}
-          </p>
-        )}
       </div>
     </div>
     {onSignIn && (
@@ -91,10 +69,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
   const [name, setName] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const [sent, setSent] = useState<{ email: string; body: string; confirmation?: boolean } | null>(null);
-  /** The address that signed in before confirming: the error gains a resend action. */
-  const [unconfirmedEmail, setUnconfirmedEmail] = useState<string | null>(null);
-  const [resent, setResent] = useState(false);
+  const [sent, setSent] = useState<{ email: string; body: string } | null>(null);
 
   const user = sessionService.getUser();
   const recovering = sessionService.isRecovering();
@@ -112,8 +87,6 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
     setMode(next);
     setError('');
     setSent(null);
-    setUnconfirmedEmail(null);
-    setResent(false);
     setConfirmPassword('');
   };
 
@@ -121,12 +94,10 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
     if (busy) return;
     setBusy(true);
     setError('');
-    setUnconfirmedEmail(null);
     try {
       await action();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : failure);
-      if (cause instanceof UnconfirmedEmailError) setUnconfirmedEmail(email.trim());
     } finally {
       setBusy(false);
     }
@@ -156,28 +127,10 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
         throw new Error('Passwords do not match.');
       }
       const { needsConfirmation } = await sessionService.signUpWithPassword(email, password, trimmedName);
-      if (needsConfirmation) {
-        setSent({
-          email: email.trim(),
-          body: 'Open the confirmation link in your inbox on this device, then come back and sign in.',
-          confirmation: true,
-        });
-        return;
-      }
+      // Waiting on the confirmation link: the session service marks it and the app shows ConfirmEmailView
+      if (needsConfirmation) return;
       onSignedIn();
     }, 'Could not create the account.');
-
-  /** Sends the confirmation link again, from the sent card or from an unconfirmed sign-in attempt. */
-  const resendConfirmation = (address: string) =>
-    run(async () => {
-      await sessionService.resendConfirmation(address);
-      setResent(true);
-      setSent({
-        email: address,
-        body: 'Open the confirmation link in your inbox on this device, then come back and sign in.',
-        confirmation: true,
-      });
-    }, 'Could not resend the confirmation email.');
 
   const sendMagic = () =>
     run(async () => {
@@ -277,9 +230,6 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
           email={sent.email}
           body={sent.body}
           onSignIn={() => switchMode('signin')}
-          onResend={sent.confirmation ? () => void resendConfirmation(sent.email) : undefined}
-          resent={resent}
-          busy={busy}
         />
       ) : (
         <form
@@ -354,14 +304,6 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
           )}
 
           {error && <ErrorNote message={error} />}
-          {unconfirmedEmail && (
-            <p className="text-[13px] text-[#594C3D] px-1">
-              Lost the email?{' '}
-              <button type="button" onClick={() => void resendConfirmation(unconfirmedEmail)} disabled={busy} className={`${LINK} min-h-9 disabled:opacity-50`}>
-                Send the confirmation link again
-              </button>
-            </p>
-          )}
 
           <PrimaryButton type="submit" disabled={busy} className="w-full">
             {busy

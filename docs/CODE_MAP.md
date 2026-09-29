@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-29 : commit 1385621 : fingerprint 1d48198267ce26be
+Generated 2026-09-29 : commit 6777193 : fingerprint e37768ff6884b687
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -12,9 +12,9 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `index.html` (30 lines) : . module: index.html
 - `scripts/generate-code-map.mjs` (212 lines) : One-line purpose per file, inferred from its path and leading doc comment.
 - `scripts/verify-google-auth.mjs` (109 lines) : scripts module: verify-google-auth
-- `src/App.tsx` (785 lines) : Older links: the roaster portal is now the Place Portal.
-  - L62 : SharedList
-  - L88 : App
+- `src/App.tsx` (810 lines) : Older links: the roaster portal is now the Place Portal.
+  - L63 : SharedList
+  - L89 : App
 - `src/index.css` (825 lines) : src entry point
 - `src/main.tsx` (13 lines) : src entry point
 - `vite.config.ts` (15 lines) : . module: vite.config
@@ -202,17 +202,21 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/services/placeService.ts` (206 lines) : Public listings (table cafes) and Place Portal applications (table place_applications). Listings are
 - `src/services/roasterService.ts` (115 lines) : Roaster-facing facade over the catalog: everything an approved roaster or
 - `src/services/sessionService.test.ts` (35 lines) : src/services module: sessionService.test
-- `src/services/sessionService.ts` (478 lines) : The signed-in account: Supabase Auth session plus the caller's row in public.profiles (role, status,
+- `src/services/sessionService.ts` (559 lines) : The signed-in account: Supabase Auth session plus the caller's row in public.profiles (role, status,
   - L14 : RESET_RETURN_TAB
   - L37 : PASSWORD_MIN_LENGTH
-  - L46 : notify
-  - L55 : rememberReturnTab
-  - L64 : readReturnTab
-  - L86 : getAuthRedirectUrl
-  - L127 : describeAuthError
-  - L152 : loadProfile
-  - L174 : setUser
-  - L180 : sessionService
+  - L40 : PendingConfirmation
+  - L50 : loadPendingConfirmation
+  - L72 : notify
+  - L77 : setPendingConfirmation
+  - L86 : clearPendingConfirmation
+  - L100 : rememberReturnTab
+  - L109 : readReturnTab
+  - L131 : getAuthRedirectUrl
+  - L172 : describeAuthError
+  - L197 : loadProfile
+  - L219 : setUser
+  - L227 : sessionService
 - `src/services/spotMapping.test.ts` (116 lines) : src/services module: spotMapping.test
 - `src/services/spotMapping.ts` (178 lines) : Community spot submissions: the row shape stored in Supabase (spot_submissions), the form input, the
 - `src/services/spotService.ts` (169 lines) : Add a Spot backed by Supabase (table spot_submissions). Row Level Security decides what each caller can
@@ -252,6 +256,8 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/utils/calendar.ts` (161 lines) : Calendar and clock helpers shared by roast drops, cafe hours, and the
 - `src/utils/geo.test.ts` (53 lines) : Meters per degree of latitude on the 6,371 km sphere.
 - `src/utils/geo.ts` (74 lines) : Distance and directions helpers for the coffee map and trails.
+- `src/utils/inbox.test.ts` (21 lines) : src/utils module: inbox.test
+- `src/utils/inbox.ts` (25 lines) : Where a visitor reads their mail, from the address they signed up with. Only providers with a stable web
 - `src/utils/router.ts` (83 lines) : Hash routes so cafes, beans, roasteries, drops, and shared lists have shareable
 - `src/utils/weekdays.ts` (13 lines) : Canonical weekday iteration order for hours tables.
 
@@ -261,14 +267,15 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L21 : AddSpotViewProps
   - L305 : AddSpotView
 - `src/views/CommunityView.tsx` (74 lines) : Cup Check community feed: one-to-three column masonry of today's brews.
+- `src/views/ConfirmEmailView.tsx` (126 lines) : The only screen an unconfirmed sign-up sees: it replaces the whole app (every tab, the portal included) until
 - `src/views/LandingView.tsx` (330 lines) : Landing page shown at the bare URL (see `isLandingEntry` in utils/router.ts). It showcases the app with real
   - L14 : LandingViewProps
   - L104 : LandingView
 - `src/views/LegalView.tsx` (206 lines) : Privacy Notice and Terms. Statements of fact describe what the code does today; anything that needs a
-- `src/views/LoginView.tsx` (417 lines) : What the page is doing: the two account modes, the two email-link flows, and the new-password form.
+- `src/views/LoginView.tsx` (359 lines) : What the page is doing: the two account modes, the two email-link flows, and the new-password form.
   - L12 : LoginMode
   - L14 : LoginViewProps
-  - L85 : LoginView
+  - L63 : LoginView
 - `src/views/PlacePortalView.tsx` (680 lines) : What the portal offers, for visitors who are not signed in or have not applied.
   - L27 : PlacePortalViewProps
   - L583 : PlacePortalView

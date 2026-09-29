@@ -28,6 +28,7 @@ import { RateCafeModal } from './components/cafe/RateCafeModal';
 import { WelcomeModal } from './components/common/WelcomeModal';
 import { AccountSetupModal } from './components/common/AccountSetupModal';
 import { LandingView } from './views/LandingView';
+import { ConfirmEmailView } from './views/ConfirmEmailView';
 import { LargeTitle, CityMenu } from './components/common/LargeTitle';
 import { GuidedTour } from './components/tour/GuidedTour';
 import { isTourDone, markTourDone } from './components/tour/tourStorage';
@@ -115,6 +116,8 @@ export const App: React.FC = () => {
   const [isWelcomeOpen, setIsWelcomeOpen] = useState<boolean>(() => !readWelcomed());
   // The bare URL opens on the landing page; deep links and sign-in returns go straight into the app
   const [isLanding, setIsLanding] = useState<boolean>(() => isLandingEntry());
+  // Which pending sign-up was let through to the sign-in form (its `at` stamp), if any
+  const [gateBypassAt, setGateBypassAt] = useState<number | null>(null);
 
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [isTourOpen, setIsTourOpen] = useState(false);
@@ -587,6 +590,28 @@ export const App: React.FC = () => {
       if (tab === 'feed' && !isTourDone()) startTour();
     }
   };
+
+  // An unconfirmed sign-up sees only the confirm-email screen, on every route, the landing page and the portal
+  // included. The one way past it is the sign-in form, for someone who confirmed on another device; a fresh
+  // "not confirmed" answer from Supabase re-stamps the pending state and closes that again.
+  const pendingConfirmation = sessionService.isAwaitingAuthReturn() ? null : sessionService.getPendingConfirmation();
+  const onGateSignIn = activeTab === LOGIN_TAB_ID && gateBypassAt === pendingConfirmation?.at;
+  if (pendingConfirmation && !onGateSignIn) {
+    return (
+      <ConfirmEmailView
+        email={pendingConfirmation.email}
+        onSignIn={() => {
+          setGateBypassAt(pendingConfirmation.at);
+          openLogin('profile');
+        }}
+        onChangeEmail={() => {
+          sessionService.cancelPendingConfirmation();
+          setLoginIntent({ mode: 'signup', returnTab: 'profile' });
+          setActiveTab(LOGIN_TAB_ID);
+        }}
+      />
+    );
+  }
 
   if (isLanding) {
     return (

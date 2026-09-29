@@ -153,3 +153,18 @@ Color is information. The tint marks the one active or primary thing in a region
 - Phone screens are real captures from the running app (`public/landing/*.jpg`, 375x812 at 2x, JPEG 78). Re-capture
   them when those screens change. No store badges (there is no native app), no eyebrow labels, no counts, no
   testimonials. In-page links scroll with buttons, never `#anchors`, because the hash is the app's router.
+
+## Confirm email screen
+
+- `src/views/ConfirmEmailView.tsx`. The only screen an unconfirmed sign-up sees: `App.tsx` returns it before the
+  landing page and before every tab (the Place Portal and Control Room included) while
+  `sessionService.getPendingConfirmation()` holds an address and nobody is signed in. The pending state is set when
+  sign-up returns no session or when Supabase answers a sign-in with "Email not confirmed", is kept in
+  `localStorage` for 24 hours, and ends when a session arrives.
+- Reading order: Aya `holding-cup`, the title, the address in primary ink, one tint button into the inbox
+  (`inboxFor` in `src/utils/inbox.ts`: Gmail, Outlook, Yahoo Mail, iCloud Mail; any other address gets a fill note
+  instead of a link, since `mailto:` opens a new message), a footnote about using the same device, then a grouped
+  list of the three ways out: send the link again, already confirmed (opens the sign-in form), wrong address (drops
+  the pending state and opens Create account). No nav bar, tab dock or footer.
+- It is a guide, not the lock. The lock is Supabase refusing a session to an unconfirmed address; clearing site
+  data or choosing "wrong address" returns the visitor to guest browsing, which has no account powers.

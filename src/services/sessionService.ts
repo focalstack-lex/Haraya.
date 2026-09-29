@@ -36,16 +36,61 @@ const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const PASSWORD_MIN_LENGTH = 8;
 
+/** An account that signed up on this device and has not opened its confirmation link yet. */
+export interface PendingConfirmation {
+  email: string;
+  /** When the link was last sent; also identifies this pending state. */
+  at: number;
+}
+
+const PENDING_CONFIRMATION_KEY = 'haraya_pending_confirmation';
+/** After a day the visitor is treated as a guest again; signing in still asks them to confirm. */
+const PENDING_CONFIRMATION_MAX_AGE_MS = 24 * 60 * 60 * 1000;
+
+function loadPendingConfirmation(): PendingConfirmation | null {
+  try {
+    const raw = localStorage.getItem(PENDING_CONFIRMATION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { email?: unknown; at?: unknown };
+    if (typeof parsed.email !== 'string' || typeof parsed.at !== 'number') return null;
+    return { email: parsed.email, at: parsed.at };
+  } catch {
+    return null;
+  }
+}
+
 const listeners = new Set<() => void>();
 let version = 0;
 let started = false;
+/** True once the stored session (or an email link's code) has been resolved on this load. */
+let ready = false;
 let user: User | null = null;
 let profile: Profile | null = null;
 let recovering = false;
+let pendingConfirmation: PendingConfirmation | null = loadPendingConfirmation();
 
 function notify(): void {
   version += 1;
   listeners.forEach((listener) => listener());
+}
+
+function setPendingConfirmation(email: string): void {
+  pendingConfirmation = { email, at: Date.now() };
+  try {
+    localStorage.setItem(PENDING_CONFIRMATION_KEY, JSON.stringify(pendingConfirmation));
+  } catch (error) {
+    console.warn('Haraya: could not remember the pending confirmation', error);
+  }
+}
+
+function clearPendingConfirmation(): void {
+  if (!pendingConfirmation) return;
+  pendingConfirmation = null;
+  try {
+    localStorage.removeItem(PENDING_CONFIRMATION_KEY);
+  } catch (error) {
+    console.warn('Haraya: could not clear the pending confirmation', error);
+  }
 }
 
 /**
@@ -173,6 +218,8 @@ async function loadProfile(): Promise<void> {
 
 async function setUser(next: User | null): Promise<void> {
   user = next;
+  // A session only exists for a confirmed address, so signing in ends the wait
+  if (next) clearPendingConfirmation();
   await loadProfile();
   notify();
 }
@@ -233,7 +280,10 @@ export const sessionService = {
   async start(): Promise<void> {
     if (started) return;
     started = true;
-    if (!supabase) return;
+    if (!supabase) {
+      ready = true;
+      return;
+    }
 
     const { data, error } = await supabase.auth.getSession();
     if (error) console.warn('Haraya: could not restore the sign-in session', error.message);
@@ -241,6 +291,7 @@ export const sessionService = {
     if (new URLSearchParams(window.location.search).has('code')) {
       window.history.replaceState(null, '', `${window.location.pathname}${window.location.hash}`);
     }
+    ready = true;
     await setUser(data.session?.user ?? null);
 
     supabase.auth.onAuthStateChange((event, session) => {
@@ -268,7 +319,12 @@ export const sessionService = {
     const { data, error } = await supabase.auth.signInWithPassword({ email: trimmed, password });
     if (error) {
       console.warn('Haraya: sign in failed', error.message);
-      if (error.message.toLowerCase().includes('email not confirmed')) throw new UnconfirmedEmailError();
+      if (error.message.toLowerCase().includes('email not confirmed')) {
+        // Right password, unconfirmed address: the app switches to the confirm-email screen
+        setPendingConfirmation(trimmed);
+        notify();
+        throw new UnconfirmedEmailError();
+      }
       throw new Error(describeAuthError(error.message, 'Could not sign in. Check the email and password and try again.'));
     }
     await setUser(data.user);
@@ -301,7 +357,11 @@ export const sessionService = {
     if (data.user && data.user.identities && data.user.identities.length === 0) {
       throw new Error('That email already has an account. Sign in instead.');
     }
-    if (!data.session) return { needsConfirmation: true };
+    if (!data.session) {
+      setPendingConfirmation(trimmed);
+      notify();
+      return { needsConfirmation: true };
+    }
     await setUser(data.user);
     return { needsConfirmation: false };
   },
@@ -324,6 +384,27 @@ export const sessionService = {
       console.warn('Haraya: resend confirmation failed', error.message);
       throw new Error(describeAuthError(error.message, 'Could not resend the confirmation email. Try again.'));
     }
+  },
+
+  /** The sign-up waiting on its confirmation link, while it is fresh and nobody is signed in. */
+  getPendingConfirmation(): PendingConfirmation | null {
+    if (!pendingConfirmation || user) return null;
+    if (Date.now() - pendingConfirmation.at > PENDING_CONFIRMATION_MAX_AGE_MS) {
+      clearPendingConfirmation();
+      return null;
+    }
+    return pendingConfirmation;
+  },
+
+  /** Drops the wait, for a mistyped address: the visitor can sign up again with another one. */
+  cancelPendingConfirmation(): void {
+    clearPendingConfirmation();
+    notify();
+  },
+
+  /** This load is an email link or OAuth return whose session has not resolved yet. */
+  isAwaitingAuthReturn(): boolean {
+    return arrivedFromAuthRedirect && !ready;
   },
 
   /** Signs in or creates an account with Google via Supabase OAuth. */
