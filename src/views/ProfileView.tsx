@@ -47,7 +47,7 @@ interface ProfileViewProps {
 const RowIcon: React.FC<{ children: React.ReactNode; tone?: 'tint' | 'red' }> = ({ children, tone = 'tint' }) => (
   <span
     className={`h-7.5 w-7.5 shrink-0 rounded-[8px] flex items-center justify-center ${
-      tone === 'red' ? 'bg-[#8C3A2E]/12 text-[#8C3A2E]' : 'bg-[#906D4B]/15 text-[#7D5C3D]'
+      tone === 'red' ? 'bg-danger/12 text-danger' : 'bg-tint/15 text-tint-ink'
     }`}
   >
     {children}
@@ -63,9 +63,9 @@ const EmptyState: React.FC<{ icon: React.ReactNode; title: string; body: string;
   actionLabel = 'Discover cafes',
 }) => (
   <div className="py-12 px-6 text-center flex flex-col items-center gap-2">
-    <span className="text-[#906D4B] mb-1">{icon}</span>
-    <h3 className="ios-title text-[19px] text-[#13191F]">{title}</h3>
-    <p className="text-[14px] text-[#594C3D] max-w-xs">{body}</p>
+    <span className="text-tint mb-1">{icon}</span>
+    <h3 className="ios-title text-[19px] text-ink">{title}</h3>
+    <p className="text-[14px] text-ink-2 max-w-xs">{body}</p>
     <PrimaryButton onClick={onAction} className="mt-3 w-full sm:w-auto">
       {actionLabel}
     </PrimaryButton>
@@ -84,7 +84,7 @@ const Visibility: React.FC<{ visit: Visit }> = ({ visit }) => {
       ? [Globe2, 'Public']
       : [Lock, 'Only me'];
   return (
-    <span className="ios-footnote text-[#594C3D] inline-flex items-center gap-1.5">
+    <span className="ios-footnote text-ink-2 inline-flex items-center gap-1.5">
       <Icon className="w-3.5 h-3.5" />
       {label}
     </span>
@@ -99,36 +99,36 @@ const DiaryEntry: React.FC<{ visit: Visit; now: Date; onOpen?: () => void }> = (
     visit.outletsStatus ? `Outlets: ${OUTLET_LABEL[visit.outletsStatus].toLowerCase()}` : null,
   ].filter((value): value is string => Boolean(value));
   return (
-    <article className="bg-[#FFFDF9] rounded-[20px] ios-card-shadow overflow-hidden">
+    <article className="bg-surface rounded-card ios-card-shadow overflow-hidden">
       <button onClick={onOpen} disabled={!onOpen} className="w-full p-4 pb-3 flex items-start gap-3 text-left ios-press disabled:active:scale-100">
-        <span className="h-10 w-10 shrink-0 rounded-full bg-[#906D4B]/15 text-[#7D5C3D] flex items-center justify-center">
+        <span className="h-10 w-10 shrink-0 rounded-full bg-tint/15 text-tint-ink flex items-center justify-center">
           {visit.sessionType === 'focus' ? <FocusTimerIcon className="w-5 h-5" /> : <RubberStampIcon className="w-5 h-5" />}
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block ios-headline text-[#13191F] truncate">{visit.cafeName}</span>
-          <span className="block ios-footnote text-[#594C3D] truncate">
+          <span className="block ios-headline text-ink truncate">{visit.cafeName}</span>
+          <span className="block ios-footnote text-ink-2 truncate">
             {visit.sessionType === 'focus' ? 'Focus session' : 'Quick stamp'} · {timeAgo(visit.createdAt, now)}
           </span>
         </span>
-        <span className="shrink-0 font-mono text-[17px] font-semibold text-[#13191F]">{formatDuration(visit.durationMinutes)}</span>
+        <span className="shrink-0 font-mono text-[17px] font-semibold text-ink">{formatDuration(visit.durationMinutes)}</span>
       </button>
       {(details.length > 0 || visit.notes) && (
         <div className="px-4 pb-3 space-y-2">
           {details.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
               {details.map((detail) => (
-                <span key={detail} className="h-7 inline-flex items-center px-2.5 rounded-full ios-fill text-[12px] font-medium text-[#13191F]">
+                <span key={detail} className="h-7 inline-flex items-center px-2.5 rounded-full ios-fill text-[12px] font-medium text-ink">
                   {detail}
                 </span>
               ))}
             </div>
           )}
-          {visit.notes && <p className="text-[14px] text-[#13191F] leading-relaxed break-words">{visit.notes}</p>}
+          {visit.notes && <p className="text-[14px] text-ink leading-relaxed break-words">{visit.notes}</p>}
         </div>
       )}
       <div className="px-4 py-2.5 ios-hairline-t flex items-center justify-between gap-3">
         <Visibility visit={visit} />
-        <span className="inline-flex items-center gap-1 text-[#594C3D]" aria-label={`${visit.clinksCount} Cup Clinks received`}>
+        <span className="inline-flex items-center gap-1 text-ink-2" aria-label={`${visit.clinksCount} Cup Clinks received`}>
           <CupClinkIcon className="w-4.5 h-4.5" />
           <span className="font-mono text-[14px] font-semibold">{visit.clinksCount}</span>
         </span>
@@ -267,32 +267,32 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-4 sm:py-6 space-y-6">
-      <LargeTitle title="Your Passport" />
+      <LargeTitle title="Passport" />
 
       {/* Account, ledger totals and privacy */}
       <div className="ios-group ios-card-shadow">
         <div className="ios-group-row py-3.5">
           <span
-            className="h-14 w-14 shrink-0 rounded-full bg-[#906D4B] text-[#FFFDF9] flex items-center justify-center text-[20px] font-semibold"
+            className="h-14 w-14 shrink-0 rounded-full bg-tint text-surface flex items-center justify-center text-[20px] font-semibold"
             aria-hidden="true"
           >
             {initials}
           </span>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <h2 className="text-[19px] font-semibold leading-tight text-[#13191F] truncate">{displayName}</h2>
+              <h2 className="text-[19px] font-semibold leading-tight text-ink truncate">{displayName}</h2>
               {portalRole === 'admin' && (
-                <span className="shrink-0 px-2 py-0.5 rounded-full bg-[#906D4B]/15 text-[#7D5C3D] text-[11px] font-semibold">
+                <span className="shrink-0 px-2 py-0.5 rounded-full bg-tint/15 text-tint-ink text-[11px] font-semibold">
                   Admin
                 </span>
               )}
               {portalRole === 'roaster' && (
-                <span className="shrink-0 px-2 py-0.5 rounded-full bg-[#3E5C48]/12 text-[#3E5C48] text-[11px] font-semibold">
+                <span className="shrink-0 px-2 py-0.5 rounded-full bg-ok/12 text-ok text-[11px] font-semibold">
                   Place owner
                 </span>
               )}
             </div>
-            <p className="ios-footnote text-[#594C3D] truncate mt-0.5">{displayEmail}</p>
+            <p className="ios-footnote text-ink-2 truncate mt-0.5">{displayEmail}</p>
           </div>
         </div>
 
@@ -302,8 +302,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               key={metric.label}
               className={`px-2 py-3 text-center flex flex-col-reverse justify-end gap-0.5 ${index > 0 ? 'shadow-[inset_0.5px_0_0_rgba(89,76,61,0.2)]' : ''}`}
             >
-              <dt className="text-[11px] leading-tight text-[#594C3D]">{metric.label}</dt>
-              <dd className="font-mono text-[20px] font-semibold leading-tight text-[#13191F]">{metric.value}</dd>
+              <dt className="text-[11px] leading-tight text-ink-2">{metric.label}</dt>
+              <dd className="font-mono text-[20px] font-semibold leading-tight text-ink">{metric.value}</dd>
             </div>
           ))}
         </dl>
@@ -312,8 +312,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           <div className="ios-group-row">
             <RowIcon>{passportPublic ? <Globe2 className="w-4 h-4" strokeWidth={2.2} /> : <Lock className="w-4 h-4" strokeWidth={2.2} />}</RowIcon>
             <span className="flex-1 min-w-0">
-              <span className="block text-[15px] text-[#13191F]">{passportPublic ? 'Public profile' : 'Private profile'}</span>
-              <span className="block ios-footnote text-[#594C3D]">
+              <span className="block text-[15px] text-ink">{passportPublic ? 'Public profile' : 'Private profile'}</span>
+              <span className="block ios-footnote text-ink-2">
                 {passportPublic ? 'Public sessions show on spot pages and can get Cup Clinks' : 'Only you see your sessions'}
               </span>
             </span>
@@ -324,9 +324,9 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               onClick={togglePrivacy}
               className="h-11 w-14 -mr-1 shrink-0 flex items-center justify-center"
             >
-              <span className={`relative h-[31px] w-[51px] rounded-full transition-colors ${passportPublic ? 'bg-[#3E5C48]' : 'bg-[#766046]/25'}`}>
+              <span className={`relative h-[31px] w-[51px] rounded-full transition-colors ${passportPublic ? 'bg-ok' : 'bg-shade/25'}`}>
                 <span
-                  className={`absolute top-[2px] h-[27px] w-[27px] rounded-full bg-[#FFFDF9] shadow-[0_2px_6px_rgba(19,25,31,0.2)] transition-[left] duration-200 ${
+                  className={`absolute top-[2px] h-[27px] w-[27px] rounded-full bg-surface shadow-[0_2px_6px_rgba(19,25,31,0.2)] transition-[left] duration-200 ${
                     passportPublic ? 'left-[22px]' : 'left-[2px]'
                   }`}
                 />
@@ -339,21 +339,21 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               <LogIn className="w-4 h-4" strokeWidth={2.2} />
             </RowIcon>
             <span className="flex-1 min-w-0">
-              <span className="block text-[15px] text-[#13191F]">Sign in or create an account</span>
-              <span className="block ios-footnote text-[#594C3D] truncate">Keep your passport, share sessions, list your place</span>
+              <span className="block text-[15px] text-ink">Sign in or create an account</span>
+              <span className="block ios-footnote text-ink-2 truncate">Keep your passport, share sessions, list your place</span>
             </span>
-            <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]/60" strokeWidth={2.5} />
+            <ChevronRight className="w-4 h-4 shrink-0 text-ink-3/60" strokeWidth={2.5} />
           </button>
         )}
       </div>
       {privacyError && (
-        <p role="alert" className="-mt-4 px-4 ios-footnote text-[#8C3A2E]">
+        <p role="alert" className="-mt-4 px-4 ios-footnote text-danger">
           {privacyError}
         </p>
       )}
 
       {/* Segmented control */}
-      <div className="flex p-0.5 rounded-[10px] ios-fill" role="tablist" aria-label="Passport sections">
+      <div className="flex p-0.5 rounded-control ios-fill" role="tablist" aria-label="Passport sections">
         {segments.map((entry) => {
           const active = section === entry.id;
           return (
@@ -368,10 +368,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 <motion.span
                   layoutId="profile-section-thumb"
                   transition={{ type: 'spring', stiffness: 500, damping: 38 }}
-                  className="absolute inset-0 rounded-[8px] bg-[#FFFDF9] shadow-[0_1px_4px_rgba(19,25,31,0.14),0_0_0_0.5px_rgba(19,25,31,0.04)]"
+                  className="absolute inset-0 rounded-[8px] bg-surface shadow-[0_1px_4px_rgba(19,25,31,0.14),0_0_0_0.5px_rgba(19,25,31,0.04)]"
                 />
               )}
-              <span className={`relative ${active ? 'text-[#13191F]' : 'text-[#594C3D]'}`}>
+              <span className={`relative ${active ? 'text-ink' : 'text-ink-2'}`}>
                 {entry.label}
                 <span className="font-mono"> ({entry.count})</span>
               </span>
@@ -406,19 +406,19 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       {/* Passport: stamps grouped by city */}
       {section === 'passport' && (
         <div className="space-y-6">
-          <div className="bg-[#FFFDF9] rounded-[20px] ios-card-shadow p-4 flex items-center gap-3">
+          <div className="bg-surface rounded-card ios-card-shadow p-4 flex items-center gap-3">
             <AyaMascot pose="stamp" size={92} alt="" className="-my-2" />
             <div className="min-w-0 flex-1 space-y-1.5">
-              <p className="ios-headline text-[#13191F]">
+              <p className="ios-headline text-ink">
                 <span className="font-mono">{stats.stamps.size}</span> of <span className="font-mono">{totalSpots}</span> spots stamped
               </p>
               <div className="h-1.5 rounded-full ios-fill overflow-hidden" aria-hidden="true">
                 <div
-                  className="h-full rounded-full bg-[#906D4B]"
+                  className="h-full rounded-full bg-tint"
                   style={{ width: `${totalSpots ? Math.round((stats.stamps.size / totalSpots) * 100) : 0}%` }}
                 />
               </div>
-              <p className="ios-footnote text-[#594C3D]">A stamp inks in when you check in within 120 m of the spot.</p>
+              <p className="ios-footnote text-ink-2">A stamp inks in when you check in within 120 m of the spot.</p>
             </div>
           </div>
 
@@ -429,14 +429,14 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               return (
                 <section key={entry.city} className="space-y-2" aria-labelledby={`passport-${entry.city}`}>
                   <div className="px-4 flex items-baseline justify-between gap-3">
-                    <h3 id={`passport-${entry.city}`} className="ios-headline text-[#13191F]">
+                    <h3 id={`passport-${entry.city}`} className="ios-headline text-ink">
                       {entry.city}
                     </h3>
-                    <span className="ios-footnote text-[#594C3D]">
+                    <span className="ios-footnote text-ink-2">
                       <span className="font-mono">{stamped}</span> of <span className="font-mono">{entry.stamps.length}</span>
                     </span>
                   </div>
-                  <ul className="grid grid-cols-3 sm:grid-cols-4 gap-x-2 gap-y-4 bg-[#FFFDF9] rounded-[20px] ios-card-shadow px-2 py-4">
+                  <ul className="grid grid-cols-3 sm:grid-cols-4 gap-x-2 gap-y-4 bg-surface rounded-card ios-card-shadow px-2 py-4">
                     {entry.stamps.map((stamp) => (
                       <li key={stamp.id} className="min-w-0">
                         <button
@@ -451,8 +451,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                             seed={stamp.id}
                             className="w-full h-auto max-w-[96px]"
                           />
-                          <span className="block w-full px-0.5 text-[12px] font-medium leading-tight text-[#13191F] truncate">{stamp.name}</span>
-                          <span className="block text-[11px] leading-tight text-[#594C3D]">
+                          <span className="block w-full px-0.5 text-[12px] font-medium leading-tight text-ink truncate">{stamp.name}</span>
+                          <span className="block text-[11px] leading-tight text-ink-2">
                             {stamp.stampedAt
                               ? new Date(stamp.stampedAt).toLocaleDateString('en-PH', { month: 'short', day: 'numeric' })
                               : 'Not yet'}
@@ -466,9 +466,9 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             })}
 
           {unchartedCities.length > 0 && (
-            <p className="px-4 ios-footnote text-[#594C3D]">
+            <p className="px-4 ios-footnote text-ink-2">
               No spots listed yet in {unchartedCities.join(', ')}. Know one?{' '}
-              <button onClick={onOpenAuth ?? onExploreFeed} className="font-semibold text-[#7D5C3D] underline underline-offset-2">
+              <button onClick={onOpenAuth ?? onExploreFeed} className="font-semibold text-tint-ink underline underline-offset-2">
                 Add a spot
               </button>
             </p>
@@ -492,7 +492,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 const openNow = isOpenNow(cafe.hours);
                 const hoursKnown = hasListedHours(cafe.hours);
                 return (
-                  <article key={cafe.id} className="bg-[#FFFDF9] rounded-[20px] ios-card-shadow overflow-hidden">
+                  <article key={cafe.id} className="bg-surface rounded-card ios-card-shadow overflow-hidden">
                     <button
                       onClick={() => onSelectCafe(cafe.id)}
                       className="w-full flex items-center gap-3 p-3 text-left ios-press active:scale-[0.99]"
@@ -501,23 +501,23 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                         src={cafe.images[0]}
                         alt=""
                         loading="lazy"
-                        className="h-16 w-16 rounded-[12px] object-cover shrink-0 bg-[#13191F]"
+                        className="h-16 w-16 rounded-row object-cover shrink-0 bg-ink"
                       />
                       <span className="min-w-0 flex-1 space-y-0.5">
-                        <span className="block ios-headline text-[#13191F] truncate">{cafe.name}</span>
-                        <span className="block ios-footnote text-[#594C3D] truncate">
+                        <span className="block ios-headline text-ink truncate">{cafe.name}</span>
+                        <span className="block ios-footnote text-ink-2 truncate">
                           {cafe.district}, {cafe.city} ·{' '}
-                          <span className={!hoursKnown ? 'text-[#594C3D]' : openNow ? 'text-[#3E5C48] font-medium' : 'text-[#8C3A2E]'}>
+                          <span className={!hoursKnown ? 'text-ink-2' : openNow ? 'text-ok font-medium' : 'text-danger'}>
                             {!hoursKnown ? 'Hours not listed' : openNow ? `Open · ${hoursTodayLabel(cafe.hours)}` : 'Closed'}
                           </span>
                         </span>
                         {cafe.signature && (
-                          <span className="block ios-footnote text-[#594C3D] truncate">
-                            Signature: <span className="text-[#13191F] font-medium">{cafe.signature}</span>
+                          <span className="block ios-footnote text-ink-2 truncate">
+                            Signature: <span className="text-ink font-medium">{cafe.signature}</span>
                           </span>
                         )}
                       </span>
-                      <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]/60" strokeWidth={2.5} />
+                      <ChevronRight className="w-4 h-4 shrink-0 text-ink-3/60" strokeWidth={2.5} />
                     </button>
 
                     <div className="flex ios-hairline-t">
@@ -525,21 +525,21 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                         href={directionsUrl([{ lat: cafe.lat, lng: cafe.lng }])}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`${actionClass} text-[#7D5C3D]`}
+                        className={`${actionClass} text-tint-ink`}
                       >
                         <Navigation className="w-4 h-4" />
                         Directions
                       </a>
                       <button
                         onClick={() => setRatingCafe(cafe)}
-                        className={`${actionClass} text-[#7D5C3D] shadow-[inset_0.5px_0_0_rgba(89,76,61,0.2)]`}
+                        className={`${actionClass} text-tint-ink shadow-[inset_0.5px_0_0_rgba(89,76,61,0.2)]`}
                       >
                         <Star className="w-4 h-4" />
                         Rate
                       </button>
                       <button
                         onClick={() => userPrefsService.toggleSavedCafe(cafe)}
-                        className={`${actionClass} text-[#8C3A2E] shadow-[inset_0.5px_0_0_rgba(89,76,61,0.2)]`}
+                        className={`${actionClass} text-danger shadow-[inset_0.5px_0_0_rgba(89,76,61,0.2)]`}
                         title="Remove from saved"
                       >
                         Remove
@@ -553,14 +553,14 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
           {ratedCafes.length > 0 && (
             <section className="space-y-1.5">
-              <h3 className="px-4 text-[13px] text-[#594C3D]">Rated cafes</h3>
+              <h3 className="px-4 text-[13px] text-ink-2">Rated cafes</h3>
               <div className="space-y-3">
                 {ratedCafes.map((cafe) => {
                   const userRating = ratings[cafe.id];
                   const openNow = isOpenNow(cafe.hours);
                   const hoursKnown = hasListedHours(cafe.hours);
                   return (
-                    <article key={cafe.id} className="bg-[#FFFDF9] rounded-[20px] ios-card-shadow overflow-hidden">
+                    <article key={cafe.id} className="bg-surface rounded-card ios-card-shadow overflow-hidden">
                       <button
                         onClick={() => onSelectCafe(cafe.id)}
                         className="w-full flex items-center gap-3 p-3 text-left ios-press active:scale-[0.99]"
@@ -569,26 +569,26 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                           src={cafe.images[0]}
                           alt=""
                           loading="lazy"
-                          className="h-16 w-16 rounded-[12px] object-cover shrink-0 bg-[#13191F]"
+                          className="h-16 w-16 rounded-row object-cover shrink-0 bg-ink"
                         />
                         <span className="min-w-0 flex-1 space-y-0.5">
                           <span className="flex items-center gap-2">
-                            <span className="ios-headline text-[#13191F] truncate">{cafe.name}</span>
-                            <span className="ml-auto inline-flex items-center gap-1 shrink-0 text-[#13191F]">
-                              <Star className="w-3.5 h-3.5 fill-[#CA9C68] text-[#CA9C68]" />
+                            <span className="ios-headline text-ink truncate">{cafe.name}</span>
+                            <span className="ml-auto inline-flex items-center gap-1 shrink-0 text-ink">
+                              <Star className="w-3.5 h-3.5 fill-star text-star" />
                               <span className="font-mono text-[13px] font-semibold">{userRating?.rating}.0</span>
                             </span>
                           </span>
-                          <span className="block ios-footnote text-[#594C3D] truncate">
+                          <span className="block ios-footnote text-ink-2 truncate">
                             {cafe.district}, {cafe.city} ·{' '}
-                            <span className={!hoursKnown ? 'text-[#594C3D]' : openNow ? 'text-[#3E5C48] font-medium' : 'text-[#8C3A2E]'}>
+                            <span className={!hoursKnown ? 'text-ink-2' : openNow ? 'text-ok font-medium' : 'text-danger'}>
                               {!hoursKnown ? 'Hours not listed' : openNow ? 'Open' : 'Closed'}
                             </span>
                           </span>
                           {userRating?.note ? (
-                            <span className="block ios-footnote text-[#13191F] italic truncate">"{userRating.note}"</span>
+                            <span className="block ios-footnote text-ink italic truncate">"{userRating.note}"</span>
                           ) : cafe.signature ? (
-                            <span className="block ios-footnote text-[#594C3D] truncate">Signature: {cafe.signature}</span>
+                            <span className="block ios-footnote text-ink-2 truncate">Signature: {cafe.signature}</span>
                           ) : null}
                         </span>
                       </button>
@@ -598,14 +598,14 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                           href={directionsUrl([{ lat: cafe.lat, lng: cafe.lng }])}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className={`${actionClass} text-[#7D5C3D]`}
+                          className={`${actionClass} text-tint-ink`}
                         >
                           <Navigation className="w-4 h-4" />
                           Directions
                         </a>
                         <button
                           onClick={() => setRatingCafe(cafe)}
-                          className={`${actionClass} text-[#7D5C3D] shadow-[inset_0.5px_0_0_rgba(89,76,61,0.2)]`}
+                          className={`${actionClass} text-tint-ink shadow-[inset_0.5px_0_0_rgba(89,76,61,0.2)]`}
                         >
                           <Edit3 className="w-4 h-4" />
                           Edit note
@@ -623,19 +623,19 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       {/* Account and places: always below the tabs */}
       <div className="space-y-6">
         <section className="space-y-1.5">
-          <h3 className="px-4 text-[13px] text-[#594C3D]">Explore</h3>
+          <h3 className="px-4 text-[13px] text-ink-2">Explore</h3>
           <div className="ios-group">
             <button onClick={onOpenMap ?? onExploreFeed} className="ios-group-row ios-press">
               <RowIcon>
                 <TopoTrailIcon className="w-4.5 h-4.5" />
               </RowIcon>
               <span className="flex-1 min-w-0">
-                <span className="block text-[15px] text-[#13191F]">Map and spots</span>
-                <span className="block ios-footnote text-[#594C3D] truncate">
+                <span className="block text-[15px] text-ink">Map and spots</span>
+                <span className="block ios-footnote text-ink-2 truncate">
                   Curated regional walking and tasting routes
                 </span>
               </span>
-              <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]/60" strokeWidth={2.5} />
+              <ChevronRight className="w-4 h-4 shrink-0 text-ink-3/60" strokeWidth={2.5} />
             </button>
 
             <button onClick={onOpenAuth ?? onExploreFeed} className="ios-group-row ios-press">
@@ -643,12 +643,12 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 <AddSpotIcon className="w-4.5 h-4.5" />
               </RowIcon>
               <span className="flex-1 min-w-0">
-                <span className="block text-[15px] text-[#13191F]">Add a hidden spot</span>
-                <span className="block ios-footnote text-[#594C3D] truncate">
+                <span className="block text-[15px] text-ink">Add a hidden spot</span>
+                <span className="block ios-footnote text-ink-2 truncate">
                   Share a quiet corner that is not on the map yet
                 </span>
               </span>
-              <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]/60" strokeWidth={2.5} />
+              <ChevronRight className="w-4 h-4 shrink-0 text-ink-3/60" strokeWidth={2.5} />
             </button>
 
             {onStartTour && (
@@ -657,10 +657,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                   <Compass className="w-4 h-4" strokeWidth={2} />
                 </RowIcon>
                 <span className="flex-1 min-w-0">
-                  <span className="block text-[15px] text-[#13191F]">Take the tour again</span>
-                  <span className="block ios-footnote text-[#594C3D] truncate">A quick walk through Discover</span>
+                  <span className="block text-[15px] text-ink">Take the tour again</span>
+                  <span className="block ios-footnote text-ink-2 truncate">A quick walk through Discover</span>
                 </span>
-                <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]/60" strokeWidth={2.5} />
+                <ChevronRight className="w-4 h-4 shrink-0 text-ink-3/60" strokeWidth={2.5} />
               </button>
             )}
 
@@ -670,31 +670,31 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                   <SquarePlus className="w-4 h-4" strokeWidth={2} />
                 </RowIcon>
                 <span className="flex-1 min-w-0">
-                  <span className="block text-[15px] text-[#13191F]">Add Haraya to your home screen</span>
-                  <span className="block ios-footnote text-[#594C3D] truncate">Open me like an app, no app store</span>
+                  <span className="block text-[15px] text-ink">Add Haraya to your home screen</span>
+                  <span className="block ios-footnote text-ink-2 truncate">Open me like an app, no app store</span>
                 </span>
-                <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]/60" strokeWidth={2.5} />
+                <ChevronRight className="w-4 h-4 shrink-0 text-ink-3/60" strokeWidth={2.5} />
               </button>
             )}
           </div>
         </section>
 
         <section className="space-y-1.5">
-          <h3 className="px-4 text-[13px] text-[#594C3D]">Your place</h3>
+          <h3 className="px-4 text-[13px] text-ink-2">Your place</h3>
           <div className="ios-group">
             <button onClick={onOpenPortal} className="ios-group-row ios-press">
               <RowIcon>
                 <Store className="w-4 h-4" strokeWidth={2.2} />
               </RowIcon>
               <span className="flex-1 min-w-0">
-                <span className="block text-[15px] text-[#13191F]">
+                <span className="block text-[15px] text-ink">
                   {portalRole === 'roaster' ? 'Manage your listing' : 'List your cafe or study spot'}
                 </span>
-                <span className="block ios-footnote text-[#594C3D] truncate">
+                <span className="block ios-footnote text-ink-2 truncate">
                   {portalRole === 'roaster' ? 'Hours, amenities, menu and more' : 'Own a place? Get a verified listing'}
                 </span>
               </span>
-              <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]/60" strokeWidth={2.5} />
+              <ChevronRight className="w-4 h-4 shrink-0 text-ink-3/60" strokeWidth={2.5} />
             </button>
 
             {portalRole === 'admin' && (
@@ -703,12 +703,26 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                   <ShieldCheck className="w-4 h-4" strokeWidth={2.2} />
                 </RowIcon>
                 <span className="flex-1 min-w-0">
-                  <span className="block text-[15px] text-[#13191F]">Control Room</span>
-                  <span className="block ios-footnote text-[#594C3D] truncate">Review spots, applications and accounts</span>
+                  <span className="block text-[15px] text-ink">Control Room</span>
+                  <span className="block ios-footnote text-ink-2 truncate">Review spots, applications and accounts</span>
                 </span>
-                <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]/60" strokeWidth={2.5} />
+                <ChevronRight className="w-4 h-4 shrink-0 text-ink-3/60" strokeWidth={2.5} />
               </button>
             )}
+          </div>
+        </section>
+
+        <section className="space-y-1.5">
+          <h3 className="px-4 text-[13px] text-ink-2">About</h3>
+          <div className="ios-group">
+            <a href="#/tab/privacy" className="ios-group-row ios-press">
+              <span className="flex-1 min-w-0 text-[15px] text-ink">Privacy Notice</span>
+              <ChevronRight className="w-4 h-4 shrink-0 text-ink-3/60" strokeWidth={2.5} />
+            </a>
+            <a href="#/tab/terms" className="ios-group-row ios-press">
+              <span className="flex-1 min-w-0 text-[15px] text-ink">Terms of Use</span>
+              <ChevronRight className="w-4 h-4 shrink-0 text-ink-3/60" strokeWidth={2.5} />
+            </a>
           </div>
         </section>
 
@@ -718,7 +732,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
               <RowIcon tone="red">
                 <LogOut className="w-4 h-4" strokeWidth={2.2} />
               </RowIcon>
-              <span className="flex-1 min-w-0 text-[15px] text-[#8C3A2E]">Sign out</span>
+              <span className="flex-1 min-w-0 text-[15px] text-danger">Sign out</span>
             </button>
           </div>
         )}

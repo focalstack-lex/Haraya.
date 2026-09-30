@@ -38,8 +38,8 @@ The tokens live in `src/index.css`; this file is the contract behind them.
   `AyaMascot`, using only the master palette (roast #574835, tan #997247, cream #FFF6EE, steam #E7AC67, coffee
   #FFC183, ink #1D1203). No outlines, gradients or mouth. One pose per surface so she reads as a character, not a
   sticker: `welcome` (WelcomeModal, first tour step), `mood` (Discover mood card, a profile-style card on `--ios-surface`: title, one line and a single tint pill
-  that opens the finder, no mood chips; Aya stands at the right like a portrait, clipped by the card's bottom edge with
-  her ears breaking out above its top, no glow, and she keeps this one pose in every card state while the copy and
+  that opens the finder, no mood chips; Aya stands at the right like a portrait at 124px, clipped by the card's bottom
+  edge with her ears breaking out 28px above its top, no glow, and she keeps this one pose in every card state while the copy and
   button follow real state: focus session in progress (Finish session), late evening, empty passport; tapping her
   opens the finder too; also Mood Finder idle), `empty` (cafe, bean, saved, visited and mood
   no-match empty states, Add a Spot title), `welcome` again on the live navigation arrival card; `drops` belongs to the
@@ -56,29 +56,40 @@ The tokens live in `src/index.css`; this file is the contract behind them.
 
 ## Color
 
-| Token | Value | Role |
-| --- | --- | --- |
-| `--ios-bg` | `#FAF5EB` | Canvas (grouped background) |
-| `--ios-surface` | `#FFFDF9` | Cards, grouped rows, sheets |
-| `--ios-fill` | `rgba(118, 96, 70, 0.12)` | Search fields, segmented track, chips |
-| `--ios-separator` | `rgba(89, 76, 61, 0.2)` | 0.5px hairlines |
-| `--ios-label` | `#13191F` | Primary text |
-| `--ios-label-2` | `#594C3D` | Secondary text (7.6:1 on canvas) |
-| `--ios-label-3` | `#6E6150` | Placeholder and tertiary text (at least 4.5:1) |
-| `--ios-tint` | `#906D4B` | Filled controls, active icons |
-| `--ios-tint-text` | `#7D5C3D` | Tinted text and links (5.6:1 on canvas) |
-| `--ios-green` | `#3E5C48` | Open now, success |
-| `--ios-red` | `#8C3A2E` | Closed, destructive |
+| Token | Utility | Value | Role |
+| --- | --- | --- | --- |
+| `--color-canvas` | `bg-canvas` | `#FAF5EB` | Canvas (grouped background) |
+| `--color-surface` | `bg-surface` | `#FFFDF9` | Cards, grouped rows, sheets, the dock, text on tint |
+| `--color-sunken` | `bg-sunken` | `#F2EAE0` | Pressed or recessed surface |
+| `--color-hairline` | `border-hairline` | `#E4D9C8` | Solid hairline where a 0.5px separator cannot be used |
+| `--color-ink` | `text-ink` | `#13191F` | Primary text |
+| `--color-ink-2` | `text-ink-2` | `#594C3D` | Secondary text (7.6:1 on canvas) |
+| `--color-ink-3` | `text-ink-3` | `#6E6150` | Placeholder, tertiary text, inactive tabs (at least 4.5:1) |
+| `--color-tint` | `bg-tint` | `#906D4B` | Filled controls, active icons |
+| `--color-tint-ink` | `text-tint-ink` | `#7D5C3D` | Tinted text and links (5.6:1 on canvas) |
+| `--color-shade` | `bg-shade/20` | `#766046` | Hover and pressed fills, only with an opacity modifier |
+| `--color-ok` | `text-ok` | `#3E5C48` | Open now, success |
+| `--color-danger` | `text-danger` | `#8C3A2E` | Closed, destructive |
+| `--color-star` | `fill-star` | `#CA9C68` | Rating stars; dots and focus rings on dark bands. Never text on light |
+| `--color-steam` | `text-steam` | `#E7AC67` | Steam accent on the dark focus banner |
+
+The tokens are one `@theme` block at the top of `src/index.css`. Components use the utilities, never raw hex.
+Raw hex remains only where a class cannot reach: the Aya and logo SVG art, Leaflet pin HTML, the Google button
+brand colors and the blue "You" dot. `--ios-fill` (12% shade) and `--ios-separator` stay as the resting fill
+and the 0.5px separator.
 
 Color is information. The tint marks the one active or primary thing in a region.
 
 ## Shape and depth
 
-- Radii: 10px controls, 14px grouped rows and inputs, 20px cards and hero, 28px sheets (top).
-- Cards have no border. They sit on `--ios-surface` with `ios-card-shadow` (a soft 1px
-  plus 8px offset shadow).
-- Materials: `ios-material-bar` for nav and tab bars (78% linen, blur 20px, saturate 180%);
-  `ios-material-dark` for controls over photos (black 35%, blur 12px).
+- Radii: `rounded-control` 10px, `rounded-row` 14px (grouped rows, inputs, notices), `rounded-card` 20px (cards and
+  hero), `rounded-sheet` 28px (sheets). The segmented thumb is 8px, concentric inside its 10px track.
+- Cards have no border. They sit on `--color-surface` with `ios-card-shadow` (`--shadow-card`: 0.5px contact line
+  plus a soft 6px offset, 20px blur). Floating bars use `--shadow-float`, sheets `--shadow-sheet`.
+- Focus on fields is `focus:focus-ring`, a 2px tint ring.
+- Materials: `ios-material-bar` for the nav bar once content scrolls under it and for map overlays (78% linen, blur
+  20px, saturate 180%); `ios-material-dark` for controls over photos (black 35%, blur 12px). Sheet headers and the
+  tab dock are solid surface: translucent headers let tinted buttons show through while scrolling.
 - Hairlines are 0.5px (`ios-hairline-b`, `ios-hairline-t`), never 1px solid borders on chrome.
 
 ## Motion
@@ -95,20 +106,25 @@ Color is information. The tint marks the one active or primary thing in a region
   hairline once content scrolls under it.
 - **Large title:** each primary page opens with a left-aligned large title and one line of
   context (city picker on Discover).
-- **Tab bar (dock):** a floating bar, 64px tall with a 22px radius, inset 12px from the screen edges
-  above the safe area, on `--ios-surface` with a soft lifted shadow. The active tab sits on a tint arch
-  (`--ios-tint`, up to 68px wide): a semicircular top that rises 14px above the bar's top edge, straight
-  sides, and a base resting on the bar's bottom edge (8px corners so it stays inside the bar's radius on
-  narrow phones). It slides between tabs on `--ios-ease` (0.5s); its icon and label turn cream (#FFFDF9,
-  4.6:1 on the tint) and lift 5px to center in the arch. Inactive tabs use `--ios-label-3` (5.9:1 on the surface). Every tab
-  keeps its 24px icon and 10px label. Geometry is in px, not Tailwind spacing units, because the project
-  scales its spacing. No indicator lines.
+- **Tab bar (dock):** a floating pill, 58px tall, inset 16px from the screen edges above the safe area, on solid
+  `--color-surface` with `--shadow-float`. No border, no blur and no indicator line: the tint alone marks the
+  active tab (icon `--color-tint`, label `--color-tint-ink`, semibold). Inactive tabs use `--color-ink-3` (5.9:1).
+  Every tab keeps its 22px icon and 11px label; all four labels fit at 320px. The focus banner and toast offsets
+  in `index.css` assume the 58px height. Phones have no footer inside the app; the footer renders on the landing
+  page and from `lg` up, and Passport carries the Privacy Notice and Terms of Use rows.
 - **Segmented control:** fill track, white thumb that slides between segments.
+- **Filter panel** (`src/components/feed/VibeFilterBar.tsx`): Discover shows the segmented control, the spot count
+  and one filter button. The button opens an inline panel with Sort and Price menus and the must-have chips. Closed,
+  the panel shows only the choices in effect as chips that remove themselves, so nothing filters unseen. The badge
+  counts chips, a set price and a changed sort; Reset returns the sort to Newest too.
+- **Cafe card:** photo with the save button, name, area, price, open state and the viewer's own rating. No action
+  row: the whole card opens the spot sheet, where Directions is the one primary.
 - **Search field:** 36-40px tall, 10px radius, fill background, no border.
 - **Grouped list:** inset rows on `--ios-surface`, 14px radius container, hairline separators
   inset from the leading edge, chevron on navigable rows.
-- **Sheet:** grabber on phones, 28px top radius, header with a centered title and a round
-  close button.
+- **Sheet:** grabber on phones, 28px top radius, solid surface header with the title and a round close button.
+  A menu is one grouped list with category subheads, not a box per category. Shared group classes live in
+  `src/components/common/sheetStyles.ts`.
 - **Sanctuary passport** (spec `docs/superpowers/specs/2026-09-29-sanctuary-passport-and-focus-logs.md`):
   - Check-in sheet (`src/components/session/CheckInModal.tsx`): one fresh GPS fix, 120 m geofence. In range, two
     large rows: Start Focus Session (tint, the one primary) and Quick Stamp (fill). Out of range, the distance in
@@ -119,12 +135,13 @@ Color is information. The tint marks the one active or primary thing in a region
   - Passport stamp (`src/components/passport/PassportStamp.tsx`): double ring, spot name on the top arc, city on the
     bottom arc, cup mark and date. Stamped in `--ios-tint` (#906D4B) with an SVG turbulence filter for a worn
     woodblock edge and a small stable tilt; unvisited as a dotted ghost (#594C3D at 20%, lettering at 42%).
-  - Profile (`Your Passport`): three metrics (focus hours, sanctuaries, clinks) in tabular figures, a privacy
+  - Profile (tab and page both named `Passport`): three metrics (focus hours, sanctuaries, clinks) in tabular figures, a privacy
     switch (green when public), then Diary, Passport and Saved tabs. Account rows sit below the tabs.
   - Cup Clink (`CupClinkIcon`): two tipped cups; a filled tint wash marks a clink you sent.
 - **Mood finder** (`src/components/moodFinder/`): entry card on Discover, sheet with mood and must-have chips,
   describe field, location and weather group rows, result cards with the pick label as a dark-material pill on
-  the photo. Map routes draw a dotted tint line from a blue "You" dot (iOS location convention, the only blue in
+  the photo. Map tiles are OpenStreetMap, muted by the `haraya-tiles` filter (one tile layer in `src/components/map/tiles.ts`)
+  so pins carry the color. Map routes draw a dotted tint line from a blue "You" dot (iOS location convention, the only blue in
   the app: it means "your position").
 
 ## Touch and responsiveness

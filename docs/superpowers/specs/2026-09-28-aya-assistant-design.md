@@ -121,7 +121,7 @@ Sample voice:
 
 > Update 2026-09-29: Haraya pivoted to a coffee and study spot guide. Aya's app knowledge must follow the current
 > features: Discover (categories All, Study & Work, Quiet, Open Late; amenity shortcuts), Map & Spots with
-> in-app live navigation, Add a Spot (sign-in link, review before public, 5 per day), and Saved Spots. Roast
+> in-app live navigation, Add a Spot (sign-in link, review before public, 5 per day), and Passport. Roast
 > Drops, beans, the Roaster Suite and Cup Check are hidden; Aya should not send people to them. The lists
 > below predate the pivot and are kept for reference until the chat is built.
 

@@ -19,7 +19,7 @@ export const NAV_TABS: { id: string; label: string; icon: React.ComponentType<{ 
   { id: 'feed', label: 'Discover', icon: FeedIcon },
   { id: 'map', label: 'Map & Spots', icon: MapIcon },
   { id: SUBMIT_TAB_ID, label: 'Add a Spot', icon: AddSpotIcon },
-  { id: 'profile', label: 'Saved Spots', icon: SavedIcon },
+  { id: 'profile', label: 'Passport', icon: SavedIcon },
 ];
 
 interface NavigationHeaderProps {
@@ -52,12 +52,12 @@ const TabButton: React.FC<TabButtonProps> = ({ id, label, count, active, onSelec
     data-tour={`tab-${id}`}
     aria-current={active ? 'page' : undefined}
     className={`h-8 px-4 rounded-full text-[13px] font-semibold font-sans ios-press flex items-center gap-1.5 ${
-      active ? 'bg-[#FFFDF9] text-[#13191F] shadow-[0_1px_3px_rgba(19,25,31,0.12)]' : 'text-[#594C3D] hover:text-[#13191F]'
+      active ? 'bg-surface text-ink shadow-[0_1px_3px_rgba(19,25,31,0.12)]' : 'text-ink-2 hover:text-ink'
     }`}
   >
     {label}
     {count !== undefined && count > 0 && (
-      <span className="h-4 min-w-4 px-1 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[9px] font-bold flex items-center justify-center">
+      <span className="h-4 min-w-4 px-1 rounded-full bg-tint text-surface text-[11px] font-bold flex items-center justify-center">
         {count}
       </span>
     )}
@@ -95,7 +95,7 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
   return (
     <header
       className={`sticky top-0 z-50 transition-[background-color,box-shadow,backdrop-filter] duration-300 pt-[env(safe-area-inset-top)] ${
-        scrolled ? 'ios-material-bar ios-hairline-b' : 'bg-[#FAF5EB]'
+        scrolled ? 'ios-material-bar ios-hairline-b' : 'bg-canvas'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -128,23 +128,23 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
           {/* Right Actions */}
           <div className="flex items-center gap-2">
             {/* Unified Search & City Filter Capsule on Desktop */}
-            <div className={`${showBarSearch ? 'hidden md:flex' : 'hidden'} items-center ios-fill rounded-[10px] h-9 transition-colors overflow-hidden`}>
+            <div className={`${showBarSearch ? 'hidden md:flex' : 'hidden'} items-center ios-fill rounded-control h-9 transition-colors overflow-hidden`}>
               {showBarSearch && (
               <div className="relative flex items-center pl-2.5 pr-1">
-                <Search className="w-4 h-4 text-[#6E6150] shrink-0 pointer-events-none" />
+                <Search className="w-4 h-4 text-ink-3 shrink-0 pointer-events-none" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
                   placeholder="Search spots"
                   aria-label="Search cafes and study spots"
-                  className="w-28 lg:w-40 bg-transparent pl-2 pr-2 font-sans text-[13px] text-[#13191F] placeholder:text-[#6E6150] focus:outline-none"
+                  className="w-28 lg:w-40 bg-transparent pl-2 pr-2 font-sans text-[13px] text-ink placeholder:text-ink-3 focus:outline-none"
                 />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery('')}
                     aria-label="Clear search"
-                    className="h-4.5 w-4.5 rounded-full bg-[#6E6150]/70 text-[#FFFDF9] flex items-center justify-center mr-1"
+                    className="h-4.5 w-4.5 rounded-full bg-ink-3/70 text-surface flex items-center justify-center mr-1"
                   >
                     <X className="w-3 h-3" strokeWidth={3} />
                   </button>
@@ -152,13 +152,13 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
               </div>
               )}
 
-              {showBarSearch && <div className="h-4 w-px bg-[#594C3D]/20" />}
+              {showBarSearch && <div className="h-4 w-px bg-ink-2/20" />}
 
               <select
                 value={selectedCity}
                 onChange={(event) => setSelectedCity(event.target.value)}
                 aria-label="Filter by city"
-                className="bg-transparent appearance-none px-3 h-9 font-sans text-[13px] font-semibold text-[#7D5C3D] focus:outline-none cursor-pointer"
+                className="bg-transparent appearance-none px-3 h-9 font-sans text-[13px] font-semibold text-tint-ink focus:outline-none cursor-pointer"
               >
                 {DAVAO_CITIES.map((city) => (
                   <option key={city} value={city}>
@@ -173,25 +173,25 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
                 {/* Sign in and Get Started for guests */}
                 <button
                   onClick={onOpenLogin}
-                  className="hidden sm:inline-flex items-center h-9 px-4 rounded-full ios-fill text-[#7D5C3D] text-[13px] font-semibold font-sans hover:bg-[#766046]/20 ios-press"
+                  className="hidden sm:inline-flex items-center h-9 px-4 rounded-full ios-fill text-tint-ink text-[13px] font-semibold font-sans hover:bg-shade/20 ios-press"
                 >
                   Sign in
                 </button>
                 {onOpenWelcome && (
                   <button
                     onClick={onOpenWelcome}
-                    className="hidden sm:inline-flex items-center h-9 px-4 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[13px] font-semibold font-sans hover:bg-[#7D5C3D] ios-press"
+                    className="hidden sm:inline-flex items-center h-9 px-4 rounded-full bg-tint text-surface text-[13px] font-semibold font-sans hover:bg-tint-ink ios-press"
                   >
                     Get Started
                   </button>
                 )}
               </>
             ) : (
-              /* Account avatar: opens Saved Spots, where the account rows live */
+              /* Account avatar: opens Passport, where the account rows live */
               <button
                 onClick={() => setActiveTab('profile')}
                 aria-label={`Account: ${accountName ?? 'signed in'}`}
-                className="hidden lg:flex h-9 w-9 rounded-full bg-[#906D4B] text-[#FFFDF9] items-center justify-center text-[14px] font-semibold ios-press"
+                className="hidden lg:flex h-9 w-9 rounded-full bg-tint text-surface items-center justify-center text-[14px] font-semibold ios-press"
               >
                 {initial || 'H'}
               </button>
@@ -204,7 +204,7 @@ export const NavigationHeader: React.FC<NavigationHeaderProps> = ({
               aria-expanded={isDrawerOpen}
               className="lg:hidden h-11 w-11 -mr-1.5 rounded-full flex items-center justify-center ios-press"
             >
-              <span className="h-8.5 w-8.5 rounded-full ios-fill flex items-center justify-center text-[#13191F]">
+              <span className="h-8.5 w-8.5 rounded-full ios-fill flex items-center justify-center text-ink">
                 <Menu className="w-4.5 h-4.5" />
               </span>
             </button>

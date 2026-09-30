@@ -1,11 +1,45 @@
 @import "tailwindcss";
 
+/* Haraya tokens (see DESIGN.md). One layer: components use these names, never raw hex. */
+@theme {
+  --color-canvas: #FAF5EB;
+  --color-surface: #FFFDF9;
+  --color-sunken: #F2EAE0;
+  --color-hairline: #E4D9C8;
+  --color-ink: #13191F;
+  --color-ink-2: #594C3D;
+  --color-ink-3: #6E6150;
+  --color-tint: #906D4B;
+  --color-tint-ink: #7D5C3D;
+  /* Only with an opacity modifier (bg-shade/20): hover and pressed fills */
+  --color-shade: #766046;
+  --color-ok: #3E5C48;
+  --color-danger: #8C3A2E;
+  /* Rating stars, and dots and focus rings on dark bands. Never text on light surfaces (2.4:1). */
+  --color-star: #CA9C68;
+  --color-steam: #E7AC67;
+
+  --radius-control: 10px;
+  --radius-row: 14px;
+  --radius-card: 20px;
+  --radius-sheet: 28px;
+
+  --shadow-card: 0 0.5px 1px rgba(19, 25, 31, 0.06), 0 6px 20px -6px rgba(19, 25, 31, 0.14);
+  --shadow-float: 0 4px 24px -4px rgba(19, 25, 31, 0.12), 0 1px 3px rgba(19, 25, 31, 0.04);
+  --shadow-sheet: 0 -8px 40px rgba(19, 25, 31, 0.18);
+}
+
+/* Keyboard and field focus ring in the tint */
+@utility focus-ring {
+  box-shadow: 0 0 0 2px var(--color-tint);
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
     font-family: var(--font-ui);
-    background-color: #FAF5EB;
-    color: #13191F;
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
@@ -14,8 +48,8 @@
   body {
     margin: 0;
     padding: 0;
-    background-color: #FAF5EB;
-    color: #13191F;
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
     font-family: var(--font-ui);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -32,84 +66,32 @@
   input,
   textarea,
   select {
-    caret-color: #906D4B;
+    caret-color: var(--color-tint);
   }
 }
 
-/* Haraya River Styx, Tanned Wood & Amber Autumn Design Tokens.
-   - River Styx (#13191F): Deep obsidian slate for headings, dark cards, and rich contrast.
-   - Carbon Fibre (#2B2F2E): Dark slate neutral for borders and dark secondary surfaces.
-   - Afternoon Tea (#594C3D): Rich roasted coffee brown for secondary text and metadata.
-   - Tanned Wood (#906D4B): Warm chestnut caramel for primary actions, badges, and brand marks.
-   - Amber Autumn (#CA9C68): Glowing warm amber for ratings, highlights, and status accents.
-   - Canvas (#FAF5EB) & Surface (#FFFDF9): Clean, warm linen background and card canvas.
-   - Hairline (#E4D9C8) & Sub-surface (#F2EAE0): Soft taupe borders and input fills. */
+/* System face first so Apple devices render SF Pro; Plus Jakarta Sans carries the same role elsewhere. */
 :root {
-  --color-white: #FFFDF9;
-  --color-zinc-50: #FAF5EB;
-  --color-zinc-100: #F2EAE0;
-  --color-zinc-200: #E4D9C8;
-  --color-zinc-300: #D8CCA8;
-  --color-zinc-400: #9E917F;
-  --color-zinc-500: #594C3D;
-  --color-zinc-600: #483E31;
-  --color-zinc-700: #383027;
-  --color-zinc-800: #2B2F2E;
-  --color-zinc-900: #1D242B;
-  --color-zinc-950: #13191F;
-  --color-amber-50: #FAF5EB;
-  --color-amber-100: #F2EAE0;
-  --color-amber-200: #E4D9C8;
-  --color-amber-500: #CA9C68;
-  --color-amber-800: #906D4B;
-  --color-amber-900: #6D5135;
-  --color-emerald-800: #3E5C48;
-  --color-red-800: #8C3A2E;
-
-  --color-brand-canvas: #FAF5EB;
-  --color-brand-light: #FFFDF9;
-  --color-brand-surface: #F2EAE0;
-  --color-brand-dark: #13191F;
-  --color-brand-subdark: #2B2F2E;
-  --color-brand-hairline: #E4D9C8;
-  --color-brand-muted: #594C3D;
-  --color-brand-roast: #906D4B;
-  --color-brand-amber: #CA9C68;
-  --color-brand-leaf: #3E5C48;
-
-  /* iOS layer (see DESIGN.md). System face first so Apple devices render SF Pro;
-     Plus Jakarta Sans carries the same role everywhere else. */
   --font-ui: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Plus Jakarta Sans', system-ui, sans-serif;
   --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Plus Jakarta Sans', system-ui, sans-serif;
 
-  --ios-bg: #FAF5EB;
-  --ios-surface: #FFFDF9;
+  /* Fills, separators and the motion curve (see DESIGN.md) */
   --ios-fill: rgba(118, 96, 70, 0.12);
-  --ios-fill-strong: rgba(118, 96, 70, 0.18);
   --ios-separator: rgba(89, 76, 61, 0.2);
-  --ios-label: #13191F;
-  --ios-label-2: #594C3D;
-  --ios-label-3: #6E6150;
-  --ios-tint: #906D4B;
-  --ios-tint-text: #7D5C3D;
-  --ios-green: #3E5C48;
-  --ios-red: #8C3A2E;
   --ios-ease: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* Tailwind's white is the warm surface, so a stray bg-white never reads cold */
+  --color-white: #FFFDF9;
 }
 
-/* Typography: headings use the system display face (SF Pro on Apple devices). */
-.font-recoleta,
-.font-cooper,
-.font-outfit {
+/* Headings use the system display face (SF Pro on Apple devices). */
+.font-cooper {
   font-family: var(--font-display);
   letter-spacing: -0.015em;
 }
 
 /* The Haraya wordmark is the logo image (BrandLogo), never set in type */
 
-/* Micro copy (chips, tabs, meta rows) uses the body sans; a tracked display face
-   rendered too thin below 12px on phones in the sibling platform. */
-.font-avantgarde,
 .font-sans {
   font-family: var(--font-ui);
 }
@@ -119,109 +101,6 @@
   font-family: var(--font-ui);
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
-}
-
-.text-display {
-  font-family: var(--font-display);
-  font-size: 38px;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-  font-weight: 700;
-}
-
-.text-headline {
-  font-family: var(--font-display);
-  font-size: 26px;
-  line-height: 1.2;
-  letter-spacing: -0.015em;
-  font-weight: 700;
-}
-
-.text-title {
-  font-family: var(--font-display);
-  font-size: 19px;
-  line-height: 1.3;
-  letter-spacing: -0.01em;
-  font-weight: 600;
-}
-
-.text-body {
-  font-family: var(--font-ui);
-  font-size: 14px;
-  line-height: 1.6;
-  letter-spacing: 0;
-}
-
-.text-meta {
-  font-family: var(--font-ui);
-  font-size: 12px;
-  line-height: 1.4;
-  letter-spacing: 0.02em;
-}
-
-.text-micro {
-  font-family: var(--font-ui);
-  font-size: 10px;
-  line-height: 1.3;
-  letter-spacing: 0.04em;
-}
-
-/* Warm Roast Accent helpers for limited single-origin badges and drop timers */
-.text-roast {
-  color: #906D4B;
-}
-
-.bg-roast {
-  background-color: #906D4B;
-}
-
-.border-roast {
-  border-color: #906D4B;
-}
-
-.bg-roast-soft {
-  background-color: rgba(144, 109, 75, 0.12);
-}
-
-.text-amber-autumn {
-  color: #CA9C68;
-}
-
-.bg-amber-autumn {
-  background-color: #CA9C68;
-}
-
-/* Brand palette utility helpers (used by map pins, editorial banners, footer) */
-.bg-brand-dark {
-  background-color: #13191F;
-}
-
-.bg-brand-subdark {
-  background-color: #2B2F2E;
-}
-
-.bg-brand-light {
-  background-color: #FFFDF9;
-}
-
-.bg-brand-canvas {
-  background-color: #FAF5EB;
-}
-
-.bg-brand-surface {
-  background-color: #F2EAE0;
-}
-
-.border-brand-hairline {
-  border-color: #E4D9C8;
-}
-
-.text-brand-dark {
-  color: #13191F;
-}
-
-.text-brand-muted {
-  color: #594C3D;
 }
 
 /* Density scale. Tailwind v4 sizes type, spacing, icons, and radii in rem, so the
@@ -319,31 +198,10 @@ html {
   padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
 }
 
-/* Tab dock: a flush, minimalist floating navigation bar.
-   --dock-i is the active index, --dock-n the tab count; cqw keeps
-   the micro-indicator and tab centers on one axis. */
-.dock {
-  container-type: inline-size;
-  --dock-pad: 8px;
-  --dock-cell: calc((100cqw - 2 * var(--dock-pad)) / var(--dock-n));
-  --dock-x: calc(var(--dock-pad) + (var(--dock-i) + 0.5) * var(--dock-cell));
-}
-
+/* Tab dock: a floating bar on a solid surface, so page content never reads through the labels. */
 .dock-bar {
-  background-color: rgba(255, 253, 249, 0.94);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(89, 76, 61, 0.12);
-  box-shadow: 0 4px 24px -4px rgba(19, 25, 31, 0.12), 0 1px 3px rgba(19, 25, 31, 0.04);
-}
-
-.dock-indicator {
-  width: 16px;
-  height: 2.5px;
-  background-color: var(--ios-tint);
-  border-radius: 9999px;
-  transform: translateX(calc(var(--dock-x) - 50%));
-  transition: transform 0.4s var(--ios-ease);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-float);
 }
 
 /* Focus session banner and its toast: just above the 58px tab dock on phones with a 12px gap (the toast
@@ -391,29 +249,15 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: #FAF5EB;
+  background: var(--color-canvas);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #E4D9C8;
+  background: var(--color-hairline);
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #D8CCA8;
-}
-
-/* Editorial hero: 6-second auto-advance progress rail segments */
-.hero-progress-segment {
-  overflow: hidden;
-  border-radius: 9999px;
-  background: rgba(255, 253, 249, 0.28);
-}
-
-.hero-progress-segment > span {
-  display: block;
-  height: 100%;
-  background: #FFFDF9;
-  border-radius: 9999px;
 }
 
 /* Bean drop countdown uses tabular numerals so ticking digits do not jitter */
@@ -427,9 +271,9 @@ html {
   border: none;
 }
 
-/* Map pin labels hide at region zoom so nearby pins do not pile up */
-.haraya-map-far .haraya-pin-label {
-  display: none !important;
+/* Map tiles sit back in a warm, muted tone so the pins carry the color */
+.haraya-tiles {
+  filter: grayscale(0.4) sepia(0.14) saturate(0.85);
 }
 
 /* Cup Check flavor pins float over post photos */
@@ -447,7 +291,7 @@ html {
   /* Card elevation: soft offset shadow instead of borders (DESIGN.md, Shape and depth) */
   .card-ambient,
   .ios-card-shadow {
-    box-shadow: 0 0.5px 1px rgba(19, 25, 31, 0.06), 0 6px 20px -6px rgba(19, 25, 31, 0.14);
+    box-shadow: var(--shadow-card);
   }
 
   .card-lift {
@@ -468,8 +312,7 @@ html {
     }
   }
 
-  /* Bar material: nav bar, tab bar, sheet headers */
-  .glass-warm,
+  /* Bar material: nav bar and map overlays. Sheets and the dock are solid. */
   .ios-material-bar {
     background-color: rgba(250, 245, 235, 0.78);
     backdrop-filter: saturate(180%) blur(20px);
@@ -481,12 +324,6 @@ html {
     background-color: rgba(19, 25, 31, 0.36);
     backdrop-filter: saturate(160%) blur(12px);
     -webkit-backdrop-filter: saturate(160%) blur(12px);
-  }
-
-  .glass-card {
-    background-color: rgba(255, 253, 249, 0.85);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
   }
 }
 
@@ -524,7 +361,7 @@ html {
   inset: 2px;
   border-radius: 9999px;
   background: #2F6FDB;
-  border: 3px solid #FFFDF9;
+  border: 3px solid var(--color-surface);
   box-shadow: 0 2px 6px rgba(19, 25, 31, 0.35);
 }
 
@@ -602,7 +439,7 @@ html {
 }
 
 .aya-tap:focus-visible {
-  outline: 2px solid #FFFDF9;
+  outline: 2px solid var(--color-surface);
   outline-offset: -6px;
   border-radius: 9999px;
 }
@@ -646,14 +483,14 @@ html {
   select:focus-visible,
   textarea:focus-visible,
   a:focus-visible {
-    outline: 2px solid #906D4B;
+    outline: 2px solid var(--color-tint);
     outline-offset: 2px;
   }
 }
 
 ::selection {
   background: rgba(144, 109, 75, 0.28);
-  color: #13191F;
+  color: var(--color-ink);
 }
 
 @layer components {
@@ -664,7 +501,7 @@ html {
     line-height: 1.1;
     font-weight: 700;
     letter-spacing: -0.022em;
-    color: #13191F;
+    color: var(--color-ink);
   }
 
   @media (min-width: 640px) {
@@ -679,7 +516,7 @@ html {
     line-height: 1.2;
     font-weight: 700;
     letter-spacing: -0.018em;
-    color: #13191F;
+    color: var(--color-ink);
   }
 
   .ios-headline {
@@ -731,7 +568,7 @@ html {
 
   /* Grouped inset list (Settings style) */
   .ios-group {
-    background: #FFFDF9;
+    background: var(--color-surface);
     border-radius: 14px;
     overflow: hidden;
   }

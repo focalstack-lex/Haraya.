@@ -52,7 +52,7 @@ export const SharedListView: React.FC<SharedListViewProps> = ({
         <button
           onClick={onBack}
           aria-label="Back to Discover"
-          className="-ml-2 inline-flex items-center gap-0.5 min-h-11 pr-2 text-[17px] text-[#7D5C3D] ios-press"
+          className="-ml-2 inline-flex items-center gap-0.5 min-h-11 pr-2 text-[17px] text-tint-ink ios-press"
         >
           <ChevronLeft className="w-6 h-6" strokeWidth={2.4} />
           Back
@@ -69,7 +69,7 @@ export const SharedListView: React.FC<SharedListViewProps> = ({
           trailing={
             <button
               onClick={copyLink}
-              className="h-9 px-3.5 rounded-full ios-fill text-[14px] font-semibold text-[#7D5C3D] inline-flex items-center gap-1.5 hover:bg-[#766046]/20 ios-press"
+              className="h-9 px-3.5 rounded-full ios-fill text-[14px] font-semibold text-tint-ink inline-flex items-center gap-1.5 hover:bg-shade/20 ios-press"
             >
               <Link2 className="w-4 h-4" strokeWidth={2.2} />
               Copy link
@@ -105,13 +105,13 @@ export const SharedListView: React.FC<SharedListViewProps> = ({
 
       {cafes.length === 0 && beans.length === 0 && (
         <div className="py-12 px-6 text-center flex flex-col items-center gap-2">
-          <h2 className="ios-title text-[19px] text-[#13191F]">Nothing on this list</h2>
-          <p className="text-[14px] text-[#594C3D] max-w-xs">
+          <h2 className="ios-title text-[19px] text-ink">Nothing on this list</h2>
+          <p className="text-[14px] text-ink-2 max-w-xs">
             This shared list has no items, or they were removed.
           </p>
           <button
             onClick={onBack}
-            className="mt-3 h-11 px-5 w-full sm:w-auto rounded-full bg-[#906D4B] text-[#FFFDF9] text-[15px] font-semibold hover:bg-[#7D5C3D] ios-press"
+            className="mt-3 h-11 px-5 w-full sm:w-auto rounded-full bg-tint text-surface text-[15px] font-semibold hover:bg-tint-ink ios-press"
           >
             Back to Discover
           </button>

@@ -20,7 +20,7 @@ interface Step {
 const ICON = 'w-5 h-5';
 
 const StepIcon: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <span aria-hidden="true" className="h-9 w-9 shrink-0 rounded-[8px] bg-[#906D4B]/15 text-[#7D5C3D] flex items-center justify-center">
+  <span aria-hidden="true" className="h-9 w-9 shrink-0 rounded-[8px] bg-tint/15 text-tint-ink flex items-center justify-center">
     {children}
   </span>
 );
@@ -118,14 +118,14 @@ export const InstallSheet: React.FC<InstallSheetProps> = ({ mode, onInstall, onC
     <Modal isOpen={isOpen && showable} onClose={onClose} maxWidth="sm:max-w-md" labelledBy="install-title">
       <div className="py-4 px-5 flex flex-col items-center gap-3 text-center">
         <AyaMascot pose="welcome" size={112} alt="" />
-        <h3 id="install-title" className="ios-title text-[19px] text-[#13191F]">
+        <h3 id="install-title" className="ios-title text-[19px] text-ink">
           {title}
         </h3>
-        <p className="text-[14px] text-[#594C3D] max-w-xs">{body}</p>
+        <p className="text-[14px] text-ink-2 max-w-xs">{body}</p>
         {steps.length > 0 && (
           <ul className="w-full flex flex-col gap-2 text-left">
             {steps.map((step) => (
-              <li key={step.text} className="flex items-center gap-3 min-h-11 text-[14px] text-[#13191F]">
+              <li key={step.text} className="flex items-center gap-3 min-h-11 text-[14px] text-ink">
                 {step.icon ? <StepIcon>{step.icon}</StepIcon> : <span aria-hidden="true" className="h-9 w-9 shrink-0" />}
                 <span>{step.text}</span>
               </li>

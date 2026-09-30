@@ -43,10 +43,10 @@ function Segmented<T extends string>({
 }) {
   return (
     <div className="space-y-1.5">
-      <span className="block px-1 text-[13px] font-medium text-[#594C3D]" id={`seg-${label}`}>
+      <span className="block px-1 text-[13px] font-medium text-ink-2" id={`seg-${label}`}>
         {label}
       </span>
-      <div role="radiogroup" aria-labelledby={`seg-${label}`} className="flex p-0.5 rounded-[10px] ios-fill">
+      <div role="radiogroup" aria-labelledby={`seg-${label}`} className="flex p-0.5 rounded-control ios-fill">
         {options.map((option) => {
           const selected = value === option.id;
           return (
@@ -57,7 +57,7 @@ function Segmented<T extends string>({
               aria-checked={selected}
               onClick={() => onChange(option.id)}
               className={`flex-1 min-h-10 px-2 rounded-[8px] text-[14px] font-semibold transition-colors ${
-                selected ? 'bg-[#FFFDF9] text-[#13191F] shadow-[0_1px_4px_rgba(19,25,31,0.14)]' : 'text-[#594C3D]'
+                selected ? 'bg-surface text-ink shadow-[0_1px_4px_rgba(19,25,31,0.14)]' : 'text-ink-2'
               }`}
             >
               {option.label}
@@ -135,10 +135,10 @@ export const EndSessionModal: React.FC<EndSessionModalProps> = ({ isOpen, onClos
         <div className="flex items-center gap-3">
           <AyaMascot pose="content" size={96} alt="" className="-my-2" />
           <div className="min-w-0">
-            <p className="ios-footnote text-[#594C3D]">You focused for</p>
-            <p className="font-mono text-[30px] font-bold leading-tight text-[#13191F]">{formatDuration(minutes)}</p>
+            <p className="ios-footnote text-ink-2">You focused for</p>
+            <p className="font-mono text-[30px] font-bold leading-tight text-ink">{formatDuration(minutes)}</p>
             {tooShort && (
-              <p className="ios-footnote text-[#8C3A2E]">Sessions under {VISIT_LIMITS.minMinutes} minutes are not logged.</p>
+              <p className="ios-footnote text-danger">Sessions under {VISIT_LIMITS.minMinutes} minutes are not logged.</p>
             )}
           </div>
         </div>
@@ -174,10 +174,10 @@ export const EndSessionModal: React.FC<EndSessionModalProps> = ({ isOpen, onClos
                 onChange={(value) => setIsPublic(value === 'public')}
               />
             ) : (
-              <p className="ios-footnote text-[#594C3D]">Signed out, this session stays on this device.</p>
+              <p className="ios-footnote text-ink-2">Signed out, this session stays on this device.</p>
             )}
             {signedIn && (
-              <p className="ios-footnote text-[#594C3D] inline-flex items-start gap-1.5">
+              <p className="ios-footnote text-ink-2 inline-flex items-start gap-1.5">
                 {isPublic ? <Globe2 className="w-3.5 h-3.5 mt-0.5 shrink-0" /> : <Lock className="w-3.5 h-3.5 mt-0.5 shrink-0" />}
                 {isPublic
                   ? visitService.isPassportPublic()
@@ -201,7 +201,7 @@ export const EndSessionModal: React.FC<EndSessionModalProps> = ({ isOpen, onClos
             type="button"
             onClick={discard}
             className={`h-11 px-5 rounded-full text-[15px] font-semibold ios-press ${
-              confirmDiscard ? 'bg-[#8C3A2E] text-[#FFFDF9]' : 'text-[#8C3A2E] hover:bg-[#8C3A2E]/10'
+              confirmDiscard ? 'bg-danger text-surface' : 'text-danger hover:bg-danger/10'
             }`}
           >
             {confirmDiscard ? 'Tap again to end without saving' : tooShort ? 'End session' : 'End without saving'}

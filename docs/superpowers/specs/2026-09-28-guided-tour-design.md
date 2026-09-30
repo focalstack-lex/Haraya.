@@ -21,7 +21,7 @@ save a cafe. They finish with something in Profile.
 | 2 | `city` | Pick your city. Discover, the map and Most saved all follow it. | Next |
 | 3 | `mood` (mood finder card) | Not sure where to go? Tap how you feel and Haraya suggests a cafe that fits, near you. | Next |
 | 4 | `save` (first cafe card bookmark) | Save a spot you would try. Tap the bookmark. | Tapping the real bookmark |
-| 5 | `tab-profile` | Everything you save lives in Saved Spots. | Next |
+| 5 | `tab-profile` | Your saves, stamps and diary live in Passport. | Next |
 | 6 | `tab-map` | See every spot on the map. Tap Directions on any spot and Haraya can walk you there. | Next |
 | 7 | `tab-submit` | Know a quiet corner that is not on Google Maps? Add it here. Enjoy your next cup. | Done |
 
@@ -68,6 +68,6 @@ errors occur. Plus `tsc -b`, `oxlint`, `vite build`, `impeccable detect`.
 
 ## Update 2026-09-29: discovery pivot
 
-The tour now has 8 steps. Copy follows the new vocabulary (spots, Saved Spots, study shortcuts), the save step uses
+The tour now has 8 steps. Copy follows the new vocabulary (spots, Passport, study shortcuts), the save step uses
 Aya's `holding-cup` pose, the map step mentions in-app directions, and a final step targets the Add a Spot tab
 (`data-tour="tab-submit"`) with Aya waving goodbye.

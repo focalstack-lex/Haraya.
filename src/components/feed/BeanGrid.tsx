@@ -19,8 +19,8 @@ const BeanCard: React.FC<{
   onToggleSave: (bean: Bean) => void;
   onSelectBean: (beanId: string) => void;
 }> = ({ bean, saved, onToggleSave, onSelectBean }) => (
-  <article className="group card-lift card-ambient bg-[#FFFDF9] rounded-[20px] overflow-hidden flex flex-col">
-    <div className="relative aspect-[4/3] overflow-hidden bg-[#13191F]">
+  <article className="group card-lift card-ambient bg-surface rounded-card overflow-hidden flex flex-col">
+    <div className="relative aspect-[4/3] overflow-hidden bg-ink">
       <img
         src={bean.images[0]}
         alt={`${bean.name} whole bean bag`}
@@ -34,14 +34,14 @@ const BeanCard: React.FC<{
         aria-label={saved ? `Remove ${bean.name} from saved` : `Save ${bean.name}`}
         className={`absolute top-1 right-1 h-11 w-11 flex items-center justify-center ios-press active:scale-90 before:absolute before:inset-[5px] before:rounded-full before:transition-colors ${
           saved
-            ? 'text-[#FFFDF9] before:bg-[#906D4B]'
-            : 'text-[#FFFDF9] before:bg-[#13191F]/45 before:backdrop-blur-md hover:before:bg-[#13191F]/65'
+            ? 'text-surface before:bg-tint'
+            : 'text-surface before:bg-ink/45 before:backdrop-blur-md hover:before:bg-ink/65'
         }`}
       >
         {saved ? <BookmarkCheck className="relative w-4 h-4" /> : <Bookmark className="relative w-4 h-4" />}
       </button>
       {bean.isLimited && (
-        <span className="absolute left-2 bottom-2 h-6 px-2.5 rounded-full ios-material-dark text-[#FFFDF9] text-[11px] font-semibold flex items-center">
+        <span className="absolute left-2 bottom-2 h-6 px-2.5 rounded-full ios-material-dark text-surface text-[11px] font-semibold flex items-center">
           Micro-lot
         </span>
       )}
@@ -50,16 +50,16 @@ const BeanCard: React.FC<{
     <div className="p-3 sm:p-3.5 flex-1 flex flex-col justify-between space-y-2.5">
       <div className="space-y-1">
         <button onClick={() => onSelectBean(bean.id)} className="block text-left w-full">
-          <h3 className="ios-headline text-[#13191F] truncate sm:line-clamp-2 sm:whitespace-normal">{bean.name}</h3>
+          <h3 className="ios-headline text-ink truncate sm:line-clamp-2 sm:whitespace-normal">{bean.name}</h3>
         </button>
-        <p className="ios-footnote text-[#594C3D] truncate">{bean.roasterName}</p>
-        <div className="flex items-center gap-1 ios-footnote text-[#594C3D] min-w-0">
-          <BeanIcon className="w-3 h-3 shrink-0 text-[#906D4B]" />
+        <p className="ios-footnote text-ink-2 truncate">{bean.roasterName}</p>
+        <div className="flex items-center gap-1 ios-footnote text-ink-2 min-w-0">
+          <BeanIcon className="w-3 h-3 shrink-0 text-tint" />
           <span className="truncate">{bean.origin}</span>
         </div>
         <div className="hidden sm:flex flex-wrap gap-1 pt-1">
           {bean.tastingNotes.slice(0, 2).map((note) => (
-            <span key={note} className="h-5.5 px-2 rounded-full ios-fill text-[11px] font-medium font-sans text-[#594C3D] flex items-center">
+            <span key={note} className="h-5.5 px-2 rounded-full ios-fill text-[11px] font-medium font-sans text-ink-2 flex items-center">
               {note}
             </span>
           ))}
@@ -67,10 +67,10 @@ const BeanCard: React.FC<{
       </div>
 
       <div className="flex items-center justify-between pt-1.5 ios-hairline-t ios-footnote">
-        <span className="font-mono font-semibold text-[#13191F] text-[14px]">
-          ₱{bean.price} <span className="font-sans font-normal text-[12px] text-[#594C3D]">/ 250g</span>
+        <span className="font-mono font-semibold text-ink text-[14px]">
+          ₱{bean.price} <span className="font-sans font-normal text-[12px] text-ink-2">/ 250g</span>
         </span>
-        <button onClick={() => onSelectBean(bean.id)} className="h-9 px-1 -mr-1 font-semibold text-[#7D5C3D] ios-press">
+        <button onClick={() => onSelectBean(bean.id)} className="h-9 px-1 -mr-1 font-semibold text-tint-ink ios-press">
           Details
         </button>
       </div>
@@ -91,7 +91,7 @@ export const BeanGrid: React.FC<BeanGridProps> = ({
       <div className="py-12 text-center space-y-2">
         <AyaMascot pose="empty" size={112} alt="" className="mb-1" />
         <h3 className="ios-title text-[19px]">{emptyTitle}</h3>
-        <p className="text-[14px] font-sans text-[#594C3D] max-w-xs mx-auto">{emptyBody}</p>
+        <p className="text-[14px] font-sans text-ink-2 max-w-xs mx-auto">{emptyBody}</p>
       </div>
     );
   }

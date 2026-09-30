@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-29 : commit d3f4ebf : fingerprint af322febce042c59
+Generated 2026-09-29 : commit 276d2e8 : fingerprint 0dc8c3faf340cd88
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -10,13 +10,12 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 ## root/
 
 - `index.html` (30 lines) : . module: index.html
-- `scripts/generate-cafes-seed.mjs` (60 lines) : Writes the SQL that stores the catalog spots in the database: Green Coffee and the Digos City shops, with their
 - `scripts/generate-code-map.mjs` (212 lines) : One-line purpose per file, inferred from its path and leading doc comment.
 - `scripts/verify-google-auth.mjs` (109 lines) : scripts module: verify-google-auth
-- `src/App.tsx` (832 lines) : Older links: the roaster portal is now the Place Portal.
+- `src/App.tsx` (839 lines) : Older links: the roaster portal is now the Place Portal.
   - L69 : SharedList
   - L95 : App
-- `src/index.css` (825 lines) : src entry point
+- `src/index.css` (662 lines) : src entry point
 - `src/main.tsx` (41 lines) : src entry point
 - `vite.config.ts` (43 lines) : . module: vite.config
 
@@ -31,12 +30,12 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 ## src/components/cafe/
 
 - `src/components/cafe/BeanDetailModal.tsx` (201 lines) : Grouped list on the white sheet: the linen canvas tone lets the inset group read as a group.
-- `src/components/cafe/CafeDetailModal.tsx` (371 lines) : Grouped list on the white sheet: the linen canvas tone lets the inset group read as a group.
-  - L52 : AmenityBadges
-  - L74 : MenuSheet
-  - L102 : CafeDetailModalProps
-  - L124 : CafeDetailModal
-- `src/components/cafe/CafeRecentVisitors.tsx` (142 lines) : "Focused 2h 15m, Americano, quiet" or "Quick stamp"
+- `src/components/cafe/CafeDetailModal.tsx` (368 lines) : Full cafe detail: snap gallery, live open status, actions (directions, save, rate,
+  - L50 : AmenityBadges
+  - L72 : MenuSheet
+  - L99 : CafeDetailModalProps
+  - L121 : CafeDetailModal
+- `src/components/cafe/CafeRecentVisitors.tsx` (143 lines) : "Focused 2h 15m, Americano, quiet" or "Quick stamp"
 - `src/components/cafe/RateCafeModal.tsx` (134 lines) : src/components/cafe module: RateCafeModal
 
 ## src/components/common/
@@ -54,6 +53,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/components/common/FormControls.tsx` (272 lines) : Shared form primitives for Haraya: an iOS-style sheet (bottom sheet with a
 - `src/components/common/ImageUploadField.tsx` (83 lines) : File input that stores the image as a dataURL with type and size validation.
 - `src/components/common/LargeTitle.tsx` (46 lines) : iOS large title: the first thing on every primary page, left aligned.
+- `src/components/common/sheetStyles.ts` (8 lines) : Class strings shared by sheets, so every grouped list and section label inside a sheet matches.
 - `src/components/common/WelcomeModal.tsx` (160 lines) : What the app does, stated plainly: one row per real surface.
 
 ## src/components/community/
@@ -61,7 +61,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/components/community/CommentsSheet.tsx` (75 lines) : Comments for a cup post; seed posts are read-only, browser posts are live.
 - `src/components/community/CupCheckCard.tsx` (114 lines) : Community cup post: photo with floating tasting-tag pins, brew method, likes.
 - `src/components/community/FlavorPinPlacer.tsx` (132 lines) : Tap the uploaded photo to drop tasting-tag pins, then name each pin. Pins
-- `src/components/community/LocationPicker.tsx` (115 lines) : Pin placement for Add a Spot: tap the map, or use the device location. The location is read once on
+- `src/components/community/LocationPicker.tsx` (113 lines) : Pin placement for Add a Spot: tap the map, or use the device location. The location is read once on
 - `src/components/community/NewPostSheet.tsx` (143 lines) : Compose a Cup Check: photo, caption, cafe tag, brew method, and flavor pins.
 
 ## src/components/drops/
@@ -75,14 +75,14 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 ## src/components/feed/
 
 - `src/components/feed/BeanGrid.tsx` (113 lines) : src/components/feed module: BeanGrid
-- `src/components/feed/CafeGrid.tsx` (163 lines) : src/components/feed module: CafeGrid
+- `src/components/feed/CafeGrid.tsx` (149 lines) : src/components/feed module: CafeGrid
 - `src/components/feed/EditorialHero.tsx` (126 lines) : Spotlight shelf built only from real listings: the top study spots, then the newest hidden gems added
-- `src/components/feed/FeedControls.tsx` (150 lines) : src/components/feed module: FeedControls
+- `src/components/feed/FeedControls.tsx` (103 lines) : src/components/feed module: FeedControls
 - `src/components/feed/FeedSearchBar.tsx` (38 lines) : iOS search field: filled, borderless, with the round clear button once text is entered.
 - `src/components/feed/PopularPicksSection.tsx` (73 lines) : "Most saved" shelf: the venues Haraya users bookmark most, from real save counts.
 - `src/components/feed/spotCategories.test.ts` (79 lines) : src/components/feed module: spotCategories.test
 - `src/components/feed/spotCategories.ts` (51 lines) : What a visitor is looking for; replaces the old Cafes / Beans / Following modes.
-- `src/components/feed/VibeFilterBar.tsx` (68 lines) : Collapsible amenity and vibe chip rail: expands when toggled or active.
+- `src/components/feed/VibeFilterBar.tsx` (152 lines) : The filter panel under the feed controls. Open: sort and price menus, then the must-have chip rail.
 
 ## src/components/install/
 
@@ -97,21 +97,22 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/layout/
 
-- `src/components/layout/BottomTabBar.tsx` (75 lines) : Persistent mobile bottom navigation (hidden while a detail modal is open).
-- `src/components/layout/FooterSection.tsx` (152 lines) : Global footer: Responsive layout tailored for both mobile and desktop.
+- `src/components/layout/BottomTabBar.tsx` (66 lines) : Persistent mobile bottom navigation (hidden while a detail modal is open).
+- `src/components/layout/FooterSection.tsx` (111 lines) : Footer for the landing page and the desktop app shell. Phones see the brand line and the legal row
 - `src/components/layout/NavigationDrawer.tsx` (223 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
 - `src/components/layout/NavigationHeader.tsx` (217 lines) : Tab ids reachable by hash route but not shown in the primary navigation.
 
 ## src/components/map/
 
-- `src/components/map/DavaoCoffeeMap.tsx` (606 lines) : Escapes catalog text before it is placed into Leaflet tooltip HTML.
-  - L34 : DavaoCoffeeMapProps
-  - L50 : DavaoCoffeeMap
+- `src/components/map/DavaoCoffeeMap.tsx` (604 lines) : Escapes catalog text before it is placed into Leaflet tooltip HTML.
+  - L35 : DavaoCoffeeMapProps
+  - L51 : DavaoCoffeeMap
 - `src/components/map/DirectionsActionSheet.tsx` (58 lines) : External map apps. Apple Maps uses its https form so the link also works outside Apple devices.
 - `src/components/map/liveNavMath.test.ts` (71 lines) : src/components/map module: liveNavMath.test
 - `src/components/map/liveNavMath.ts` (63 lines) : Pure math for in-app walking navigation. These straight-line figures are the fallback when no street route
 - `src/components/map/routeMath.test.ts` (53 lines) : src/components/map module: routeMath.test
 - `src/components/map/routeMath.ts` (63 lines) : Pure math for following a street route: snap the visitor onto the nearest route segment, measure what is
+- `src/components/map/tiles.ts` (11 lines) : The one map tile layer, shared by the coffee map and the location picker.
 - `src/components/map/useLiveNavigation.ts` (129 lines) : Walking navigation driven by navigator.geolocation.watchPosition with high accuracy. Positions stay in
 - `src/components/map/walkingRoute.ts` (110 lines) : Street-following walking routes from the FOSSGIS OSRM server (OpenStreetMap data, foot profile, no key).
 
@@ -165,8 +166,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/data/
 
-- `src/data/digosCafes.test.ts` (78 lines) : src/data module: digosCafes.test
-- `src/data/digosCafes.ts` (134 lines) : Digos City coffee shops chosen by Lex from Google Maps on 2026-09-29 (names and streets as that listing shows
+- `src/data/digosCafes.ts` (99 lines) : Digos City coffee shops chosen by Lex from Google Maps on 2026-09-29 (names and streets as that listing shows
 - `src/data/spots.ts` (61 lines) : Curated spots listed by the Haraya team, shown ahead of roaster and community listings. Every field comes
 - `src/data/trails.ts` (8 lines) : Curated coffee trails. Empty until real trails are set up: each entry lists at least two cafe ids that
 
@@ -179,8 +179,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 ## src/services/
 
 - `src/services/adminService.ts` (66 lines) : Control Room account management: the list of profiles (readable by admins only, per Row Level
-- `src/services/catalogService.test.ts` (37 lines) : src/services module: catalogService.test
-- `src/services/catalogService.ts` (369 lines) : Catalog layer over roaster-created and admin-moderated records kept in
+- `src/services/catalogService.ts` (364 lines) : Catalog layer over roaster-created and admin-moderated records kept in
   - L31 : CafeMetrics
   - L38 : MetricsStore
   - L53 : readJson
@@ -190,8 +189,8 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L84 : deriveStatus
   - L89 : catalogService
 - `src/services/communityService.ts` (154 lines) : Cup Check community layer: browser-created posts, likes, and comments. Likes are stored per browser (no accounts needed to
-- `src/services/placeMapping.test.ts` (159 lines) : src/services module: placeMapping.test
-- `src/services/placeMapping.ts` (370 lines) : Place Portal data: the application a place owner sends (place_applications), the public listing row
+- `src/services/placeMapping.test.ts` (155 lines) : src/services module: placeMapping.test
+- `src/services/placeMapping.ts` (369 lines) : Place Portal data: the application a place owner sends (place_applications), the public listing row
   - L12 : PLACE_TYPES
   - L17 : PlaceType
   - L20 : REGION_BOUNDS
@@ -210,10 +209,10 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L204 : parseHours
   - L219 : parseMenu
   - L239 : cafeRowToCafe
-  - L272 : listingFromCafe
-  - L295 : validateListing
-  - L333 : toCafeUpdateRow
-  - L360 : describePlaceError
+  - L271 : listingFromCafe
+  - L294 : validateListing
+  - L332 : toCafeUpdateRow
+  - L359 : describePlaceError
 - `src/services/placeService.ts` (206 lines) : Public listings (table cafes) and Place Portal applications (table place_applications). Listings are
 - `src/services/roasterService.ts` (115 lines) : Roaster-facing facade over the catalog: everything an approved roaster or
 - `src/services/sessionService.test.ts` (35 lines) : src/services module: sessionService.test
@@ -299,7 +298,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/views/PlacePortalView.tsx` (680 lines) : What the portal offers, for visitors who are not signed in or have not applied.
   - L27 : PlacePortalViewProps
   - L583 : PlacePortalView
-- `src/views/ProfileView.tsx` (736 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
+- `src/views/ProfileView.tsx` (750 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
   - L27 : ProfileSection
   - L29 : ProfileViewProps
   - L140 : StampEntry

@@ -247,7 +247,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ isOpen, onFinish }) => {
       {/* Callout */}
       <motion.div
         ref={calloutRef}
-        className="absolute left-0 top-0 pointer-events-auto bg-[#FFFDF9] rounded-[20px] p-4 shadow-[0_12px_40px_-8px_rgba(19,25,31,0.45)]"
+        className="absolute left-0 top-0 pointer-events-auto bg-surface rounded-card p-4 shadow-[0_12px_40px_-8px_rgba(19,25,31,0.45)]"
         style={{ width: calloutWidth }}
         initial={false}
         animate={{ x: calloutLeft, y: calloutTop }}
@@ -261,19 +261,19 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ isOpen, onFinish }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
             aria-live="polite"
-            className="flex-1 min-w-0 text-[15px] leading-snug text-[#13191F]"
+            className="flex-1 min-w-0 text-[15px] leading-snug text-ink"
           >
             {step.text}
           </motion.p>
         </div>
         <div className="mt-3.5 flex items-center gap-2">
-          <span className="ios-footnote font-mono text-[#594C3D]">
+          <span className="ios-footnote font-mono text-ink-2">
             {index + 1} of {TOUR_STEPS.length}
           </span>
           <button
             ref={isAction ? primaryRef : undefined}
             onClick={() => finish('skipped')}
-            className="ml-auto h-11 px-3 text-[15px] font-medium text-[#594C3D] ios-press"
+            className="ml-auto h-11 px-3 text-[15px] font-medium text-ink-2 ios-press"
           >
             Skip
           </button>
@@ -281,7 +281,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({ isOpen, onFinish }) => {
             <button
               ref={primaryRef}
               onClick={next}
-              className="h-11 px-5 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[15px] font-semibold hover:bg-[#7D5C3D] ios-press"
+              className="h-11 px-5 rounded-full bg-tint text-surface text-[15px] font-semibold hover:bg-tint-ink ios-press"
             >
               {isLast ? 'Done' : 'Next'}
             </button>

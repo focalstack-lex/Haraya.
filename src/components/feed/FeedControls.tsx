@@ -1,12 +1,12 @@
 import React from 'react';
-import { ArrowUpDown, ChevronDown, SlidersHorizontal } from 'lucide-react';
+import { SlidersHorizontal } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { PRICE_RANGES } from '../../types/coffee';
-import type { PriceRange } from '../../types/coffee';
 import { SPOT_CATEGORIES, type SpotCategory } from './spotCategories';
 
 export type FeedMode = SpotCategory;
 export type SortKey = 'newest' | 'nearest' | 'mostSaved';
+
+export const DEFAULT_SORT: SortKey = 'newest';
 
 export const SORT_LABELS: Record<SortKey, string> = {
   newest: 'Newest',
@@ -17,10 +17,6 @@ export const SORT_LABELS: Record<SortKey, string> = {
 interface FeedControlsProps {
   mode: FeedMode;
   onModeChange: (mode: FeedMode) => void;
-  sortKey: SortKey;
-  onSortChange: (sort: SortKey) => void;
-  priceRange: PriceRange['id'];
-  onPriceRangeChange: (range: PriceRange['id']) => void;
   itemCount: number;
   isFiltersOpen?: boolean;
   onToggleFilters?: () => void;
@@ -31,10 +27,6 @@ interface FeedControlsProps {
 export const FeedControls: React.FC<FeedControlsProps> = ({
   mode,
   onModeChange,
-  sortKey,
-  onSortChange,
-  priceRange,
-  onPriceRangeChange,
   itemCount,
   isFiltersOpen,
   onToggleFilters,
@@ -43,13 +35,10 @@ export const FeedControls: React.FC<FeedControlsProps> = ({
 }) => {
   const modes = SPOT_CATEGORIES;
 
-  const menuClass =
-    'relative flex items-center gap-1 h-8 pl-3 pr-2 rounded-full ios-fill focus-within:ring-2 focus-within:ring-[#906D4B]/50 text-[13px] font-medium font-sans text-[#13191F] hover:bg-[#766046]/20 transition-colors';
-
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
       {/* Segmented control: the white thumb slides between spot categories; scrolls on narrow phones */}
-      <div className="flex p-0.5 rounded-[10px] ios-fill sm:w-auto overflow-x-auto scrollbar-none" role="tablist" aria-label="Spot category">
+      <div className="flex p-0.5 rounded-control ios-fill sm:w-auto overflow-x-auto scrollbar-none" role="tablist" aria-label="Spot category">
         {modes.map((entry) => {
           const active = mode === entry.id;
           return (
@@ -64,70 +53,34 @@ export const FeedControls: React.FC<FeedControlsProps> = ({
                 <motion.span
                   layoutId="feed-mode-thumb"
                   transition={{ type: 'spring', stiffness: 500, damping: 38 }}
-                  className="absolute inset-0 rounded-[8px] bg-[#FFFDF9] shadow-[0_1px_4px_rgba(19,25,31,0.14),0_0_0_0.5px_rgba(19,25,31,0.04)]"
+                  className="absolute inset-0 rounded-[8px] bg-surface shadow-[0_1px_4px_rgba(19,25,31,0.14),0_0_0_0.5px_rgba(19,25,31,0.04)]"
                 />
               )}
-              <span className={`relative ${active ? 'text-[#13191F]' : 'text-[#594C3D]'}`}>{entry.label}</span>
+              <span className={`relative ${active ? 'text-ink' : 'text-ink-2'}`}>{entry.label}</span>
             </button>
           );
         })}
       </div>
 
       <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2">
-        <span className="ios-footnote text-[#594C3D] font-mono">
+        <span className="ios-footnote text-ink-2 font-mono">
           {itemCount} {itemCount === 1 ? 'spot' : 'spots'}
         </span>
 
-        {/* Wraps under the count on a 320px phone once Reset joins the row, instead of running off the edge */}
-        <div className="flex flex-wrap items-center justify-end gap-1.5">
-          <label className={menuClass}>
-            <ArrowUpDown className="w-3.5 h-3.5 text-[#594C3D]" />
-            {/* The select lies transparently over the whole pill, so the icon and chevron open it too */}
-            <span aria-hidden="true">{SORT_LABELS[sortKey]}</span>
-            <select
-              value={sortKey}
-              onChange={(e) => onSortChange(e.target.value as SortKey)}
-              aria-label="Sort feed"
-              className="select-overlay"
-            >
-              {(Object.keys(SORT_LABELS) as SortKey[]).map((key) => (
-                <option key={key} value={key}>
-                  {SORT_LABELS[key]}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="w-3.5 h-3.5 text-[#594C3D]" />
-          </label>
-
-          <label className={menuClass}>
-            <span aria-hidden="true">{PRICE_RANGES.find((range) => range.id === priceRange)?.label}</span>
-            <select
-              value={priceRange}
-              onChange={(e) => onPriceRangeChange(e.target.value as PriceRange['id'])}
-              aria-label="Filter price"
-              className="select-overlay"
-            >
-              {PRICE_RANGES.map((range) => (
-                <option key={range.id} value={range.id}>
-                  {range.label}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="w-3.5 h-3.5 text-[#594C3D]" />
-          </label>
-
+        {/* Sort, price and must-haves all live behind the one filter button */}
+        <div className="flex items-center justify-end gap-1.5">
           {onToggleFilters && (
             <button
               onClick={onToggleFilters}
               aria-expanded={isFiltersOpen}
-              aria-label="Filters"
+              aria-label="Sort and filters"
               className={`relative h-8 w-8 rounded-full flex items-center justify-center ios-press ${
-                isFiltersOpen || activeFilterCount > 0 ? 'bg-[#906D4B] text-[#FFFDF9]' : 'ios-fill text-[#13191F]'
+                isFiltersOpen || activeFilterCount > 0 ? 'bg-tint text-surface' : 'ios-fill text-ink'
               }`}
             >
               <SlidersHorizontal className="w-4 h-4" />
               {activeFilterCount > 0 && (
-                <span className="absolute -top-1 -right-1 h-4 min-w-4 px-1 rounded-full bg-[#13191F] text-[#FFFDF9] text-[10px] font-semibold font-mono flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 h-4 min-w-4 px-1 rounded-full bg-ink text-surface text-[11px] font-semibold font-mono flex items-center justify-center">
                   {activeFilterCount}
                 </span>
               )}
@@ -137,7 +90,7 @@ export const FeedControls: React.FC<FeedControlsProps> = ({
           {onClearFilters && (
             <button
               onClick={onClearFilters}
-              className="h-8 px-2 text-[13px] font-medium font-sans text-[#7D5C3D] ios-press"
+              className="h-8 px-2 text-[13px] font-medium font-sans text-tint-ink ios-press"
             >
               Reset
             </button>

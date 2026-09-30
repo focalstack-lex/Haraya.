@@ -30,8 +30,8 @@ interface PlacePortalViewProps {
   onBrowse: () => void;
 }
 
-const CARD = 'rounded-[20px] bg-[#FFFDF9] ios-card-shadow p-4 sm:p-5';
-const GROUP_LABEL = 'px-1 text-[13px] font-medium text-[#594C3D]';
+const CARD = 'rounded-card bg-surface ios-card-shadow p-4 sm:p-5';
+const GROUP_LABEL = 'px-1 text-[13px] font-medium text-ink-2';
 const MENU_CATEGORIES: MenuItem['category'][] = ['Espresso Bar', 'Filter', 'Signature', 'Pastry'];
 const PRICE_OPTIONS: { value: 1 | 2 | 3; label: string }[] = [
   { value: 1, label: 'Budget' },
@@ -65,12 +65,12 @@ const Pitch: React.FC = () => (
       { icon: ShieldCheck, title: 'Reviewed by Haraya', body: 'We check the permit number before a listing goes live.' },
     ].map((item) => (
       <li key={item.title} className="flex items-start gap-3">
-        <span className="h-9 w-9 shrink-0 rounded-[10px] bg-[#906D4B]/12 flex items-center justify-center text-[#906D4B]">
+        <span className="h-9 w-9 shrink-0 rounded-control bg-tint/12 flex items-center justify-center text-tint">
           <item.icon className="w-4.5 h-4.5" />
         </span>
         <span className="min-w-0">
-          <span className="block ios-headline text-[#13191F]">{item.title}</span>
-          <span className="block text-[14px] text-[#594C3D] leading-snug">{item.body}</span>
+          <span className="block ios-headline text-ink">{item.title}</span>
+          <span className="block text-[14px] text-ink-2 leading-snug">{item.body}</span>
         </span>
       </li>
     ))}
@@ -122,10 +122,10 @@ const ApplicationForm: React.FC<{ onSubmitted: () => void }> = ({ onSubmitted })
                   type="button"
                   aria-pressed={active}
                   onClick={() => set('placeType', type.id as PlaceType)}
-                  className={`text-left rounded-[14px] px-3.5 py-2.5 ios-press ${active ? 'bg-[#13191F] text-[#FFFDF9]' : 'ios-fill text-[#13191F]'}`}
+                  className={`text-left rounded-row px-3.5 py-2.5 ios-press ${active ? 'bg-ink text-surface' : 'ios-fill text-ink'}`}
                 >
                   <span className="block text-[15px] font-semibold">{type.label}</span>
-                  <span className={`block ios-footnote ${active ? 'text-[#FFFDF9]/80' : 'text-[#594C3D]'}`}>{type.hint}</span>
+                  <span className={`block ios-footnote ${active ? 'text-surface/80' : 'text-ink-2'}`}>{type.hint}</span>
                 </button>
               );
             })}
@@ -180,14 +180,14 @@ const ApplicationForm: React.FC<{ onSubmitted: () => void }> = ({ onSubmitted })
         </Field>
       </div>
 
-      <label className="flex items-start gap-3 rounded-[14px] ios-fill px-3.5 py-3 cursor-pointer">
+      <label className="flex items-start gap-3 rounded-row ios-fill px-3.5 py-3 cursor-pointer">
         <input
           type="checkbox"
           checked={input.ownerConfirmed}
           onChange={(event) => set('ownerConfirmed', event.target.checked)}
-          className="accent-[#906D4B] h-5 w-5 mt-0.5 shrink-0"
+          className="accent-tint h-5 w-5 mt-0.5 shrink-0"
         />
-        <span className="text-[14px] text-[#13191F]">
+        <span className="text-[14px] text-ink">
           I own or manage this place, it is open to the public, and the details are true to my knowledge.
         </span>
       </label>
@@ -196,10 +196,10 @@ const ApplicationForm: React.FC<{ onSubmitted: () => void }> = ({ onSubmitted })
       <PrimaryButton onClick={() => void submit()} disabled={busy} className="w-full">
         {busy ? 'Sending' : 'Send application'}
       </PrimaryButton>
-      <p className="ios-footnote text-[#594C3D]">
+      <p className="ios-footnote text-ink-2">
         Haraya checks the permit number before the listing goes live. By applying you agree to the{' '}
-        <a href="#/tab/terms" className="font-semibold text-[#7D5C3D] underline underline-offset-2">Terms</a> and{' '}
-        <a href="#/tab/privacy" className="font-semibold text-[#7D5C3D] underline underline-offset-2">Privacy Notice</a>.
+        <a href="#/tab/terms" className="font-semibold text-tint-ink underline underline-offset-2">Terms</a> and{' '}
+        <a href="#/tab/privacy" className="font-semibold text-tint-ink underline underline-offset-2">Privacy Notice</a>.
       </p>
     </div>
   );
@@ -207,8 +207,8 @@ const ApplicationForm: React.FC<{ onSubmitted: () => void }> = ({ onSubmitted })
 
 const DetailRow: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
   <div className="ios-group-row justify-between">
-    <dt className="text-[15px] text-[#13191F] shrink-0">{label}</dt>
-    <dd className="text-[15px] text-[#594C3D] text-right min-w-0 truncate">{children}</dd>
+    <dt className="text-[15px] text-ink shrink-0">{label}</dt>
+    <dd className="text-[15px] text-ink-2 text-right min-w-0 truncate">{children}</dd>
   </div>
 );
 
@@ -221,16 +221,16 @@ const ApplicationStatus: React.FC<{ application: PlaceApplicationRow; onApplyAga
         <div className="ios-group-row items-start py-3">
           <span
             className={`h-8 w-8 shrink-0 rounded-full flex items-center justify-center ${
-              rejected ? 'bg-[#8C3A2E]/12 text-[#8C3A2E]' : 'bg-[#906D4B]/14 text-[#7D5C3D]'
+              rejected ? 'bg-danger/12 text-danger' : 'bg-tint/14 text-tint-ink'
             }`}
           >
             {rejected ? <XCircle className="w-4.5 h-4.5" /> : <Clock className="w-4.5 h-4.5" />}
           </span>
           <div className="min-w-0 space-y-0.5">
-            <p className={`ios-headline ${rejected ? 'text-[#8C3A2E]' : 'text-[#7D5C3D]'}`}>
+            <p className={`ios-headline ${rejected ? 'text-danger' : 'text-tint-ink'}`}>
               {rejected ? 'Application needs changes' : 'Under review'}
             </p>
-            <p className="text-[14px] leading-[1.45] text-[#594C3D]">
+            <p className="text-[14px] leading-[1.45] text-ink-2">
               {rejected
                 ? application.review_note || 'Haraya could not verify the permit number. Check the details and apply again.'
                 : `${application.business_name} is waiting for verification. Haraya checks the permit number before a listing goes live.`}
@@ -240,7 +240,7 @@ const ApplicationStatus: React.FC<{ application: PlaceApplicationRow; onApplyAga
       </div>
 
       <section className="space-y-1.5" aria-labelledby="application-details-title">
-        <h2 id="application-details-title" className="px-4 text-[13px] text-[#594C3D]">
+        <h2 id="application-details-title" className="px-4 text-[13px] text-ink-2">
           Application
         </h2>
         <dl className="ios-group ios-card-shadow">
@@ -279,10 +279,10 @@ const HoursEditor: React.FC<{ value: ListingInput['hours']; onChange: (hours: Li
               onChange={(event) =>
                 onChange({ ...value, [day]: event.target.checked ? { open: '08:00', close: '20:00' } : { open: null, close: null } })
               }
-              className="accent-[#906D4B] h-5 w-5 shrink-0"
+              className="accent-tint h-5 w-5 shrink-0"
               aria-label={`${day} open`}
             />
-            <span className="text-[15px] text-[#13191F]">{day}</span>
+            <span className="text-[15px] text-ink">{day}</span>
           </label>
           {open ? (
             <span className="flex items-center gap-2 ml-auto">
@@ -291,19 +291,19 @@ const HoursEditor: React.FC<{ value: ListingInput['hours']; onChange: (hours: Li
                 value={entry.open ?? ''}
                 onChange={(event) => onChange({ ...value, [day]: { ...entry, open: event.target.value || null } })}
                 aria-label={`${day} opens`}
-                className="h-9 w-[6.5rem] ios-fill rounded-[10px] px-2.5 text-[14px] text-[#13191F] focus:outline-none focus:shadow-[0_0_0_2px_#906D4B]"
+                className="h-9 w-[6.5rem] ios-fill rounded-control px-2.5 text-[14px] text-ink focus:outline-none focus:focus-ring"
               />
-              <span className="ios-footnote text-[#594C3D]">to</span>
+              <span className="ios-footnote text-ink-2">to</span>
               <input
                 type="time"
                 value={entry.close ?? ''}
                 onChange={(event) => onChange({ ...value, [day]: { ...entry, close: event.target.value || null } })}
                 aria-label={`${day} closes`}
-                className="h-9 w-[6.5rem] ios-fill rounded-[10px] px-2.5 text-[14px] text-[#13191F] focus:outline-none focus:shadow-[0_0_0_2px_#906D4B]"
+                className="h-9 w-[6.5rem] ios-fill rounded-control px-2.5 text-[14px] text-ink focus:outline-none focus:focus-ring"
               />
             </span>
           ) : (
-            <span className="ml-auto ios-footnote text-[#594C3D]">Closed</span>
+            <span className="ml-auto ios-footnote text-ink-2">Closed</span>
           )}
         </div>
       );
@@ -340,15 +340,15 @@ const MenuEditor: React.FC<{ value: MenuItem[]; onChange: (menu: MenuItem[]) => 
           {value.map((item, index) => (
             <li key={`${item.name}-${index}`} className="ios-group-row">
               <span className="flex-1 min-w-0">
-                <span className="block text-[15px] text-[#13191F] truncate">{item.name}</span>
-                <span className="block ios-footnote text-[#594C3D]">{item.category}</span>
+                <span className="block text-[15px] text-ink truncate">{item.name}</span>
+                <span className="block ios-footnote text-ink-2">{item.category}</span>
               </span>
-              <span className="font-mono text-[15px] text-[#13191F]">{item.price}</span>
+              <span className="font-mono text-[15px] text-ink">{item.price}</span>
               <button
                 type="button"
                 onClick={() => onChange(value.filter((_, i) => i !== index))}
                 aria-label={`Remove ${item.name}`}
-                className="h-11 w-11 -mr-2 flex items-center justify-center text-[#8C3A2E] ios-press"
+                className="h-11 w-11 -mr-2 flex items-center justify-center text-danger ios-press"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -403,7 +403,7 @@ const ListingEditor: React.FC<{ onViewPlace: (cafeId: string) => void }> = ({ on
   if (!cafe || !input) {
     return (
       <div className={CARD}>
-        <p className="text-[15px] text-[#594C3D]">Your listing is loading. If this stays, refresh the page.</p>
+        <p className="text-[15px] text-ink-2">Your listing is loading. If this stays, refresh the page.</p>
       </div>
     );
   }
@@ -436,13 +436,13 @@ const ListingEditor: React.FC<{ onViewPlace: (cafeId: string) => void }> = ({ on
       {/* Listing header */}
       <div className="ios-group ios-card-shadow">
         <div className="ios-group-row py-3.5">
-          <img src={cafe.logoUrl} alt="" className="h-12 w-12 rounded-[12px] object-cover shrink-0 bg-[#F2EAE0]" />
+          <img src={cafe.logoUrl} alt="" className="h-12 w-12 rounded-row object-cover shrink-0 bg-sunken" />
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5">
-              <h2 className="ios-headline text-[#13191F] truncate">{cafe.name}</h2>
-              {cafe.verified && <BadgeCheck className="w-4 h-4 shrink-0 text-[#3E5C48]" aria-label="Verified" />}
+              <h2 className="ios-headline text-ink truncate">{cafe.name}</h2>
+              {cafe.verified && <BadgeCheck className="w-4 h-4 shrink-0 text-ok" aria-label="Verified" />}
             </div>
-            <p className="ios-footnote text-[#594C3D] truncate">
+            <p className="ios-footnote text-ink-2 truncate">
               {cafe.district}, {cafe.city}
               {' · '}
               <span className="font-mono">{cafe.saveCount}</span> saves
@@ -450,7 +450,7 @@ const ListingEditor: React.FC<{ onViewPlace: (cafeId: string) => void }> = ({ on
           </div>
           <button
             onClick={() => onViewPlace(cafe.id)}
-            className="min-h-11 inline-flex items-center gap-1 text-[14px] font-semibold text-[#7D5C3D] ios-press"
+            className="min-h-11 inline-flex items-center gap-1 text-[14px] font-semibold text-tint-ink ios-press"
           >
             <ExternalLink className="w-4 h-4" />
             View
@@ -469,14 +469,14 @@ const ListingEditor: React.FC<{ onViewPlace: (cafeId: string) => void }> = ({ on
           <Field label="About" hint={`${input.description.length} of ${LISTING_LIMITS.description}`}>
             <TextArea value={input.description} onChange={(value) => set('description', value)} rows={4} maxLength={LISTING_LIMITS.description} />
           </Field>
-          <label className="flex items-center gap-3 rounded-[14px] ios-fill px-3.5 py-3 cursor-pointer">
+          <label className="flex items-center gap-3 rounded-row ios-fill px-3.5 py-3 cursor-pointer">
             <input
               type="checkbox"
               checked={input.isRoastery}
               onChange={(event) => set('isRoastery', event.target.checked)}
-              className="accent-[#906D4B] h-5 w-5 shrink-0"
+              className="accent-tint h-5 w-5 shrink-0"
             />
-            <span className="text-[14px] text-[#13191F]">We roast our own beans</span>
+            <span className="text-[14px] text-ink">We roast our own beans</span>
           </label>
         </div>
 
@@ -564,14 +564,14 @@ const ListingEditor: React.FC<{ onViewPlace: (cafeId: string) => void }> = ({ on
 
         {error && <ErrorNote message={error} />}
         {saved && !error && (
-          <p role="status" className="ios-footnote text-[#3E5C48] bg-[#3E5C48]/10 rounded-[12px] px-3.5 py-2.5">
+          <p role="status" className="ios-footnote text-ok bg-ok/10 rounded-row px-3.5 py-2.5">
             Saved. Your listing is updated for everyone.
           </p>
         )}
         <PrimaryButton onClick={() => void save()} disabled={busy} className="w-full">
           {busy ? 'Saving' : 'Save listing'}
         </PrimaryButton>
-        <p className="ios-footnote text-[#594C3D]">
+        <p className="ios-footnote text-ink-2">
           Photos are not collected yet; your listing shows a placeholder until photo uploads are added.
         </p>
       </div>
@@ -601,7 +601,7 @@ export const PlacePortalView: React.FC<PlacePortalViewProps> = ({ onOpenLogin, o
     if (!placeService.isAvailable()) {
       return (
         <div className={CARD}>
-          <p className="text-[15px] text-[#594C3D]">The Place Portal is not available right now. Please check back soon.</p>
+          <p className="text-[15px] text-ink-2">The Place Portal is not available right now. Please check back soon.</p>
         </div>
       );
     }
@@ -623,7 +623,7 @@ export const PlacePortalView: React.FC<PlacePortalViewProps> = ({ onOpenLogin, o
       return (
         <div className={`${CARD} flex items-center gap-3`} role="status">
           <AyaMascot pose="welcome" size={64} alt="" />
-          <p className="text-[15px] text-[#13191F]">Thank you. Haraya will check the permit number and email you once the listing is live.</p>
+          <p className="text-[15px] text-ink">Thank you. Haraya will check the permit number and email you once the listing is live.</p>
         </div>
       );
     }
@@ -656,8 +656,8 @@ export const PlacePortalView: React.FC<PlacePortalViewProps> = ({ onOpenLogin, o
       />
 
       {user && (
-        <p className="ios-footnote text-[#594C3D] px-1 truncate">
-          Signed in as <span className="text-[#13191F] font-medium">{user.email}</span>
+        <p className="ios-footnote text-ink-2 px-1 truncate">
+          Signed in as <span className="text-ink font-medium">{user.email}</span>
         </p>
       )}
 
@@ -668,7 +668,7 @@ export const PlacePortalView: React.FC<PlacePortalViewProps> = ({ onOpenLogin, o
       {!owner && (
         <button
           onClick={onBrowse}
-          className="h-11 flex items-center justify-center gap-1.5 mx-auto px-3 text-[15px] font-medium font-sans text-[#7D5C3D] ios-press"
+          className="h-11 flex items-center justify-center gap-1.5 mx-auto px-3 text-[15px] font-medium font-sans text-tint-ink ios-press"
         >
           <Store className="w-4 h-4" />
           Keep browsing

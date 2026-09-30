@@ -20,7 +20,7 @@ interface AdminDashboardProps {
 
 type AdminTab = 'overview' | 'spots' | 'places' | 'users';
 
-const CARD = 'rounded-[20px] bg-[#FFFDF9] ios-card-shadow p-4 sm:p-5';
+const CARD = 'rounded-card bg-surface ios-card-shadow p-4 sm:p-5';
 
 /** A public listing from the cafes table (not a curated, community or legacy browser-only cafe). */
 const isListedPlace = (cafe: { id: string }) => placeService.isListed(cafe.id);
@@ -39,11 +39,11 @@ const StatCard: React.FC<{ label: string; value: number; icon: React.ComponentTy
 }) => {
   const body = (
     <>
-      <span className="flex items-center gap-1.5 text-[13px] text-[#594C3D]">
+      <span className="flex items-center gap-1.5 text-[13px] text-ink-2">
         <Icon className="w-4 h-4" />
         {label}
       </span>
-      <span className="block font-mono text-[28px] font-bold leading-tight text-[#13191F]">{value.toLocaleString()}</span>
+      <span className="block font-mono text-[28px] font-bold leading-tight text-ink">{value.toLocaleString()}</span>
     </>
   );
   return onClick ? (
@@ -80,29 +80,29 @@ const ApplicationQueue: React.FC<{ rows: PlaceApplicationRow[]; onViewCafe: (caf
     <div className="space-y-6">
       <section className="space-y-2" aria-labelledby="place-queue-title">
         <h2 id="place-queue-title" className="ios-title px-1">
-          Place applications <span className="font-mono text-[#594C3D]">({pending.length})</span>
+          Place applications <span className="font-mono text-ink-2">({pending.length})</span>
         </h2>
         {error && <ErrorNote message={error} />}
         {pending.length === 0 ? (
-          <p className="px-1 text-[14px] text-[#594C3D]">No applications waiting.</p>
+          <p className="px-1 text-[14px] text-ink-2">No applications waiting.</p>
         ) : (
           pending.map((row) => (
             <article key={row.id} className={`${CARD} space-y-2.5`}>
               <div>
-                <h3 className="ios-headline text-[#13191F]">{row.business_name}</h3>
-                <p className="ios-footnote text-[#594C3D]">
+                <h3 className="ios-headline text-ink">{row.business_name}</h3>
+                <p className="ios-footnote text-ink-2">
                   {placeTypeLabel(row.place_type)}
                   {' · '}
                   {row.address}, {row.district}, {row.city}
                 </p>
-                <p className="ios-footnote text-[#594C3D] mt-1">
-                  Permit <span className="font-mono text-[#13191F]">{row.permit_number}</span>
+                <p className="ios-footnote text-ink-2 mt-1">
+                  Permit <span className="font-mono text-ink">{row.permit_number}</span>
                   {' · '}
                   {row.contact_name}
                   {row.contact_phone ? ` · ${row.contact_phone}` : ''}
                 </p>
-                {row.description && <p className="text-[14px] text-[#13191F]/85 mt-1">{row.description}</p>}
-                <p className="ios-footnote text-[#594C3D] mt-1">
+                {row.description && <p className="text-[14px] text-ink/85 mt-1">{row.description}</p>}
+                <p className="ios-footnote text-ink-2 mt-1">
                   <span className="font-mono">{row.lat.toFixed(5)}, {row.lng.toFixed(5)}</span>
                   {' · '}
                   sent {new Date(row.created_at).toLocaleDateString()}
@@ -114,20 +114,20 @@ const ApplicationQueue: React.FC<{ rows: PlaceApplicationRow[]; onViewCafe: (caf
                 maxLength={280}
                 placeholder="Note to the applicant (shown if rejected)"
                 aria-label={`Review note for ${row.business_name}`}
-                className="w-full h-11 ios-fill rounded-[12px] px-3.5 text-[14px] text-[#13191F] placeholder:text-[#6E6150] focus:outline-none focus:shadow-[0_0_0_2px_#906D4B]"
+                className="w-full h-11 ios-fill rounded-row px-3.5 text-[14px] text-ink placeholder:text-ink-3 focus:outline-none focus:focus-ring"
               />
               <div className="flex gap-2">
                 <button
                   onClick={() => void review(row.id, 'approved')}
                   disabled={busyId === row.id}
-                  className="h-11 flex-1 rounded-full bg-[#3E5C48] text-[#FFFDF9] text-[15px] font-semibold inline-flex items-center justify-center gap-1.5 disabled:opacity-50 ios-press"
+                  className="h-11 flex-1 rounded-full bg-ok text-surface text-[15px] font-semibold inline-flex items-center justify-center gap-1.5 disabled:opacity-50 ios-press"
                 >
                   <Check className="w-4 h-4" /> Approve and list
                 </button>
                 <button
                   onClick={() => void review(row.id, 'rejected')}
                   disabled={busyId === row.id}
-                  className="h-11 flex-1 rounded-full ios-fill text-[#8C3A2E] text-[15px] font-semibold inline-flex items-center justify-center gap-1.5 disabled:opacity-50 ios-press"
+                  className="h-11 flex-1 rounded-full ios-fill text-danger text-[15px] font-semibold inline-flex items-center justify-center gap-1.5 disabled:opacity-50 ios-press"
                 >
                   <X className="w-4 h-4" /> Reject
                 </button>
@@ -139,28 +139,28 @@ const ApplicationQueue: React.FC<{ rows: PlaceApplicationRow[]; onViewCafe: (caf
 
       {reviewed.length > 0 && (
         <section className="space-y-1.5" aria-labelledby="place-history-title">
-          <h2 id="place-history-title" className="px-4 text-[13px] text-[#594C3D]">
+          <h2 id="place-history-title" className="px-4 text-[13px] text-ink-2">
             Reviewed
           </h2>
           <ul className="ios-group ios-card-shadow">
             {reviewed.map((row) => (
               <li key={row.id} className="ios-group-row">
                 <span className="flex-1 min-w-0">
-                  <span className="block text-[15px] text-[#13191F] truncate">{row.business_name}</span>
-                  <span className="block ios-footnote text-[#594C3D] truncate">
+                  <span className="block text-[15px] text-ink truncate">{row.business_name}</span>
+                  <span className="block ios-footnote text-ink-2 truncate">
                     {row.reviewed_at ? new Date(row.reviewed_at).toLocaleDateString() : ''}
                     {row.review_note ? ` · ${row.review_note}` : ''}
                   </span>
                 </span>
                 <span
                   className={`shrink-0 px-2 py-0.5 rounded-full text-[11px] font-semibold ${
-                    row.status === 'approved' ? 'bg-[#3E5C48]/12 text-[#3E5C48]' : 'bg-[#8C3A2E]/12 text-[#8C3A2E]'
+                    row.status === 'approved' ? 'bg-ok/12 text-ok' : 'bg-danger/12 text-danger'
                   }`}
                 >
                   {row.status === 'approved' ? 'Listed' : 'Rejected'}
                 </span>
                 {row.status === 'approved' && row.cafe_id && (
-                  <button onClick={() => onViewCafe(row.cafe_id ?? '')} aria-label={`View ${row.business_name}`} className="h-11 w-11 -mr-2 flex items-center justify-center text-[#7D5C3D] ios-press">
+                  <button onClick={() => onViewCafe(row.cafe_id ?? '')} aria-label={`View ${row.business_name}`} className="h-11 w-11 -mr-2 flex items-center justify-center text-tint-ink ios-press">
                     <ExternalLink className="w-4 h-4" />
                   </button>
                 )}
@@ -195,19 +195,19 @@ const ListingsPanel: React.FC<{ onViewCafe: (cafeId: string) => void }> = ({ onV
   return (
     <section className="space-y-2" aria-labelledby="listings-title">
       <h2 id="listings-title" className="ios-title px-1">
-        Listed places <span className="font-mono text-[#594C3D]">({listed.length})</span>
+        Listed places <span className="font-mono text-ink-2">({listed.length})</span>
       </h2>
       {error && <ErrorNote message={error} />}
       {listed.length === 0 ? (
-        <p className="px-1 text-[14px] text-[#594C3D]">No listings yet. Approved place applications appear here.</p>
+        <p className="px-1 text-[14px] text-ink-2">No listings yet. Approved place applications appear here.</p>
       ) : (
         <ul className="ios-group ios-card-shadow">
           {listed.map((cafe) => (
             <li key={cafe.id} className="ios-group-row">
-              <img src={cafe.logoUrl} alt="" className="h-10 w-10 rounded-[10px] object-cover shrink-0 bg-[#F2EAE0]" />
+              <img src={cafe.logoUrl} alt="" className="h-10 w-10 rounded-control object-cover shrink-0 bg-sunken" />
               <span className="flex-1 min-w-0">
-                <span className="block text-[15px] text-[#13191F] truncate">{cafe.name}</span>
-                <span className="block ios-footnote text-[#594C3D] truncate">
+                <span className="block text-[15px] text-ink truncate">{cafe.name}</span>
+                <span className="block ios-footnote text-ink-2 truncate">
                   {cafe.district}, {cafe.city}
                 </span>
               </span>
@@ -216,13 +216,13 @@ const ListingsPanel: React.FC<{ onViewCafe: (cafeId: string) => void }> = ({ onV
                 disabled={busyId === cafe.id}
                 aria-pressed={cafe.verified}
                 className={`h-9 px-3 rounded-full text-[13px] font-semibold inline-flex items-center gap-1 disabled:opacity-50 ios-press ${
-                  cafe.verified ? 'bg-[#3E5C48] text-[#FFFDF9]' : 'ios-fill text-[#13191F]'
+                  cafe.verified ? 'bg-ok text-surface' : 'ios-fill text-ink'
                 }`}
               >
                 <BadgeCheck className="w-3.5 h-3.5" />
                 {cafe.verified ? 'Verified' : 'Unverified'}
               </button>
-              <button onClick={() => onViewCafe(cafe.id)} aria-label={`View ${cafe.name}`} className="h-11 w-11 -mr-2 flex items-center justify-center text-[#7D5C3D] ios-press">
+              <button onClick={() => onViewCafe(cafe.id)} aria-label={`View ${cafe.name}`} className="h-11 w-11 -mr-2 flex items-center justify-center text-tint-ink ios-press">
                 <ExternalLink className="w-4 h-4" />
               </button>
             </li>
@@ -260,34 +260,34 @@ const UsersPanel: React.FC<{ profiles: Profile[] }> = ({ profiles }) => {
   return (
     <section className="space-y-3" aria-labelledby="users-title">
       <h2 id="users-title" className="ios-title px-1">
-        Accounts <span className="font-mono text-[#594C3D]">({profiles.length})</span>
+        Accounts <span className="font-mono text-ink-2">({profiles.length})</span>
       </h2>
       <input
         value={query}
         onChange={(event) => setQuery(event.target.value)}
         placeholder="Search by email or name"
         aria-label="Search accounts"
-        className="w-full h-11 ios-fill rounded-[12px] px-3.5 text-[15px] text-[#13191F] placeholder:text-[#6E6150] focus:outline-none focus:shadow-[0_0_0_2px_#906D4B]"
+        className="w-full h-11 ios-fill rounded-row px-3.5 text-[15px] text-ink placeholder:text-ink-3 focus:outline-none focus:focus-ring"
       />
       {error && <ErrorNote message={error} />}
       {adminService.getLoadError() && <ErrorNote message={adminService.getLoadError() ?? ''} />}
       {shown.length === 0 ? (
-        <p className="px-1 text-[14px] text-[#594C3D]">No accounts match.</p>
+        <p className="px-1 text-[14px] text-ink-2">No accounts match.</p>
       ) : (
         <ul className="ios-group ios-card-shadow">
           {shown.map((profile) => {
             const self = profile.id === me;
             return (
               <li key={profile.id} className="ios-group-row">
-                <span className="h-9 w-9 shrink-0 rounded-full bg-[#906D4B]/15 text-[#7D5C3D] flex items-center justify-center text-[14px] font-semibold" aria-hidden="true">
+                <span className="h-9 w-9 shrink-0 rounded-full bg-tint/15 text-tint-ink flex items-center justify-center text-[14px] font-semibold" aria-hidden="true">
                   {(profile.name || profile.email)[0]?.toUpperCase() ?? '?'}
                 </span>
                 <span className="flex-1 min-w-0">
-                  <span className="block text-[15px] text-[#13191F] truncate">
+                  <span className="block text-[15px] text-ink truncate">
                     {profile.name || profile.email}
                     {self ? ' (you)' : ''}
                   </span>
-                  <span className="block ios-footnote text-[#594C3D] truncate">
+                  <span className="block ios-footnote text-ink-2 truncate">
                     {profile.email}
                     {profile.business_name ? ` · ${profile.business_name}` : ''}
                     {' · joined '}
@@ -300,7 +300,7 @@ const UsersPanel: React.FC<{ profiles: Profile[] }> = ({ profiles }) => {
                     value={profile.role}
                     disabled={self || busyId === profile.id}
                     onChange={(event) => void changeRole(profile.id, event.target.value as ProfileRole)}
-                    className="h-9 ios-fill rounded-[10px] px-2.5 text-[13px] font-semibold text-[#13191F] focus:outline-none focus:shadow-[0_0_0_2px_#906D4B] disabled:opacity-60"
+                    className="h-9 ios-fill rounded-control px-2.5 text-[13px] font-semibold text-ink focus:outline-none focus:focus-ring disabled:opacity-60"
                   >
                     {(Object.keys(ROLE_LABELS) as ProfileRole[]).map((role) => (
                       <option key={role} value={role}>
@@ -314,7 +314,7 @@ const UsersPanel: React.FC<{ profiles: Profile[] }> = ({ profiles }) => {
           })}
         </ul>
       )}
-      <p className="px-1 ios-footnote text-[#594C3D]">
+      <p className="px-1 ios-footnote text-ink-2">
         Place owner is granted automatically when a place application is approved. Setting it here does not create a listing.
       </p>
     </section>
@@ -344,7 +344,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewCafe, onOp
       <div className="max-w-md mx-auto px-4 pt-1 pb-8 sm:pt-4 space-y-5">
         <LargeTitle title="Control Room" />
         <div className={CARD}>
-          <p className="text-[15px] text-[#594C3D]">The Control Room is not available right now.</p>
+          <p className="text-[15px] text-ink-2">The Control Room is not available right now.</p>
         </div>
       </div>
     );
@@ -371,8 +371,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewCafe, onOp
       <div className="max-w-md mx-auto px-4 pt-1 pb-8 sm:pt-4 space-y-5">
         <LargeTitle title="Control Room" />
         <div className={`${CARD} space-y-2`}>
-          <p className="text-[15px] text-[#13191F]">This account has no admin access.</p>
-          <p className="text-[14px] text-[#594C3D]">
+          <p className="text-[15px] text-ink">This account has no admin access.</p>
+          <p className="text-[14px] text-ink-2">
             Signed in as {user.email}. Admin roles are granted in the database, never from the app.
           </p>
         </div>
@@ -400,13 +400,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewCafe, onOp
         title="Control Room"
         subtitle={`Signed in as ${user.email}`}
         trailing={
-          <span className="h-9 w-9 rounded-full bg-[#906D4B]/15 text-[#7D5C3D] flex items-center justify-center">
+          <span className="h-9 w-9 rounded-full bg-tint/15 text-tint-ink flex items-center justify-center">
             <ShieldCheck className="w-4.5 h-4.5" />
           </span>
         }
       />
 
-      <div className="flex p-0.5 rounded-[10px] ios-fill" role="tablist" aria-label="Control Room sections">
+      <div className="flex p-0.5 rounded-control ios-fill" role="tablist" aria-label="Control Room sections">
         {tabs.map((entry) => {
           const active = tab === entry.id;
           return (
@@ -421,10 +421,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewCafe, onOp
                 <motion.span
                   layoutId="admin-tab-thumb"
                   transition={{ type: 'spring', stiffness: 500, damping: 38 }}
-                  className="absolute inset-0 rounded-[8px] bg-[#FFFDF9] shadow-[0_1px_4px_rgba(19,25,31,0.14),0_0_0_0.5px_rgba(19,25,31,0.04)]"
+                  className="absolute inset-0 rounded-[8px] bg-surface shadow-[0_1px_4px_rgba(19,25,31,0.14),0_0_0_0.5px_rgba(19,25,31,0.04)]"
                 />
               )}
-              <span className={`relative ${active ? 'text-[#13191F]' : 'text-[#594C3D]'}`}>
+              <span className={`relative ${active ? 'text-ink' : 'text-ink-2'}`}>
                 {entry.label}
                 {entry.count !== undefined && entry.count > 0 && <span className="font-mono"> ({entry.count})</span>}
               </span>

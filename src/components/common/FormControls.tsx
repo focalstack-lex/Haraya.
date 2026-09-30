@@ -79,7 +79,7 @@ export const Modal: React.FC<{
 
   return (
     <motion.div
-      className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center bg-[#13191F]/40 p-0 sm:p-6"
+      className="fixed inset-0 z-[80] flex items-end sm:items-center justify-center bg-ink/40 p-0 sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-labelledby={labelledBy}
@@ -99,7 +99,7 @@ export const Modal: React.FC<{
         dragConstraints={{ top: 0, bottom: 0 }}
         dragElastic={{ top: 0, bottom: 0.9 }}
         onDragEnd={handleDragEnd}
-        className={`relative bg-[#FFFDF9] w-full ${maxWidth} rounded-t-[28px] sm:rounded-[24px] max-h-[92dvh] overflow-y-auto overscroll-contain shadow-[0_-8px_40px_rgba(19,25,31,0.18)] sm:shadow-[0_24px_64px_-12px_rgba(19,25,31,0.35)] sheet-safe`}
+        className={`relative bg-surface w-full ${maxWidth} rounded-t-sheet sm:rounded-sheet max-h-[92dvh] overflow-y-auto overscroll-contain shadow-sheet sm:shadow-[0_24px_64px_-12px_rgba(19,25,31,0.35)] sheet-safe`}
       >
         {/* Grabber: the drag handle on phones */}
         <div
@@ -122,17 +122,17 @@ export const ModalHeader: React.FC<{
 }> = ({ title, subtitle, onClose }) => {
   const labelId = useContext(ModalLabelContext);
   return (
-    <div className="sticky top-0 z-10 ios-material-bar ios-hairline-b px-4 sm:px-6 pt-5 sm:pt-4 pb-3 flex items-start justify-between gap-3">
+    <div className="sticky top-0 z-10 bg-surface ios-hairline-b px-4 sm:px-6 pt-5 sm:pt-4 pb-3 flex items-start justify-between gap-3">
       <div className="min-w-0 pt-1">
-        <h2 id={labelId} className="font-cooper text-[19px] sm:text-xl font-bold text-[#13191F] leading-tight truncate">{title}</h2>
-        {subtitle && <p className="ios-footnote text-[#594C3D] mt-0.5 truncate">{subtitle}</p>}
+        <h2 id={labelId} className="font-cooper text-[19px] sm:text-xl font-bold text-ink leading-tight truncate">{title}</h2>
+        {subtitle && <p className="ios-footnote text-ink-2 mt-0.5 truncate">{subtitle}</p>}
       </div>
       <button
         onClick={onClose}
         aria-label="Close dialog"
         className="h-11 w-11 -mr-2 -mt-1 shrink-0 flex items-center justify-center ios-press"
       >
-        <span className="h-7.5 w-7.5 rounded-full bg-[#766046]/15 flex items-center justify-center text-[#594C3D]">
+        <span className="h-7.5 w-7.5 rounded-full bg-shade/15 flex items-center justify-center text-ink-2">
           <X className="w-4 h-4" strokeWidth={2.5} />
         </span>
       </button>
@@ -146,14 +146,14 @@ export const Field: React.FC<{
   hint?: string;
 }> = ({ label, children, hint }) => (
   <label className="block space-y-1.5">
-    <span className="block px-1 text-[13px] font-medium text-[#594C3D] font-sans">{label}</span>
+    <span className="block px-1 text-[13px] font-medium text-ink-2 font-sans">{label}</span>
     {children}
-    {hint && <span className="block px-1 ios-footnote text-[#594C3D]">{hint}</span>}
+    {hint && <span className="block px-1 ios-footnote text-ink-2">{hint}</span>}
   </label>
 );
 
 const inputClass =
-  'w-full ios-fill rounded-[12px] px-3.5 h-11 min-h-[40px] font-sans text-[15px] text-[#13191F] placeholder:text-[#6E6150] focus:outline-none focus:bg-[#FFFDF9] focus:shadow-[0_0_0_2px_#906D4B] transition-[background-color,box-shadow]';
+  'w-full ios-fill rounded-row px-3.5 h-11 min-h-[40px] font-sans text-[15px] text-ink placeholder:text-ink-3 focus:outline-none focus:bg-surface focus:focus-ring transition-[background-color,box-shadow]';
 
 export const TextInput: React.FC<{
   value: string;
@@ -191,7 +191,7 @@ export const TextArea: React.FC<{
     maxLength={maxLength}
     placeholder={placeholder}
     onChange={(event) => onChange(event.target.value)}
-    className="w-full ios-fill rounded-[12px] px-3.5 py-3 font-sans text-[15px] text-[#13191F] placeholder:text-[#6E6150] focus:outline-none focus:bg-[#FFFDF9] focus:shadow-[0_0_0_2px_#906D4B] transition-[background-color,box-shadow] resize-none"
+    className="w-full ios-fill rounded-row px-3.5 py-3 font-sans text-[15px] text-ink placeholder:text-ink-3 focus:outline-none focus:bg-surface focus:focus-ring transition-[background-color,box-shadow] resize-none"
   />
 );
 
@@ -203,7 +203,7 @@ export const SelectInput: React.FC<{
   <select
     value={value}
     onChange={(event) => onChange(event.target.value)}
-    className="w-full ios-fill rounded-[12px] px-3.5 h-11 min-h-[40px] font-sans text-[15px] text-[#13191F] focus:outline-none focus:shadow-[0_0_0_2px_#906D4B] transition-shadow"
+    className="w-full ios-fill rounded-row px-3.5 h-11 min-h-[40px] font-sans text-[15px] text-ink focus:outline-none focus:focus-ring transition-shadow"
   >
     {options.map((option) => (
       <option key={option.value} value={option.value}>
@@ -226,7 +226,7 @@ export const PrimaryButton: React.FC<{
     type={type}
     onClick={onClick}
     disabled={disabled}
-    className={`h-11 px-5 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[15px] font-semibold font-sans hover:bg-[#7D5C3D] ios-press disabled:opacity-40 disabled:cursor-not-allowed ${className}`}
+    className={`h-11 px-5 rounded-full bg-tint text-surface text-[15px] font-semibold font-sans hover:bg-tint-ink ios-press disabled:opacity-40 disabled:cursor-not-allowed ${className}`}
   >
     {children}
   </button>
@@ -240,7 +240,7 @@ export const SecondaryButton: React.FC<{
   <button
     type="button"
     onClick={onClick}
-    className={`h-11 px-5 rounded-full ios-fill text-[#7D5C3D] text-[15px] font-semibold font-sans hover:bg-[#766046]/20 ios-press ${className}`}
+    className={`h-11 px-5 rounded-full ios-fill text-tint-ink text-[15px] font-semibold font-sans hover:bg-shade/20 ios-press ${className}`}
   >
     {children}
   </button>
@@ -257,7 +257,7 @@ export const Chip: React.FC<{
     onClick={onClick}
     aria-pressed={active}
     className={`h-8 shrink-0 px-3.5 rounded-full text-[13px] font-medium font-sans whitespace-nowrap ios-press ${
-      active ? 'bg-[#13191F] text-[#FFFDF9]' : 'ios-fill text-[#13191F] hover:bg-[#766046]/20'
+      active ? 'bg-ink text-surface' : 'ios-fill text-ink hover:bg-shade/20'
     } ${className}`}
   >
     {label}
@@ -265,7 +265,7 @@ export const Chip: React.FC<{
 );
 
 export const ErrorNote: React.FC<{ message: string }> = ({ message }) => (
-  <p role="alert" className="ios-footnote text-[#8C3A2E] bg-[#8C3A2E]/10 rounded-[12px] px-3.5 py-2.5">
+  <p role="alert" className="ios-footnote text-danger bg-danger/10 rounded-row px-3.5 py-2.5">
     {message}
   </p>
 );

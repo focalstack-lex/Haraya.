@@ -132,7 +132,7 @@ export const MtApoOriginIcon: React.FC<IconProps> = ({ className = 'w-5 h-5' }) 
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className}>
     <path d="m2 20 8.5-13 4 6 2.5-3.5 5 10.5H2Z" />
     <path d="m8 11 2.5 3.5 3-2 1.5 2" className="opacity-65" />
-    <circle cx="17.5" cy="7.5" r="1.5" className="text-[#CA9C68]" />
+    <circle cx="17.5" cy="7.5" r="1.5" className="text-star" />
   </svg>
 );
 

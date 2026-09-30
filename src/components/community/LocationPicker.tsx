@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { TILE_URL, TILE_OPTIONS } from '../map/tiles';
 import L from 'leaflet';
 import { LocateFixed } from 'lucide-react';
 
@@ -26,10 +27,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({ lat, lng, onChan
   useEffect(() => {
     if (!canvasRef.current || mapRef.current) return;
     const map = L.map(canvasRef.current, { center: DAVAO_CENTER, zoom: 12, zoomControl: true, scrollWheelZoom: false });
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      maxZoom: 19,
-    }).addTo(map);
+    L.tileLayer(TILE_URL, TILE_OPTIONS).addTo(map);
     map.on('click', (event: L.LeafletMouseEvent) => onChangeRef.current({ lat: event.latlng.lat, lng: event.latlng.lng }));
     mapRef.current = map;
     return () => {
@@ -91,15 +89,15 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({ lat, lng, onChan
         type="button"
         onClick={useMyLocation}
         disabled={locating}
-        className="h-11 w-full sm:w-auto px-4 rounded-full ios-fill text-[15px] font-semibold text-[#7D5C3D] inline-flex items-center justify-center gap-2 hover:bg-[#766046]/20 disabled:opacity-50 ios-press"
+        className="h-11 w-full sm:w-auto px-4 rounded-full ios-fill text-[15px] font-semibold text-tint-ink inline-flex items-center justify-center gap-2 hover:bg-shade/20 disabled:opacity-50 ios-press"
       >
         <LocateFixed className="w-4 h-4" />
         {locating ? 'Finding you' : 'Use my current location'}
       </button>
-      <div className="relative isolate rounded-[16px] overflow-hidden ios-card-shadow">
+      <div className="relative isolate rounded-row overflow-hidden ios-card-shadow">
         <div ref={canvasRef} className="h-56 sm:h-64 z-0" role="application" aria-label="Tap to place the spot on the map" />
       </div>
-      <p className="ios-footnote text-[#594C3D]">
+      <p className="ios-footnote text-ink-2">
         {lat !== null && lng !== null ? (
           <>
             Pin set at <span className="font-mono">{lat.toFixed(5)}, {lng.toFixed(5)}</span>. Tap the map to move it.
@@ -108,7 +106,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({ lat, lng, onChan
           'Tap the map where the entrance is.'
         )}
       </p>
-      {locateError && <p className="ios-footnote text-[#8C3A2E]">{locateError}</p>}
+      {locateError && <p className="ios-footnote text-danger">{locateError}</p>}
     </div>
   );
 };

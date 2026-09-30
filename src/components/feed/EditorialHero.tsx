@@ -65,13 +65,13 @@ export const EditorialHero: React.FC<EditorialHeroProps> = ({ studySpots, hidden
 
   return (
     <section aria-label="Featured study spots and hidden gems" aria-roledescription="carousel" className="-mx-4 sm:mx-0">
-      <div ref={trackRef} onScroll={handleScroll} style={{ scrollPaddingInline: 0 }} className="ios-shelf sm:rounded-[20px] sm:overflow-hidden">
+      <div ref={trackRef} onScroll={handleScroll} style={{ scrollPaddingInline: 0 }} className="ios-shelf sm:rounded-card sm:overflow-hidden">
         {slides.map((slide, i) => (
           <div key={slide.id} className="w-full shrink-0 px-4 sm:px-0" aria-roledescription="slide" aria-label={`${i + 1} of ${slides.length}`}>
             <button
               type="button"
               onClick={slide.onOpen}
-              className="group relative block w-full aspect-[16/10] sm:aspect-[21/9] rounded-[20px] sm:rounded-none overflow-hidden bg-[#13191F] text-left ios-press active:scale-[0.985]"
+              className="group relative block w-full aspect-[16/10] sm:aspect-[21/9] rounded-card sm:rounded-none overflow-hidden bg-ink text-left ios-press active:scale-[0.985]"
             >
               <img
                 src={slide.image}
@@ -79,17 +79,17 @@ export const EditorialHero: React.FC<EditorialHeroProps> = ({ studySpots, hidden
                 loading={i === 0 ? 'eager' : 'lazy'}
                 className="absolute inset-0 w-full h-full object-cover"
               />
-              <span className="absolute inset-0 bg-gradient-to-t from-[#13191F]/90 via-[#13191F]/25 to-transparent sm:bg-gradient-to-r sm:from-[#13191F]/85 sm:via-[#13191F]/35" />
+              <span className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/25 to-transparent sm:bg-gradient-to-r sm:from-ink/85 sm:via-ink/35" />
               <span className="absolute inset-x-0 bottom-0 p-5 sm:p-8 sm:max-w-lg sm:top-0 sm:flex sm:flex-col sm:justify-end">
-                <span className="block font-cooper text-[26px] sm:text-4xl font-bold leading-[1.08] text-[#FFFDF9] text-balance">
+                <span className="block font-cooper text-[26px] sm:text-4xl font-bold leading-[1.08] text-surface text-balance">
                   {slide.title}
                 </span>
-                <span className="block mt-1.5 text-[13px] sm:text-sm font-medium text-[#FFFDF9]/85 line-clamp-1">{slide.meta}</span>
+                <span className="block mt-1.5 text-[13px] sm:text-sm font-medium text-surface/85 line-clamp-1">{slide.meta}</span>
                 {slide.body && (
-                  <span className="block mt-0.5 text-[13px] sm:text-sm text-[#FFFDF9]/70 line-clamp-1">{slide.body}</span>
+                  <span className="block mt-0.5 text-[13px] sm:text-sm text-surface/70 line-clamp-1">{slide.body}</span>
                 )}
                 <span className="mt-3 sm:mt-4 flex items-center">
-                  <span className="shrink-0 inline-flex items-center gap-1 h-9 pl-4 pr-3 rounded-full bg-[#FFFDF9] text-[#13191F] text-[14px] font-semibold">
+                  <span className="shrink-0 inline-flex items-center gap-1 h-9 pl-4 pr-3 rounded-full bg-surface text-ink text-[14px] font-semibold">
                     View spot
                     <ChevronRight className="w-4 h-4" strokeWidth={2.5} />
                   </span>
@@ -113,7 +113,7 @@ export const EditorialHero: React.FC<EditorialHeroProps> = ({ studySpots, hidden
             >
               <span
                 className={`block h-2 rounded-full transition-all duration-300 ${
-                  index === i ? 'w-5 bg-[#13191F]' : 'w-2 bg-[#13191F]/25'
+                  index === i ? 'w-5 bg-ink' : 'w-2 bg-ink/25'
                 }`}
               />
             </button>

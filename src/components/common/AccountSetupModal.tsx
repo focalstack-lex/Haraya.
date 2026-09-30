@@ -52,10 +52,10 @@ export const AccountSetupModal: React.FC<AccountSetupModalProps> = ({ isOpen, on
       <div className="p-5 sm:p-6 space-y-4">
         <div className="flex flex-col items-center text-center space-y-2 pt-2 sm:pt-0">
           <AyaMascot pose="welcome" size={80} alt="" />
-          <h2 id="account-setup-title" className="ios-title2 font-cooper text-[#13191F]">
+          <h2 id="account-setup-title" className="ios-title2 font-cooper text-ink">
             Set up your account
           </h2>
-          <p className="text-[14px] text-[#594C3D] max-w-sm">
+          <p className="text-[14px] text-ink-2 max-w-sm">
             Welcome to Haraya. Set your username and a password so you can also sign in with email anytime.
           </p>
         </div>
