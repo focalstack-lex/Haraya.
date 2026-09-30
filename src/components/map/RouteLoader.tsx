@@ -12,7 +12,7 @@ const COPY: Record<Exclude<RouteLoadPhase, null>, { title: string; line: string 
  * Holds a loading phase on screen for at least MIN_LOADER_MS after it first appears, so a quick answer does not
  * flash the loader. Returns the phase to show, or null when the loader should be gone.
  */
-export function useHeldPhase(phase: RouteLoadPhase): RouteLoadPhase {
+export function useHeldPhase(phase: RouteLoadPhase, minMs: number = MIN_LOADER_MS): RouteLoadPhase {
   const [shown, setShown] = useState<RouteLoadPhase>(phase);
   const shownSince = useRef<number | null>(phase ? Date.now() : null);
 
@@ -26,13 +26,13 @@ export function useHeldPhase(phase: RouteLoadPhase): RouteLoadPhase {
       setShown(null);
       return;
     }
-    const wait = Math.max(0, MIN_LOADER_MS - (Date.now() - shownSince.current));
+    const wait = Math.max(0, minMs - (Date.now() - shownSince.current));
     const timer = window.setTimeout(() => {
       shownSince.current = null;
       setShown(null);
     }, wait);
     return () => window.clearTimeout(timer);
-  }, [phase]);
+  }, [phase, minMs]);
 
   return shown;
 }
@@ -42,6 +42,9 @@ export function useHeldPhase(phase: RouteLoadPhase): RouteLoadPhase {
 export const RouteLoader: React.FC<{ phase: Exclude<RouteLoadPhase, null> }> = ({ phase }) => (
   <p className="ios-footnote text-ink-2">{COPY[phase].line}</p>
 );
+
+/** Aya's search stays on the map at least this long, so even an instant GPS fix gets its moment. */
+export const MIN_OVERLAY_MS = 1500;
 
 /** How long Aya celebrates once the wait ends well, before the map is handed back. */
 const FOUND_MS = 1100;

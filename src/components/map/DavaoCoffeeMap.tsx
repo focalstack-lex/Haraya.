@@ -31,7 +31,7 @@ import { ROUTE_ATTRIBUTION, useWalkingRoute } from './walkingRoute';
 import { externalMapLinks } from './DirectionsActionSheet';
 import { AyaMascot } from '../common/AyaMascot';
 import { routeLoadPhase } from './routeLoadPhase';
-import { MapAyaOverlay, RouteLoader, useHeldPhase } from './RouteLoader';
+import { MapAyaOverlay, MIN_OVERLAY_MS, RouteLoader, useHeldPhase } from './RouteLoader';
 import { Chip } from '../common/FormControls';
 import { LocationHelp } from '../common/LocationHelp';
 import { LargeTitle } from '../common/LargeTitle';
@@ -181,7 +181,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({
   const { position: myPosition, status: locationStatus, request: requestLocation } = useLocation({ maximumAgeMs: 0, highAccuracy: true });
   const framedNearbyFix = useRef<GeoPoint | null>(null);
   // Aya covers the map for either wait: the walk's first fix and route, or the fix for the nearby view
-  const overlayPhase = useHeldPhase(loadPhase ?? (!navTarget && locationStatus === 'locating' ? 'locating' : null));
+  const overlayPhase = useHeldPhase(loadPhase ?? (!navTarget && locationStatus === 'locating' ? 'locating' : null), MIN_OVERLAY_MS);
   const overlaySucceeded = navTarget
     ? Boolean(nav.position) && nav.status !== 'denied' && nav.status !== 'unavailable'
     : Boolean(myPosition) && locationStatus === 'granted';
