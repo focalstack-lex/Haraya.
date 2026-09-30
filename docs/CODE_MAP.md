@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-30 : commit 8ebffc4 : fingerprint 5b06b0b740f3eae4
+Generated 2026-09-30 : commit 37924fe : fingerprint 941d3e05fdbebcfc
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
