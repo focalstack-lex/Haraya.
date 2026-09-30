@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-30 : commit d2a6706 : fingerprint ec1fc69332ffc345
+Generated 2026-09-30 : commit 6949fbe : fingerprint 90a2bf4b3cc23cf0
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -11,7 +11,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 - `index.html` (30 lines) : . module: index.html
 - `scripts/generate-cafes-seed.mjs` (60 lines) : Writes the SQL that stores the catalog spots in the database: Green Coffee and the Digos City shops, with their
-- `scripts/generate-code-map.mjs` (212 lines) : One-line purpose per file, inferred from its path and leading doc comment.
+- `scripts/generate-code-map.mjs` (215 lines) : One-line purpose per file, inferred from its path and leading doc comment.
 - `scripts/make-email-logo.mjs` (30 lines) : Builds public/brand/haraya-email-logo.png: the wordmark on its own linen tile with rounded corners.
 - `scripts/verify-google-auth.mjs` (109 lines) : scripts module: verify-google-auth
 - `src/App.tsx` (893 lines) : Older links: the roaster portal is now the Place Portal. The Passport tab also answers to its own name.

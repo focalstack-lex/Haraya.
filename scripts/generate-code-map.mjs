@@ -118,7 +118,8 @@ function fingerprint(files) {
   for (const file of files) {
     hash.update(relative(ROOT, file).replaceAll('\\', '/'));
     hash.update('\0');
-    hash.update(readFileSync(file));
+    // Line endings are normalized so a Windows checkout (CRLF) and CI on Linux (LF) agree
+    hash.update(readFileSync(file, 'utf8').replace(/\r\n/g, '\n'));
     hash.update('\0');
   }
   return hash.digest('hex').slice(0, 16);
@@ -177,7 +178,9 @@ function compose(files) {
 
 // ---------- main ----------
 
-const files = walk(ROOT).sort();
+// Sorted by the forward-slash path, so the order does not depend on the platform's separator
+const relKey = (file) => relative(ROOT, file).replaceAll('\\', '/');
+const files = walk(ROOT).sort((a, b) => (relKey(a) < relKey(b) ? -1 : relKey(a) > relKey(b) ? 1 : 0));
 if (files.length === 0) {
   console.error('generate-code-map: no source files found');
   process.exit(1);
