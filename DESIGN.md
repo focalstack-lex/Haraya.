@@ -187,7 +187,10 @@ Color is information. The tint marks the one active or primary thing in a region
 - It is a guide, not the lock. The lock is Supabase refusing a session to an unconfirmed address; clearing site
   data or choosing "wrong address" returns the visitor to guest browsing, which has no account powers.
 - Confirmation email: `supabase/templates/confirm-signup.html` (paste into the hosted dashboard, Authentication >
-  Emails > Confirm signup). Linen canvas, one surface card, the wordmark, a tint pill button, Arial only. No hidden
+  Emails > Confirm signup). Linen canvas, one surface card, Arial only. Built to survive phone dark mode, where
+  Gmail repaints backgrounds and text but not images: the logo is `public/brand/haraya-email-logo.png`, the
+  wordmark on its own linen tile (`node scripts/make-email-logo.mjs`), and the pill button is ink (#13191F) with
+  cream text, which stays high-contrast when flipped; the tint button turned tan with brown text. No hidden
   preview text, one image, and the link is `{{ .SiteURL }}/?token_hash=...&type=email` so it shows Haraya's domain;
   `sessionService.start()` verifies it with `verifyOtp`, which also works on a device that did not start the sign-up.
 
