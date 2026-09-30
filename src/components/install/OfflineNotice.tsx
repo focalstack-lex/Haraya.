@@ -1,20 +1,9 @@
-import React, { useSyncExternalStore } from 'react';
+import React from 'react';
 import { AyaMascot } from '../common/AyaMascot';
-
-const subscribe = (notify: () => void) => {
-  window.addEventListener('online', notify);
-  window.addEventListener('offline', notify);
-  return () => {
-    window.removeEventListener('online', notify);
-    window.removeEventListener('offline', notify);
-  };
-};
-
-const getOnline = () => navigator.onLine;
-const getServerOnline = () => true;
+import { useOnline } from '../../hooks/useOnline';
 
 export const OfflineNotice: React.FC = () => {
-  const online = useSyncExternalStore(subscribe, getOnline, getServerOnline);
+  const online = useOnline();
   if (online) return null;
 
   return (

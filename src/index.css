@@ -276,6 +276,71 @@ html {
   filter: grayscale(0.4) sepia(0.14) saturate(0.85);
 }
 
+/* Map pins (mapPins.ts): each spot's profile picture, and overlapping pictures for spots too close to tell apart.
+   The hovered or previewed one grows; the scale sits on the inner div because Leaflet positions the container
+   with its own transform. */
+.haraya-pin {
+  transition: transform 0.2s var(--ios-ease);
+  transform-origin: 50% 100%;
+}
+
+.haraya-pin-active .haraya-pin {
+  transform: scale(1.25);
+}
+
+.haraya-photo-pin {
+  position: relative;
+  width: 40px;
+  height: 40px;
+}
+
+/* The tail under the photo points at the spot; the marker is anchored at its tip */
+.haraya-photo-pin::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  width: 10px;
+  height: 10px;
+  margin-left: -5px;
+  background: #FFFDF9;
+  transform: rotate(45deg);
+  box-shadow: 2px 2px 3px rgba(19, 25, 31, 0.25);
+}
+
+.haraya-photo-pin img,
+.haraya-photo-stack img {
+  display: block;
+  border-radius: 9999px;
+  object-fit: cover;
+  background: #13191F;
+  border: 2.5px solid #FFFDF9;
+  box-shadow: 0 1px 2px rgba(19, 25, 31, 0.2), 0 4px 10px rgba(19, 25, 31, 0.3);
+}
+
+/* Photo widths and heights are inline in mapPins.ts: Leaflet's marker img rule outranks these classes */
+.haraya-photo-pin img {
+  position: relative;
+  z-index: 1;
+}
+
+.haraya-photo-stack {
+  position: relative;
+  height: 34px;
+  transform-origin: 50% 50%;
+}
+
+.haraya-photo-stack img {
+  position: absolute;
+  top: 0;
+}
+
+/* Map tiles overlap by 1px (SeamlessTileLayer in DavaoCoffeeMap.tsx) so no hairline gap shows at 125% or 150%
+   display scale. Leaflet's own plus-lighter blend (its seam workaround) would add the overlapping pixels into a
+   bright line, so tiles paint normally here. */
+.leaflet-container .leaflet-tile-container img.leaflet-tile {
+  mix-blend-mode: normal;
+}
 /* Cup Check flavor pins float over post photos */
 .flavor-pin {
   filter: drop-shadow(0 2px 8px rgba(19, 25, 31, 0.4));

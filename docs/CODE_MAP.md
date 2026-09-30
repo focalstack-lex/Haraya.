@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-29 : commit 773334d : fingerprint b24b63f89bbe7136
+Generated 2026-09-29 : commit 4a809b0 : fingerprint 7a4e10967dd6bed3
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -10,12 +10,13 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 ## root/
 
 - `index.html` (30 lines) : . module: index.html
+- `scripts/generate-cafes-seed.mjs` (60 lines) : Writes the SQL that stores the catalog spots in the database: Green Coffee and the Digos City shops, with their
 - `scripts/generate-code-map.mjs` (212 lines) : One-line purpose per file, inferred from its path and leading doc comment.
 - `scripts/verify-google-auth.mjs` (109 lines) : scripts module: verify-google-auth
-- `src/App.tsx` (832 lines) : Older links: the roaster portal is now the Place Portal.
+- `src/App.tsx` (833 lines) : Older links: the roaster portal is now the Place Portal.
   - L69 : SharedList
   - L95 : App
-- `src/index.css` (825 lines) : src entry point
+- `src/index.css` (890 lines) : src entry point
 - `src/main.tsx` (41 lines) : src entry point
 - `vite.config.ts` (43 lines) : . module: vite.config
 
@@ -53,6 +54,9 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/components/common/FormControls.tsx` (272 lines) : Shared form primitives for Haraya: an iOS-style sheet (bottom sheet with a
 - `src/components/common/ImageUploadField.tsx` (83 lines) : File input that stores the image as a dataURL with type and size validation.
 - `src/components/common/LargeTitle.tsx` (46 lines) : iOS large title: the first thing on every primary page, left aligned.
+- `src/components/common/locationFix.test.ts` (37 lines) : src/components/common module: locationFix.test
+- `src/components/common/locationFix.ts` (46 lines) : Which set of steps fits the visitor's device.
+- `src/components/common/LocationHelp.tsx` (34 lines) : Why Haraya cannot see the visitor's location, with the steps for their device to turn it on.
 - `src/components/common/WelcomeModal.tsx` (160 lines) : What the app does, stated plainly: one row per real surface.
 
 ## src/components/community/
@@ -91,7 +95,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/components/install/installPromptStore.ts` (62 lines) : Captures the browser's install prompt so Aya can offer it at the right moment. The event can
 - `src/components/install/InstallSheet.tsx` (150 lines) : Aya offers to put Haraya on the home screen. The variant follows the platform mode snapshot: a real
 - `src/components/install/installStorage.ts` (20 lines) : Remembers that Aya already offered to install Haraya. Storage can throw in private
-- `src/components/install/OfflineNotice.tsx` (31 lines) : src/components/install module: OfflineNotice
+- `src/components/install/OfflineNotice.tsx` (20 lines) : src/components/install module: OfflineNotice
 - `src/components/install/useInstallPrompt.ts` (19 lines) : src/components/install module: useInstallPrompt
 
 ## src/components/layout/
@@ -103,15 +107,20 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/map/
 
-- `src/components/map/DavaoCoffeeMap.tsx` (611 lines) : Escapes catalog text before it is placed into Leaflet tooltip HTML.
-  - L36 : DavaoCoffeeMapProps
-  - L52 : DavaoCoffeeMap
+- `src/components/map/DavaoCoffeeMap.tsx` (962 lines) : Floating map control: a round bar-material button inside a 44px hit area.
+  - L55 : RowHandlers
+  - L128 : DavaoCoffeeMapProps
+  - L146 : DavaoCoffeeMap
 - `src/components/map/DirectionsActionSheet.tsx` (58 lines) : External map apps. Apple Maps uses its https form so the link also works outside Apple devices.
 - `src/components/map/liveNavMath.test.ts` (71 lines) : src/components/map module: liveNavMath.test
 - `src/components/map/liveNavMath.ts` (63 lines) : Pure math for in-app walking navigation. These straight-line figures are the fallback when no street route
-- `src/components/map/RouteLoader.tsx` (50 lines) : Holds a loading phase on screen for at least MIN_LOADER_MS after it first appears, so a quick answer does not
-- `src/components/map/routeLoadPhase.test.ts` (34 lines) : src/components/map module: routeLoadPhase.test
-- `src/components/map/routeLoadPhase.ts` (22 lines) : What the walk is still waiting for before the first route can be drawn; null once there is nothing to wait for.
+- `src/components/map/mapFilters.test.ts` (70 lines) : src/components/map module: mapFilters.test
+- `src/components/map/mapFilters.ts` (33 lines) : True when the spot passes every active map filter; no filters means every spot.
+- `src/components/map/mapPins.test.ts` (72 lines) : src/components/map module: mapPins.test
+- `src/components/map/mapPins.ts` (95 lines) : Whether a spot is open right now, for the list and the preview card.
+- `src/components/map/MapPreviewCard.tsx` (123 lines) : Inside the last hour the card counts down, so a visitor does not walk to a door that is about to shut.
+- `src/components/map/nearby.test.ts` (31 lines) : src/components/map module: nearby.test
+- `src/components/map/nearby.ts` (21 lines) : Spots this close to the visitor show up on their own when the map opens.
 - `src/components/map/routeMath.test.ts` (53 lines) : src/components/map module: routeMath.test
 - `src/components/map/routeMath.ts` (63 lines) : Pure math for following a street route: snap the visitor onto the nearest route segment, measure what is
 - `src/components/map/useLiveNavigation.ts` (129 lines) : Walking navigation driven by navigator.geolocation.watchPosition with high accuracy. Positions stay in
@@ -121,9 +130,9 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 - `src/components/moodFinder/MoodCard.tsx` (106 lines) : Late evening, when "open late" matters: 8 PM to 4 AM on the device clock.
 - `src/components/moodFinder/moodCardState.test.ts` (34 lines) : src/components/moodFinder module: moodCardState.test
-- `src/components/moodFinder/MoodFinderSheet.tsx` (352 lines) : The mood finder: say how you feel and what you need, get three explained picks and a route.
-  - L16 : MoodFinderSheetProps
-  - L39 : MoodFinderSheet
+- `src/components/moodFinder/MoodFinderSheet.tsx` (363 lines) : The mood finder: say how you feel and what you need, get three explained picks and a route.
+  - L17 : MoodFinderSheetProps
+  - L40 : MoodFinderSheet
 - `src/components/moodFinder/MoodResultCard.tsx` (83 lines) : One suggestion: why it fits (real catalog facts), how far, how long it stays open, what to order.
 - `src/components/moodFinder/moods.ts` (44 lines) : Moods rank cafes softly; must-haves filter strictly. See docs/superpowers/specs/2026-09-28-mood-finder-design.md.
 - `src/components/moodFinder/moodStorage.ts` (25 lines) : Remembers the last chosen must-haves. Storage can throw or hold stale values, so reads validate.
@@ -131,7 +140,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/components/moodFinder/parseQuery.ts` (85 lines) : Deterministic reading of a typed request ("quiet place to study, not too pricey, near Matina").
 - `src/components/moodFinder/scoreCafes.test.ts` (167 lines) : src/components/moodFinder module: scoreCafes.test
 - `src/components/moodFinder/scoreCafes.ts` (236 lines) : The mood finder's matcher. Pure: the same catalog, request and context always give the same
-- `src/components/moodFinder/useLocation.ts` (35 lines) : Asks for the visitor's position only when request() is called (the "Near me" tap).
+- `src/components/moodFinder/useLocation.ts` (70 lines) : insecure: the page is not https (or localhost), so the browser refuses location before asking anyone.
 - `src/components/moodFinder/weather.ts` (63 lines) : Current Davao weather from Open-Meteo (free, no key). Fixed city coordinates, never the
 
 ## src/components/passport/
@@ -167,7 +176,8 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/data/
 
-- `src/data/digosCafes.ts` (99 lines) : Digos City coffee shops chosen by Lex from Google Maps on 2026-09-29 (names and streets as that listing shows
+- `src/data/digosCafes.test.ts` (78 lines) : src/data module: digosCafes.test
+- `src/data/digosCafes.ts` (134 lines) : Digos City coffee shops chosen by Lex from Google Maps on 2026-09-29 (names and streets as that listing shows
 - `src/data/spots.ts` (61 lines) : Curated spots listed by the Haraya team, shown ahead of roaster and community listings. Every field comes
 - `src/data/trails.ts` (8 lines) : Curated coffee trails. Empty until real trails are set up: each entry lists at least two cafe ids that
 
@@ -175,12 +185,14 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 - `src/hooks/useFocusSession.test.ts` (76 lines) : src/hooks module: useFocusSession.test
 - `src/hooks/useFocusSession.ts` (237 lines) : The running Deep Focus Session. It lives in localStorage (haraya_active_focus) so a refresh, a tab change or
+- `src/hooks/useOnline.ts` (19 lines) : True while the browser reports a network connection; re-renders when it drops or comes back.
 - `src/hooks/useServiceVersions.ts` (48 lines) : Subscriber-version hooks: each service exposes a monotonically increasing
 
 ## src/services/
 
 - `src/services/adminService.ts` (66 lines) : Control Room account management: the list of profiles (readable by admins only, per Row Level
-- `src/services/catalogService.ts` (364 lines) : Catalog layer over roaster-created and admin-moderated records kept in
+- `src/services/catalogService.test.ts` (37 lines) : src/services module: catalogService.test
+- `src/services/catalogService.ts` (369 lines) : Catalog layer over roaster-created and admin-moderated records kept in
   - L31 : CafeMetrics
   - L38 : MetricsStore
   - L53 : readJson
@@ -190,8 +202,8 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L84 : deriveStatus
   - L89 : catalogService
 - `src/services/communityService.ts` (154 lines) : Cup Check community layer: browser-created posts, likes, and comments. Likes are stored per browser (no accounts needed to
-- `src/services/placeMapping.test.ts` (155 lines) : src/services module: placeMapping.test
-- `src/services/placeMapping.ts` (369 lines) : Place Portal data: the application a place owner sends (place_applications), the public listing row
+- `src/services/placeMapping.test.ts` (159 lines) : src/services module: placeMapping.test
+- `src/services/placeMapping.ts` (370 lines) : Place Portal data: the application a place owner sends (place_applications), the public listing row
   - L12 : PLACE_TYPES
   - L17 : PlaceType
   - L20 : REGION_BOUNDS
@@ -210,10 +222,10 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L204 : parseHours
   - L219 : parseMenu
   - L239 : cafeRowToCafe
-  - L271 : listingFromCafe
-  - L294 : validateListing
-  - L332 : toCafeUpdateRow
-  - L359 : describePlaceError
+  - L272 : listingFromCafe
+  - L295 : validateListing
+  - L333 : toCafeUpdateRow
+  - L360 : describePlaceError
 - `src/services/placeService.ts` (206 lines) : Public listings (table cafes) and Place Portal applications (table place_applications). Listings are
 - `src/services/roasterService.ts` (115 lines) : Roaster-facing facade over the catalog: everything an approved roaster or
 - `src/services/sessionService.test.ts` (35 lines) : src/services module: sessionService.test
