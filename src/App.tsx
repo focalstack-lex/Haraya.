@@ -230,6 +230,8 @@ export const App: React.FC = () => {
   useEffect(() => {
     const apply = () => {
       const route = parseHash();
+      // Any app route leaves the landing page: the browser's Forward button and typed #/ addresses arrive here
+      if (route.kind !== 'none') setIsLanding(false);
       switch (route.kind) {
         case 'tab': {
           const id = TAB_ALIASES[route.id] ?? route.id;
