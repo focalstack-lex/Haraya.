@@ -11,6 +11,8 @@ import { progressAlongRoute, routeMinutesLeft, routeProgress } from './routeMath
 import { ROUTE_ATTRIBUTION, useWalkingRoute } from './walkingRoute';
 import { externalMapLinks } from './DirectionsActionSheet';
 import { AyaMascot } from '../common/AyaMascot';
+import { routeLoadPhase } from './routeLoadPhase';
+import { RouteLoader, useHeldPhase } from './RouteLoader';
 import { isOpenNow, hasListedHours } from '../../utils/calendar';
 import { LargeTitle } from '../common/LargeTitle';
 
@@ -64,6 +66,8 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
     () => (walk.route && nav.position ? progressAlongRoute(walk.route.points, nav.position) : null),
     [walk.route, nav.position]
   );
+  // The first wait of a walk (GPS fix, then the street route): Aya stands in for the numbers until they are real
+  const loadPhase = useHeldPhase(routeLoadPhase(Boolean(navTarget), nav.status, Boolean(nav.position), walk.status));
   const remainingKm = along ? along.remainingKm : nav.remainingKm;
   const minutesLeft = along ? routeMinutesLeft(along.remainingKm) : nav.minutesLeft;
   const progress = along && walk.totalKm !== null ? routeProgress(walk.totalKm, along.remainingKm) : nav.progress;
@@ -234,7 +238,8 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
       : [latLng, target];
     const lineStyle: L.PolylineOptions = along
       ? { color: '#906D4B', weight: 5, dashArray: undefined, lineCap: 'round', lineJoin: 'round', opacity: 1 }
-      : { color: '#906D4B', weight: 4, dashArray: '2 10', lineCap: 'round', opacity: 0.95 };
+      : // The straight-line guide waits until the street route has been tried
+        { color: '#906D4B', weight: 4, dashArray: '2 10', lineCap: 'round', opacity: loadPhase ? 0 : 0.95 };
     const cone =
       here.heading === null
         ? ''
@@ -270,7 +275,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
     } else if (followMe) {
       map.panTo(latLng, { animate: true });
     }
-  }, [nav.position, navTarget, followMe, along]);
+  }, [nav.position, navTarget, followMe, along, loadPhase]);
 
   // Credit the router while its route is on screen
   const routeShown = walk.status === 'ready';
@@ -330,7 +335,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
               aria-label="Interactive map of Davao cafes and study spots"
             />
             {/* Navigation banner: destination, distance and time left */}
-            {navTarget && remainingKm !== null && nav.status !== 'arrived' && (
+            {navTarget && remainingKm !== null && nav.status !== 'arrived' && !loadPhase && (
               <div className="absolute top-2.5 left-2.5 right-14 z-[500] rounded-row ios-material-bar shadow-[0_4px_16px_-6px_rgba(19,25,31,0.35)] px-3.5 py-2.5" aria-live="polite">
                 <p className="ios-footnote text-ink-2 truncate">To {navTarget.name}</p>
                 <p className="text-[17px] font-semibold text-ink">
@@ -435,8 +440,8 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({ cafes, onSelectC
                       End
                     </button>
                   </div>
-                  {nav.status === 'locating' ? (
-                    <p className="ios-footnote text-ink-2">Finding your location</p>
+                  {loadPhase ? (
+                    <RouteLoader phase={loadPhase} />
                   ) : (
                     <>
                       <div
