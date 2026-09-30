@@ -283,6 +283,8 @@ export function isMissingTableError(error: { code?: string; message?: string } |
 /** Friendly text for errors raised by the triggers, policies and constraints. */
 export function describeVisitError(message: string): string {
   if (message.includes('visit_limit')) return 'You can log up to 6 visits a day. Try again tomorrow.';
+  if (message.includes('visit_too_far')) return 'You need to be at the spot to check in. Move closer and try again.';
+  if (message.includes('visit_unknown_spot')) return 'This spot cannot take check-ins yet.';
   if (message.includes('row-level security')) return 'Sign in again to log this visit.';
   if (message.includes('violates check constraint')) return 'Some visit details were not accepted. Check them and try again.';
   return 'Could not save the visit. Try again.';

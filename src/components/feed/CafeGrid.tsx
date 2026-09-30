@@ -15,6 +15,8 @@ interface CafeGridProps {
   emptyTitle?: string;
   emptyBody?: string;
   emptyAction?: { label: string; onClick: () => void };
+  /** A quieter second way out of the empty state. */
+  emptySecondaryAction?: { label: string; onClick: () => void };
 }
 
 const CafeCard: React.FC<{
@@ -112,6 +114,7 @@ export const CafeGrid: React.FC<CafeGridProps> = ({
   emptyTitle = 'No cafes match this pour',
   emptyBody = 'Try clearing a vibe filter or widening the city to find your next cup.',
   emptyAction,
+  emptySecondaryAction,
 }) => {
   if (cafes.length === 0) {
     return (
@@ -125,6 +128,14 @@ export const CafeGrid: React.FC<CafeGridProps> = ({
             className="mt-2 h-11 px-5 rounded-full bg-tint text-surface text-[15px] font-semibold font-sans ios-press"
           >
             {emptyAction.label}
+          </button>
+        )}
+        {emptySecondaryAction && (
+          <button
+            onClick={emptySecondaryAction.onClick}
+            className="h-11 px-5 rounded-full ios-fill text-[15px] font-semibold font-sans text-tint-ink ios-press"
+          >
+            {emptySecondaryAction.label}
           </button>
         )}
       </div>

@@ -38,7 +38,10 @@ function notify(): void {
 function readCache(): SpotRow[] {
   try {
     const raw = localStorage.getItem(CACHE_KEY);
-    return raw ? (JSON.parse(raw) as SpotRow[]) : [];
+    const parsed: unknown = raw ? JSON.parse(raw) : [];
+    // A damaged or hand-edited cache is dropped rather than rendered
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((row): row is SpotRow => Boolean(row) && typeof row === 'object' && 'id' in row && 'name' in row);
   } catch {
     return [];
   }

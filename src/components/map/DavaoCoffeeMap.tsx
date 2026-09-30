@@ -212,6 +212,15 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({
     [cafes]
   );
 
+  // The widest useful view: every listed spot in frame, or the whole region while there are none
+  const cafesRef = useRef(cafes);
+  cafesRef.current = cafes;
+  const showAllSpots = (map: L.Map) => {
+    const pins = cafesRef.current.map((cafe) => [cafe.lat, cafe.lng] as [number, number]);
+    if (pins.length > 0) map.fitBounds(L.latLngBounds(pins).pad(0.3), { maxZoom: 14, animate: false });
+    else map.setView(DAVAO_CENTER, REGION_ZOOM);
+  };
+
   useEffect(() => {
     if (!canvasRef.current || mapRef.current) return;
 
@@ -228,6 +237,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({
     map.on('zoomend', () => setZoom(map.getZoom()));
     map.on('click', () => setPreviewId(null));
     mapRef.current = map;
+    showAllSpots(map);
 
     // Wheel over the map, Google Maps style: Ctrl or ⌘ + scroll (and a trackpad pinch, which arrives as Ctrl +
     // wheel) zooms the map instead of the whole page; a plain scroll keeps scrolling the page and shows a hint.
@@ -369,7 +379,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({
       }
     } else if (lastTrailIdRef.current) {
       // Only clearing a trail zooms back out; a catalog refresh (a save, a filter) keeps the visitor's view
-      map.setView(DAVAO_CENTER, REGION_ZOOM);
+      showAllSpots(map);
     }
     lastTrailIdRef.current = activeTrail?.id ?? null;
 
@@ -602,7 +612,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({
     if (stops.length >= 2) {
       map.fitBounds(L.latLngBounds(stops.map((cafe) => [cafe.lat, cafe.lng] as [number, number])).pad(0.25));
     } else {
-      map.setView(DAVAO_CENTER, REGION_ZOOM);
+      showAllSpots(map);
     }
   };
 
@@ -677,7 +687,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({
                   <MapControl label="Show spots near me" onClick={showNearMe}>
                     <LocateFixed className={`w-4.5 h-4.5 ${myPosition ? 'text-[#2F6FDB]' : ''}`} strokeWidth={2} />
                   </MapControl>
-                  <MapControl label={activeTrail ? 'Fit trail in view' : 'Recenter on Davao Region'} onClick={recenter}>
+                  <MapControl label={activeTrail ? 'Fit trail in view' : 'Show all spots'} onClick={recenter}>
                     <MapIcon className="w-4.5 h-4.5" strokeWidth={2} />
                   </MapControl>
                 </>

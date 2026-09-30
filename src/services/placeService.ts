@@ -40,7 +40,10 @@ function notify(): void {
 function readCache(): CafeRow[] {
   try {
     const raw = localStorage.getItem(CACHE_KEY);
-    return raw ? (JSON.parse(raw) as CafeRow[]) : [];
+    const parsed: unknown = raw ? JSON.parse(raw) : [];
+    // A damaged or hand-edited cache is dropped rather than rendered
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((row): row is CafeRow => Boolean(row) && typeof row === 'object' && 'id' in row && 'name' in row);
   } catch {
     return [];
   }

@@ -10,10 +10,12 @@ interface MoodResultCardProps {
   onRoute: () => void;
   onOpen: () => void;
   onToggleSave: () => void;
+  /** False when the visitor's location is unknown: the distance would be a guess, so it is left out. */
+  located?: boolean;
 }
 
 /** One suggestion: why it fits (real catalog facts), how far, how long it stays open, what to order. */
-export const MoodResultCard: React.FC<MoodResultCardProps> = ({ label, match, saved, onRoute, onOpen, onToggleSave }) => {
+export const MoodResultCard: React.FC<MoodResultCardProps> = ({ label, match, saved, onRoute, onOpen, onToggleSave, located = true }) => {
   const { cafe } = match;
   return (
     <article className="bg-surface rounded-card ios-card-shadow overflow-hidden">
@@ -40,13 +42,19 @@ export const MoodResultCard: React.FC<MoodResultCardProps> = ({ label, match, sa
             </button>
           </div>
           <p className="ios-footnote text-ink-2 -mt-1.5">
-            <span className="font-mono">{formatKm(match.km)}</span>, about <span className="font-mono">{match.walkMin}</span> min walk
-            {match.closesAt ? (
+            {located ? (
               <>
-                , open until <span className="font-mono">{match.closesAt}</span>
+                <span className="font-mono">{formatKm(match.km)}</span>, about <span className="font-mono">{match.walkMin}</span> min walk,{' '}
               </>
             ) : (
-              <span className="text-danger">, closed now</span>
+              <>{cafe.district}, </>
+            )}
+            {match.closesAt ? (
+              <>
+                open until <span className="font-mono">{match.closesAt}</span>
+              </>
+            ) : (
+              <span className="text-danger">closed now</span>
             )}
           </p>
           <ul className="flex flex-wrap gap-1 mt-2" aria-label="Why it fits">
@@ -56,12 +64,14 @@ export const MoodResultCard: React.FC<MoodResultCardProps> = ({ label, match, sa
               </li>
             ))}
           </ul>
-          <p className="mt-2 ios-footnote text-ink-2 flex items-center gap-1 min-w-0">
-            <Coffee className="w-3.5 h-3.5 shrink-0 text-tint" />
-            <span className="truncate">
-              Try: <span className="text-ink font-medium">{match.drink}</span>
-            </span>
-          </p>
+          {match.drink && (
+            <p className="mt-2 ios-footnote text-ink-2 flex items-center gap-1 min-w-0">
+              <Coffee className="w-3.5 h-3.5 shrink-0 text-tint" />
+              <span className="truncate">
+                Try: <span className="text-ink font-medium">{match.drink}</span>
+              </span>
+            </p>
+          )}
         </div>
       </div>
 

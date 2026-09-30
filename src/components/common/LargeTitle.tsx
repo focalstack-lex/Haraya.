@@ -24,8 +24,8 @@ export const LargeTitle: React.FC<LargeTitleProps> = ({ title, subtitle, trailin
   </div>
 );
 
-/** Pull-down city menu styled as a tinted pill; uses the native picker on touch devices. */
-export const CityMenu: React.FC<{ value: string; onChange: (city: string) => void }> = ({ value, onChange }) => (
+/** Pull-down city menu styled as a tinted pill; uses the native picker on touch devices. `counts` adds each city's number of spots. */
+export const CityMenu: React.FC<{ value: string; onChange: (city: string) => void; counts?: Record<string, number> }> = ({ value, onChange, counts }) => (
   <label data-tour="city" className="relative inline-flex items-center gap-1 h-9 pl-3.5 pr-2.5 rounded-full ios-fill text-[14px] font-semibold text-tint-ink ios-press">
     <span className="max-w-[9.5rem] truncate">{value === 'All Davao Region' ? 'All Davao' : value}</span>
     <ChevronDown className="w-4 h-4" strokeWidth={2.5} />
@@ -37,7 +37,7 @@ export const CityMenu: React.FC<{ value: string; onChange: (city: string) => voi
     >
       {DAVAO_CITIES.map((city) => (
         <option key={city} value={city}>
-          {city}
+          {counts ? `${city} (${counts[city] ?? 0})` : city}
         </option>
       ))}
     </select>

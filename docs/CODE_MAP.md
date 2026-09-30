@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-30 : commit da2f656 : fingerprint c40e67da1dcdcc72
+Generated 2026-09-30 : commit be3caca : fingerprint 95148484e190214f
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -14,9 +14,9 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `scripts/generate-code-map.mjs` (212 lines) : One-line purpose per file, inferred from its path and leading doc comment.
 - `scripts/make-email-logo.mjs` (30 lines) : Builds public/brand/haraya-email-logo.png: the wordmark on its own linen tile with rounded corners.
 - `scripts/verify-google-auth.mjs` (109 lines) : scripts module: verify-google-auth
-- `src/App.tsx` (842 lines) : Older links: the roaster portal is now the Place Portal.
-  - L69 : SharedList
-  - L95 : App
+- `src/App.tsx` (870 lines) : Older links: the roaster portal is now the Place Portal. The Passport tab also answers to its own name.
+  - L78 : SharedList
+  - L104 : App
 - `src/index.css` (727 lines) : src entry point
 - `src/main.tsx` (41 lines) : src entry point
 - `vite.config.ts` (43 lines) : . module: vite.config
@@ -80,11 +80,13 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 ## src/components/feed/
 
 - `src/components/feed/BeanGrid.tsx` (113 lines) : src/components/feed module: BeanGrid
-- `src/components/feed/CafeGrid.tsx` (149 lines) : src/components/feed module: CafeGrid
+- `src/components/feed/CafeGrid.tsx` (160 lines) : src/components/feed module: CafeGrid
 - `src/components/feed/EditorialHero.tsx` (126 lines) : Spotlight shelf built only from real listings: the top study spots, then the newest hidden gems added
 - `src/components/feed/FeedControls.tsx` (103 lines) : src/components/feed module: FeedControls
 - `src/components/feed/FeedSearchBar.tsx` (38 lines) : iOS search field: filled, borderless, with the round clear button once text is entered.
 - `src/components/feed/PopularPicksSection.tsx` (73 lines) : "Most saved" shelf: the venues Haraya users bookmark most, from real save counts.
+- `src/components/feed/searchSpots.test.ts` (40 lines) : src/components/feed module: searchSpots.test
+- `src/components/feed/searchSpots.ts` (35 lines) : Lowercase, and "Wi-Fi" reads the same as "wifi".
 - `src/components/feed/spotCategories.test.ts` (79 lines) : src/components/feed module: spotCategories.test
 - `src/components/feed/spotCategories.ts` (51 lines) : What a visitor is looking for; replaces the old Cafes / Beans / Following modes.
 - `src/components/feed/VibeFilterBar.tsx` (152 lines) : The filter panel under the feed controls. Open: sort and price menus, then the must-have chip rail.
@@ -109,7 +111,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/map/
 
-- `src/components/map/DavaoCoffeeMap.tsx` (965 lines) : Floating map control: a round bar-material button inside a 44px hit area.
+- `src/components/map/DavaoCoffeeMap.tsx` (975 lines) : Floating map control: a round bar-material button inside a 44px hit area.
   - L58 : RowHandlers
   - L131 : DavaoCoffeeMapProps
   - L149 : DavaoCoffeeMap
@@ -136,16 +138,16 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 - `src/components/moodFinder/MoodCard.tsx` (106 lines) : Late evening, when "open late" matters: 8 PM to 4 AM on the device clock.
 - `src/components/moodFinder/moodCardState.test.ts` (34 lines) : src/components/moodFinder module: moodCardState.test
-- `src/components/moodFinder/MoodFinderSheet.tsx` (363 lines) : The mood finder: say how you feel and what you need, get three explained picks and a route.
+- `src/components/moodFinder/MoodFinderSheet.tsx` (364 lines) : The mood finder: say how you feel and what you need, get three explained picks and a route.
   - L17 : MoodFinderSheetProps
-  - L40 : MoodFinderSheet
-- `src/components/moodFinder/MoodResultCard.tsx` (83 lines) : One suggestion: why it fits (real catalog facts), how far, how long it stays open, what to order.
+  - L39 : MoodFinderSheet
+- `src/components/moodFinder/MoodResultCard.tsx` (93 lines) : One suggestion: why it fits (real catalog facts), how far, how long it stays open, what to order.
 - `src/components/moodFinder/moods.ts` (44 lines) : Moods rank cafes softly; must-haves filter strictly. See docs/superpowers/specs/2026-09-28-mood-finder-design.md.
 - `src/components/moodFinder/moodStorage.ts` (25 lines) : Remembers the last chosen must-haves. Storage can throw or hold stale values, so reads validate.
 - `src/components/moodFinder/parseQuery.test.ts` (50 lines) : src/components/moodFinder module: parseQuery.test
 - `src/components/moodFinder/parseQuery.ts` (85 lines) : Deterministic reading of a typed request ("quiet place to study, not too pricey, near Matina").
 - `src/components/moodFinder/scoreCafes.test.ts` (167 lines) : src/components/moodFinder module: scoreCafes.test
-- `src/components/moodFinder/scoreCafes.ts` (236 lines) : The mood finder's matcher. Pure: the same catalog, request and context always give the same
+- `src/components/moodFinder/scoreCafes.ts` (241 lines) : The mood finder's matcher. Pure: the same catalog, request and context always give the same
 - `src/components/moodFinder/useLocation.ts` (70 lines) : insecure: the page is not https (or localhost), so the browser refuses location before asking anyone.
 - `src/components/moodFinder/weather.ts` (63 lines) : Current Davao weather from Open-Meteo (free, no key). Fixed city coordinates, never the
 
@@ -232,7 +234,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L295 : validateListing
   - L333 : toCafeUpdateRow
   - L360 : describePlaceError
-- `src/services/placeService.ts` (206 lines) : Public listings (table cafes) and Place Portal applications (table place_applications). Listings are
+- `src/services/placeService.ts` (209 lines) : Public listings (table cafes) and Place Portal applications (table place_applications). Listings are
 - `src/services/roasterService.ts` (115 lines) : Roaster-facing facade over the catalog: everything an approved roaster or
 - `src/services/sessionService.test.ts` (35 lines) : src/services module: sessionService.test
 - `src/services/sessionService.ts` (582 lines) : The signed-in account: Supabase Auth session plus the caller's row in public.profiles (role, status,
@@ -255,7 +257,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L252 : sessionService
 - `src/services/spotMapping.test.ts` (116 lines) : src/services module: spotMapping.test
 - `src/services/spotMapping.ts` (178 lines) : Community spot submissions: the row shape stored in Supabase (spot_submissions), the form input, the
-- `src/services/spotService.ts` (169 lines) : Add a Spot backed by Supabase (table spot_submissions). Row Level Security decides what each caller can
+- `src/services/spotService.ts` (172 lines) : Add a Spot backed by Supabase (table spot_submissions). Row Level Security decides what each caller can
 - `src/services/userPrefsService.ts` (372 lines) : Buyer-side preferences kept per browser: saved cafes and beans, custom coffee
   - L20 : CafeRating
   - L27 : CustomList
@@ -265,7 +267,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L63 : notify
   - L68 : makeListId
   - L72 : userPrefsService
-- `src/services/visitMapping.ts` (290 lines) : Sanctuary visits (focus sessions and Quick Stamps): the row shape stored in Supabase (sanctuary_visits),
+- `src/services/visitMapping.ts` (292 lines) : Sanctuary visits (focus sessions and Quick Stamps): the row shape stored in Supabase (sanctuary_visits),
 - `src/services/visitService.test.ts` (253 lines) : Records every builder call so the query shape can be asserted without a network. The chain's last call
 - `src/services/visitService.ts` (333 lines) : The sanctuary ledger. Local first: every visit is written to this device (localStorage) so the diary and
   - L45 : notify
@@ -308,9 +310,9 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L305 : AddSpotView
 - `src/views/CommunityView.tsx` (74 lines) : Cup Check community feed: one-to-three column masonry of today's brews.
 - `src/views/ConfirmEmailView.tsx` (105 lines) : The only screen an unconfirmed sign-up sees: it replaces the whole app (every tab, the portal included) until
-- `src/views/LandingView.tsx` (330 lines) : Landing page shown at the bare URL (see `isLandingEntry` in utils/router.ts). It showcases the app with real
+- `src/views/LandingView.tsx` (339 lines) : Landing page shown at the bare URL (see `isLandingEntry` in utils/router.ts). It showcases the app with real
   - L14 : LandingViewProps
-  - L104 : LandingView
+  - L106 : LandingView
 - `src/views/LegalView.tsx` (206 lines) : Privacy Notice and Terms. Statements of fact describe what the code does today; anything that needs a
 - `src/views/LoginView.tsx` (359 lines) : What the page is doing: the two account modes, the two email-link flows, and the new-password form.
   - L12 : LoginMode

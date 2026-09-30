@@ -14,6 +14,8 @@ import { DAVAO_CITIES } from '../types/coffee';
 interface LandingViewProps {
   /** Enters the app on a tab, optionally scoped to a city. */
   onEnter: (tab: string, city?: string) => void;
+  /** Spots listed per city, so a city with none says so instead of opening an empty page unannounced. */
+  cityCounts?: Record<string, number>;
 }
 
 const SCREEN = { width: 750, height: 1624 };
@@ -101,7 +103,7 @@ const Benefit: React.FC<{ icon: React.ComponentType<{ className?: string; stroke
   </div>
 );
 
-export const LandingView: React.FC<LandingViewProps> = ({ onEnter }) => {
+export const LandingView: React.FC<LandingViewProps> = ({ onEnter, cityCounts }) => {
   const reduceMotion = useReducedMotion();
 
   // In-page links scroll instead of setting a hash, because the hash is the app's router
@@ -280,10 +282,17 @@ export const LandingView: React.FC<LandingViewProps> = ({ onEnter }) => {
                 <li key={city}>
                   <button
                     onClick={() => onEnter('feed', city)}
-                    className="group w-full min-h-14 px-4 rounded-row bg-surface ios-card-shadow flex items-center gap-3 text-left ios-press focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tint"
+                    className="group w-full min-h-14 px-4 py-2.5 rounded-row bg-surface ios-card-shadow flex items-center gap-3 text-left ios-press focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tint"
                   >
                     <MapPin className="w-4.5 h-4.5 shrink-0 text-tint-ink" strokeWidth={2.2} />
-                    <span className="flex-1 min-w-0 text-[16px] font-medium">{city}</span>
+                    <span className="flex-1 min-w-0">
+                      <span className="block text-[16px] font-medium">{city}</span>
+                      {cityCounts && (
+                        <span className="block text-[13px] text-ink-2">
+                          {cityCounts[city] ? `${cityCounts[city]} ${cityCounts[city] === 1 ? 'spot' : 'spots'}` : 'No spots yet. Add the first.'}
+                        </span>
+                      )}
+                    </span>
                     <ArrowRight className="w-4 h-4 shrink-0 text-ink-3 transition-transform group-hover:translate-x-0.5" strokeWidth={2.2} />
                   </button>
                 </li>

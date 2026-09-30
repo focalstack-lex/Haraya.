@@ -18,9 +18,8 @@ interface MoodFinderSheetProps {
   isOpen: boolean;
   initialMood: MoodId | null;
   cafes: Cafe[];
-  /** Fallback distance origin when location is off: the chosen city's center. */
+  /** Stand-in origin when location is off. Distances from it are never shown. */
   cityOrigin: GeoPoint;
-  cityLabel: string;
   savedIds: string[];
   recentIds: string[];
   onClose: () => void;
@@ -42,7 +41,6 @@ export const MoodFinderSheet: React.FC<MoodFinderSheetProps> = ({
   initialMood,
   cafes,
   cityOrigin,
-  cityLabel,
   savedIds,
   recentIds,
   onClose,
@@ -105,18 +103,20 @@ export const MoodFinderSheet: React.FC<MoodFinderSheetProps> = ({
   };
 
   const origin = location.position ?? cityOrigin;
+  const located = Boolean(location.position);
   const hasAsk = Boolean(request.mood || request.mustHaves.length || request.maxPrice || request.district);
 
   const result = useMemo(
     () =>
       scoreCafes(cafes, request, {
         origin,
+        located,
         now: new Date(),
         weather,
         savedIds,
         recentIds,
       }),
-    [cafes, request, origin, weather, savedIds, recentIds]
+    [cafes, request, origin, located, weather, savedIds, recentIds]
   );
 
   const { relax } = result;
@@ -135,6 +135,7 @@ export const MoodFinderSheet: React.FC<MoodFinderSheetProps> = ({
       label={label}
       match={match}
       saved={savedIds.includes(match.cafe.id)}
+      located={located}
       onRoute={() => routeTo(match)}
       onOpen={() => onOpenCafe(match.cafe.id)}
       onToggleSave={() => onToggleSave(match.cafe)}
@@ -148,13 +149,13 @@ export const MoodFinderSheet: React.FC<MoodFinderSheetProps> = ({
       case 'locating':
         return 'Finding you...';
       case 'denied':
-        return `Location is off. Distances from ${cityLabel} center.`;
+        return 'Location is off, so distances are hidden.';
       case 'unavailable':
-        return `Location unavailable. Distances from ${cityLabel} center.`;
+        return 'Location unavailable, so distances are hidden.';
       case 'insecure':
-        return `Location can't be used here. Distances from ${cityLabel} center.`;
+        return "Location can't be used here, so distances are hidden.";
       default:
-        return `Distances from ${cityLabel} center`;
+        return 'Turn on location to see how far each pick is';
     }
   })();
 
@@ -350,7 +351,7 @@ export const MoodFinderSheet: React.FC<MoodFinderSheetProps> = ({
                     <span className="block text-[15px] text-ink truncate">{match.cafe.name}</span>
                     <span className="block ios-footnote text-ink-2 truncate">{match.reasons.join(', ')}</span>
                   </span>
-                  <span className="text-[13px] font-mono text-ink-2 shrink-0">{formatKm(match.km)}</span>
+                  {located && <span className="text-[13px] font-mono text-ink-2 shrink-0">{formatKm(match.km)}</span>}
                 </button>
               ))}
             </div>

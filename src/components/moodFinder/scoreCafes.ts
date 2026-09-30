@@ -17,6 +17,8 @@ export interface Weather {
 
 export interface ScoreContext {
   origin: GeoPoint;
+  /** False when `origin` is a stand-in (the visitor's location is unknown). Defaults to true. */
+  located?: boolean;
   now: Date;
   weather: Weather | null;
   savedIds: string[];
@@ -35,7 +37,7 @@ export interface Match {
   drink: string;
 }
 
-export type PickLabel = 'Best match' | 'Closest' | 'Wildcard';
+export type PickLabel = 'Best match' | 'Closest' | 'Also fits' | 'Wildcard';
 
 export interface MoodResult {
   matches: Match[];
@@ -166,6 +168,7 @@ const passesFilters = (cafe: Cafe, request: MoodRequest, mustHaves: MustHaveId[]
 
 export function scoreCafes(cafes: Cafe[], request: MoodRequest, ctx: ScoreContext): MoodResult {
   const { now, origin, weather, recentIds } = ctx;
+  const located = ctx.located ?? true;
   const saved = cafes.filter((cafe) => ctx.savedIds.includes(cafe.id));
 
   const matches: Match[] = cafes
@@ -175,7 +178,8 @@ export function scoreCafes(cafes: Cafe[], request: MoodRequest, ctx: ScoreContex
       const minutesLeft = minutesUntilClose(cafe.hours, now);
       const closesAt = minutesLeft > 0 ? clockAfter(now, minutesLeft) : null;
 
-      const traits = request.mood ? moodTraits(request.mood, cafe, km, now, recentIds) : [];
+      // Without a real location nothing can be called close by
+      const traits = request.mood ? moodTraits(request.mood, cafe, located ? km : Infinity, now, recentIds) : [];
       const fit = traits.length > 0 ? traits.filter((trait) => trait.has).length / traits.length : 0.5;
 
       const rainyFit = Boolean(weather?.rainy) && (cafe.amenities.includes('quietFocus') || !cafe.amenities.includes('outdoor'));
@@ -187,7 +191,7 @@ export function scoreCafes(cafes: Cafe[], request: MoodRequest, ctx: ScoreContex
 
       const score =
         45 * fit +
-        25 * distanceScore(km) +
+        (located ? 25 * distanceScore(km) : 0) +
         10 * Math.min(1, minutesLeft / 240) +
         10 * (rainyFit || hotFit ? 1 : 0) +
         10 * (similar ? 1 : 0);
@@ -216,8 +220,9 @@ export function scoreCafes(cafes: Cafe[], request: MoodRequest, ctx: ScoreContex
   if (matches.length > 0) {
     const [best, ...rest] = matches;
     picks.push({ label: 'Best match', match: best });
-    const closest = [...rest].sort((a, b) => a.km - b.km)[0];
-    if (closest) picks.push({ label: 'Closest', match: closest });
+    // "Closest" is only claimed from the visitor's real position; otherwise the runner-up is shown as such
+    const closest = located ? [...rest].sort((a, b) => a.km - b.km)[0] : rest[0];
+    if (closest) picks.push({ label: located ? 'Closest' : 'Also fits', match: closest });
     const wildcard = rest.find((match) => match !== closest && !recentIds.includes(match.cafe.id));
     if (wildcard) picks.push({ label: 'Wildcard', match: wildcard });
   }

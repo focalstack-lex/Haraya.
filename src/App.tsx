@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { NavigationHeader, ADMIN_TAB_ID, LOGIN_TAB_ID, PORTAL_TAB_ID, SUBMIT_TAB_ID } from './components/layout/NavigationHeader';
 import { NavigationDrawer } from './components/layout/NavigationDrawer';
 import { BottomTabBar } from './components/layout/BottomTabBar';
@@ -11,19 +11,15 @@ import { PopularPicksSection } from './components/feed/PopularPicksSection';
 import { FeedSearchBar } from './components/feed/FeedSearchBar';
 import { CafeGrid } from './components/feed/CafeGrid';
 import { isStudySpot, matchesCategory } from './components/feed/spotCategories';
+import { matchesSearch } from './components/feed/searchSpots';
 
 import { CafeDetailModal } from './components/cafe/CafeDetailModal';
-import { DavaoCoffeeMap } from './components/map/DavaoCoffeeMap';
 import { DirectionsActionSheet } from './components/map/DirectionsActionSheet';
 
-import { AdminDashboard } from './components/admin/AdminDashboard';
 
-import { AddSpotView } from './views/AddSpotView';
 import { LoginView, type LoginMode } from './views/LoginView';
-import { PlacePortalView } from './views/PlacePortalView';
 import { ProfileView, type ProfileSection } from './views/ProfileView';
 import { SharedListView } from './views/SharedListView';
-import { LegalView } from './views/LegalView';
 import { RateCafeModal } from './components/cafe/RateCafeModal';
 import { WelcomeModal } from './components/common/WelcomeModal';
 import { AccountSetupModal } from './components/common/AccountSetupModal';
@@ -59,10 +55,23 @@ import { distanceKm } from './utils/geo';
 import { PRICE_RANGES } from './types/coffee';
 import type { Cafe } from './types/coffee';
 
+// Pages most visits never open are fetched when first shown, so Discover loads with less code
+const AddSpotView = lazy(() => import('./views/AddSpotView').then((module) => ({ default: module.AddSpotView })));
+const DavaoCoffeeMap = lazy(() => import('./components/map/DavaoCoffeeMap').then((module) => ({ default: module.DavaoCoffeeMap })));
+const AdminDashboard = lazy(() => import('./components/admin/AdminDashboard').then((module) => ({ default: module.AdminDashboard })));
+const PlacePortalView = lazy(() => import('./views/PlacePortalView').then((module) => ({ default: module.PlacePortalView })));
+const LegalView = lazy(() => import('./views/LegalView').then((module) => ({ default: module.LegalView })));
+
+const PageLoading: React.FC = () => (
+  <p role="status" className="px-4 py-16 text-center text-[14px] text-ink-2">
+    Loading...
+  </p>
+);
+
 // Drops, beans and Cup Check are hidden since the discovery pivot (their code is kept).
 const TAB_IDS = new Set(['feed', 'map', SUBMIT_TAB_ID, 'profile', 'saved', 'privacy', 'terms', LOGIN_TAB_ID, PORTAL_TAB_ID, ADMIN_TAB_ID]);
-/** Older links: the roaster portal is now the Place Portal. */
-const TAB_ALIASES: Record<string, string> = { roaster: PORTAL_TAB_ID };
+/** Older links: the roaster portal is now the Place Portal. The Passport tab also answers to its own name. */
+const TAB_ALIASES: Record<string, string> = { roaster: PORTAL_TAB_ID, passport: 'profile' };
 /** #/tab/saved opens the passport on its Saved section rather than the Diary. */
 const SAVED_SECTION_REQUEST = { section: 'saved', at: 0 } as const;
 
@@ -157,6 +166,10 @@ export const App: React.FC = () => {
     // Leaving through the tab bar also leaves a shared list, so Discover shows the catalog again
     setSharedList(null);
     setIsLanding(false);
+    // Sheets belong to the page they were opened on
+    setCheckInCafe(null);
+    setRatingCafe(null);
+    setMoodSheet((current) => (current.open ? { ...current, open: false } : current));
     setActiveTabState(resolved);
     if (TAB_IDS.has(resolved)) {
       baseHashRef.current = buildHash(`/tab/${resolved}`);
@@ -236,11 +249,19 @@ export const App: React.FC = () => {
         case 'tab': {
           const id = TAB_ALIASES[route.id] ?? route.id;
           if (TAB_IDS.has(id)) {
+            // Back, Forward or a typed address moved to another page: the mood picker stays behind
+            if (baseHashRef.current !== buildHash(`/tab/${id}`)) {
+              setMoodSheet((current) => (current.open ? { ...current, open: false } : current));
+            }
             setActiveTabState(id);
             baseHashRef.current = buildHash(`/tab/${id}`);
           }
           setSharedList(null);
           setSelectedCafeId(null);
+          // Sheets opened from a spot close with it
+          setCheckInCafe(null);
+          setRatingCafe(null);
+          setDirectionsFor(null);
           break;
         }
         case 'cafe': {
@@ -414,24 +435,20 @@ export const App: React.FC = () => {
 
   const savedCafeIds = userPrefsService.getSavedCafes();
 
+  /** How many spots each city has, so the city menus can say so before the visitor picks an empty one. */
+  const cityCounts = useMemo(() => {
+    const counts: Record<string, number> = { 'All Davao Region': allCafes.length };
+    for (const cafe of allCafes) counts[cafe.city] = (counts[cafe.city] ?? 0) + 1;
+    return counts;
+  }, [allCafes]);
+  const cityIsEmpty = selectedCity !== 'All Davao Region' && !cityCounts[selectedCity];
+
 
   const cafes = useMemo(() => {
     let list = allCafes;
     if (selectedCity !== 'All Davao Region') list = list.filter((cafe) => cafe.city === selectedCity);
     list = list.filter((cafe) => matchesCategory(cafe, feedMode));
-    const query = searchQuery.trim().toLowerCase();
-    if (query) {
-      list = list.filter(
-        (cafe) =>
-          cafe.name.toLowerCase().includes(query) ||
-          cafe.district.toLowerCase().includes(query) ||
-          cafe.city.toLowerCase().includes(query) ||
-          cafe.signature.toLowerCase().includes(query) ||
-          cafe.address.toLowerCase().includes(query) ||
-          (cafe.community?.tip ?? '').toLowerCase().includes(query) ||
-          cafe.vibeTags.some((tag) => tag.toLowerCase().includes(query))
-      );
-    }
+    if (searchQuery.trim()) list = list.filter((cafe) => matchesSearch(cafe, searchQuery));
     for (const filter of vibeFilters) {
       if (filter === 'roastery') {
         list = list.filter((cafe) => cafe.isRoastery);
@@ -494,6 +511,11 @@ export const App: React.FC = () => {
     setVibeFilters(new Set());
   };
 
+  const clearAll = () => {
+    resetFilters();
+    setFeedMode('all');
+  };
+
   const handleViewAllPicks = () => {
     setFeedMode('all');
     setSortKey('mostSaved');
@@ -526,7 +548,7 @@ export const App: React.FC = () => {
     return (
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-1 pb-6 sm:pt-4 space-y-6 sm:space-y-8">
         <div className="space-y-3">
-          <LargeTitle title="Discover" trailing={<CityMenu value={selectedCity} onChange={setSelectedCity} />} />
+          <LargeTitle title="Discover" trailing={<CityMenu value={selectedCity} onChange={setSelectedCity} counts={cityCounts} />} />
           <FeedSearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
         </div>
 
@@ -575,23 +597,28 @@ export const App: React.FC = () => {
             savedCafeIds={savedCafeIds}
             onToggleSave={toggleSaveCafe}
             onSelectCafe={openCafe}
-            emptyTitle={allCafes.length === 0 ? 'No spots yet' : 'No spots match'}
+            emptyTitle={allCafes.length === 0 ? 'No spots yet' : cityIsEmpty ? `No spots in ${selectedCity} yet` : 'No spots match'}
             emptyBody={
               allCafes.length === 0
                 ? 'Know a good cafe or a quiet study corner? Add it and help others find it.'
-                : 'Try another category, clear a filter, or widen the city.'
+                : cityIsEmpty
+                  ? `Know a good cafe or study corner in ${selectedCity}? Be the first to add one.`
+                  : searchQuery.trim()
+                    ? `Nothing matches "${searchQuery.trim()}". Check the spelling, or add the spot if it is missing.`
+                    : 'Try another category or remove a filter.'
             }
             emptyAction={
-              allCafes.length === 0
+              allCafes.length === 0 || cityIsEmpty
                 ? { label: 'Add a Spot', onClick: openAddSpot }
                 : hasActiveFilters || feedMode !== 'all'
-                  ? {
-                      label: 'Clear Filters',
-                      onClick: () => {
-                        resetFilters();
-                        setFeedMode('all');
-                      },
-                    }
+                  ? { label: 'Clear Filters', onClick: clearAll }
+                  : undefined
+            }
+            emptySecondaryAction={
+              cityIsEmpty
+                ? { label: 'See all Davao Region', onClick: clearAll }
+                : allCafes.length > 0 && searchQuery.trim()
+                  ? { label: 'Add a Spot', onClick: openAddSpot }
                   : undefined
             }
           />
@@ -641,7 +668,7 @@ export const App: React.FC = () => {
   if (isLanding) {
     return (
       <>
-        <LandingView onEnter={enterApp} />
+        <LandingView onEnter={enterApp} cityCounts={cityCounts} />
         <FooterSection setActiveTab={enterApp} setSelectedCity={setSelectedCity} onAddSpot={() => enterApp(SUBMIT_TAB_ID)} />
       </>
     );
@@ -682,6 +709,7 @@ export const App: React.FC = () => {
       />
 
       <main className="flex-1 pb-28 sm:pb-32">
+        <Suspense fallback={<PageLoading />}>
         {activeTab === 'feed' && renderFeed()}
 
         {activeTab === 'map' && (
@@ -726,6 +754,7 @@ export const App: React.FC = () => {
         {activeTab === ADMIN_TAB_ID && <AdminDashboard onViewCafe={openCafe} onOpenLogin={() => openLogin(ADMIN_TAB_ID)} />}
 
         {(activeTab === 'privacy' || activeTab === 'terms') && <LegalView page={activeTab} />}
+        </Suspense>
       </main>
 
       <MoodFinderSheet
@@ -733,7 +762,6 @@ export const App: React.FC = () => {
         initialMood={moodSheet.mood}
         cafes={allCafes}
         cityOrigin={cityCentroid}
-        cityLabel={selectedCity === 'All Davao Region' ? 'Davao Region' : selectedCity}
         savedIds={savedCafeIds}
         recentIds={userPrefsService.getRecentViews()}
         onClose={() => setMoodSheet((current) => ({ ...current, open: false }))}
