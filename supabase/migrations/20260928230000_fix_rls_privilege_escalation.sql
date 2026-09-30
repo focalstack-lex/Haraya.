@@ -26,6 +26,7 @@ grant update (name, business_name, updated_at) on public.profiles to authenticat
 
 drop policy if exists "Roasters can update their cafes" on public.cafes;
 
+drop policy if exists "Owners and admins can update cafes" on public.cafes;
 create policy "Owners and admins can update cafes"
   on public.cafes
   for update

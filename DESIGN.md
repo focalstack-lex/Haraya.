@@ -182,8 +182,11 @@ Color is information. The tint marks the one active or primary thing in a region
 - Reading order: Aya `holding-cup`, the title, the address in primary ink, one tint button into the inbox
   (`inboxFor` in `src/utils/inbox.ts`: Gmail, Outlook, Yahoo Mail, iCloud Mail; any other address gets a fill note
   instead of a link, since `mailto:` opens a new message), a footnote about using the same device, then a grouped
-  list of the three ways out: send the link again, already confirmed (opens the sign-in form), wrong address (drops
-  the pending state and opens Create account). No nav bar, tab dock or footer.
+  list. It always holds "I confirmed it, sign me in" (opens the sign-in form, for someone who confirmed on another
+  device). "Wrong address, use another email" (drops the pending state and opens Create account) appears only when
+  the address looks mistyped (`suggestEmail` in `src/utils/emailTypos.ts`: a near miss of Gmail, Yahoo, Outlook,
+  Hotmail or iCloud), together with a warning that names the corrected address, because that is the one case where
+  the email cannot have arrived. There is deliberately no "send the link again". No nav bar, tab dock or footer.
 - It is a guide, not the lock. The lock is Supabase refusing a session to an unconfirmed address; clearing site
   data or choosing "wrong address" returns the visitor to guest browsing, which has no account powers.
 - Confirmation email: `supabase/templates/confirm-signup.html` (paste into the hosted dashboard, Authentication >

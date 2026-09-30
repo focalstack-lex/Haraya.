@@ -8,6 +8,8 @@ drop policy if exists "Users can insert cup checks" on public.cup_checks;
 revoke insert, update, delete on public.cup_checks from anon, authenticated;
 
 -- 2. Profiles: bound the two fields users may edit (column grants from 20260928230000 already limit which).
+alter table public.profiles drop constraint if exists profiles_name_length;
+alter table public.profiles drop constraint if exists profiles_business_name_length;
 alter table public.profiles
   add constraint profiles_name_length check (char_length(name) <= 80),
   add constraint profiles_business_name_length check (business_name is null or char_length(business_name) <= 120);

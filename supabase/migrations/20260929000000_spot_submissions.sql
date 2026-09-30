@@ -44,21 +44,25 @@ create index if not exists spot_submissions_owner_created_idx on public.spot_sub
 
 alter table public.spot_submissions enable row level security;
 
+drop policy if exists "Approved spots are public" on public.spot_submissions;
 create policy "Approved spots are public"
   on public.spot_submissions for select
   to anon, authenticated
   using (status = 'approved');
 
+drop policy if exists "Contributors see their own submissions" on public.spot_submissions;
 create policy "Contributors see their own submissions"
   on public.spot_submissions for select
   to authenticated
   using (submitted_by = auth.uid());
 
+drop policy if exists "Admins see all submissions" on public.spot_submissions;
 create policy "Admins see all submissions"
   on public.spot_submissions for select
   to authenticated
   using (public.is_admin());
 
+drop policy if exists "Signed-in users submit pending spots as themselves" on public.spot_submissions;
 create policy "Signed-in users submit pending spots as themselves"
   on public.spot_submissions for insert
   to authenticated

@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-30 : commit a5968dc : fingerprint f6149c5ead8c795d
+Generated 2026-09-30 : commit da2f656 : fingerprint c40e67da1dcdcc72
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -235,7 +235,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/services/placeService.ts` (206 lines) : Public listings (table cafes) and Place Portal applications (table place_applications). Listings are
 - `src/services/roasterService.ts` (115 lines) : Roaster-facing facade over the catalog: everything an approved roaster or
 - `src/services/sessionService.test.ts` (35 lines) : src/services module: sessionService.test
-- `src/services/sessionService.ts` (602 lines) : The signed-in account: Supabase Auth session plus the caller's row in public.profiles (role, status,
+- `src/services/sessionService.ts` (582 lines) : The signed-in account: Supabase Auth session plus the caller's row in public.profiles (role, status,
   - L14 : RESET_RETURN_TAB
   - L37 : PASSWORD_MIN_LENGTH
   - L40 : PendingConfirmation
@@ -292,6 +292,8 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/utils/backgroundUpdate.ts` (30 lines) : Applies a waiting service worker update only after the page has been hidden for a while, so a quick
 - `src/utils/calendar.test.ts` (57 lines) : src/utils module: calendar.test
 - `src/utils/calendar.ts` (161 lines) : Calendar and clock helpers shared by roast drops, cafe hours, and the
+- `src/utils/emailTypos.test.ts` (39 lines) : src/utils module: emailTypos.test
+- `src/utils/emailTypos.ts` (38 lines) : Spots an address whose domain is a near miss of a popular mail provider (gmial.com, gmail.con, hotmial.com).
 - `src/utils/geo.test.ts` (53 lines) : Meters per degree of latitude on the 6,371 km sphere.
 - `src/utils/geo.ts` (74 lines) : Distance and directions helpers for the coffee map and trails.
 - `src/utils/inbox.test.ts` (21 lines) : src/utils module: inbox.test
@@ -305,7 +307,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L21 : AddSpotViewProps
   - L305 : AddSpotView
 - `src/views/CommunityView.tsx` (74 lines) : Cup Check community feed: one-to-three column masonry of today's brews.
-- `src/views/ConfirmEmailView.tsx` (126 lines) : The only screen an unconfirmed sign-up sees: it replaces the whole app (every tab, the portal included) until
+- `src/views/ConfirmEmailView.tsx` (105 lines) : The only screen an unconfirmed sign-up sees: it replaces the whole app (every tab, the portal included) until
 - `src/views/LandingView.tsx` (330 lines) : Landing page shown at the bare URL (see `isLandingEntry` in utils/router.ts). It showcases the app with real
   - L14 : LandingViewProps
   - L104 : LandingView

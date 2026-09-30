@@ -127,18 +127,27 @@ alter table public.cafe_saves enable row level security;
 
 -- RLS Policies
 -- Public Read Access for Discovery
+drop policy if exists "Public can view verified cafes" on public.cafes;
 create policy "Public can view verified cafes" on public.cafes for select using (true);
+drop policy if exists "Public can view beans" on public.beans;
 create policy "Public can view beans" on public.beans for select using (true);
+drop policy if exists "Public can view roast drops" on public.roast_drops;
 create policy "Public can view roast drops" on public.roast_drops for select using (true);
+drop policy if exists "Public can view cup checks" on public.cup_checks;
 create policy "Public can view cup checks" on public.cup_checks for select using (true);
 
 -- User-specific Policies
+drop policy if exists "Users can view own profile" on public.profiles;
 create policy "Users can view own profile" on public.profiles for select using (auth.uid() = id);
+drop policy if exists "Users can update own profile" on public.profiles;
 create policy "Users can update own profile" on public.profiles for update using (auth.uid() = id);
+drop policy if exists "Users can manage own saves" on public.cafe_saves;
 create policy "Users can manage own saves" on public.cafe_saves for all using (auth.uid() = user_id);
+drop policy if exists "Users can insert cup checks" on public.cup_checks;
 create policy "Users can insert cup checks" on public.cup_checks for insert with check (auth.uid() = user_id);
 
 -- Roasters / Admins can manage their cafes and drops
+drop policy if exists "Roasters can update their cafes" on public.cafes;
 create policy "Roasters can update their cafes" on public.cafes for update using (
   exists (select 1 from public.profiles where id = auth.uid() and role in ('roaster', 'admin'))
 );
