@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Lock, Volume1 } from 'lucide-react';
+import { Flag, Lock, Volume1 } from 'lucide-react';
 import type { Cafe } from '../../types/coffee';
 import { visitService } from '../../services/visitService';
 import { sessionService } from '../../services/sessionService';
@@ -7,6 +7,7 @@ import { useVisitVersion, useSessionVersion } from '../../hooks/useServiceVersio
 import { communityPulse, formatDuration, NOISE_LEVELS, timeAgo, type Visit } from '../../services/visitMapping';
 import { CupClinkIcon } from '../common/CustomIcons';
 import { GROUP, SECTION_LABEL } from '../common/sheetStyles';
+import type { ReportSubject } from './ReportSheet';
 
 const NOISE_WORD: Record<string, string> = Object.fromEntries(NOISE_LEVELS.map((level) => [level.id, level.label.toLowerCase()]));
 
@@ -34,7 +35,7 @@ function describe(visit: Visit): string {
  * newest public sessions logged there (and the viewer's own), each with a Cup Clink. Loads from Supabase
  * when the sheet opens; with no connection or no sanctuary tables yet it shows only the viewer's visits.
  */
-export const CafeRecentVisitors: React.FC<{ cafe: Cafe }> = ({ cafe }) => {
+export const CafeRecentVisitors: React.FC<{ cafe: Cafe; onReport?: (subject: ReportSubject) => void }> = ({ cafe, onReport }) => {
   useVisitVersion();
   useSessionVersion();
   const [notice, setNotice] = useState<string | null>(null);
@@ -113,6 +114,16 @@ export const CafeRecentVisitors: React.FC<{ cafe: Cafe }> = ({ cafe }) => {
                     <span className="font-mono text-[14px]">{visit.clinksCount}</span>
                   </span>
                 ) : (
+                  <>
+                  {onReport && (
+                    <button
+                      onClick={() => onReport({ type: 'visit', id: visit.id, label: `Check-in at ${cafe.name} by ${visit.visitorName}` })}
+                      aria-label={`Report the check-in by ${visit.visitorName}`}
+                      className="h-11 w-9 shrink-0 flex items-center justify-center text-ink-3 ios-press"
+                    >
+                      <Flag className="w-4 h-4" />
+                    </button>
+                  )}
                   <button
                     onClick={() => clink(visit)}
                     aria-pressed={clinked}
@@ -126,6 +137,7 @@ export const CafeRecentVisitors: React.FC<{ cafe: Cafe }> = ({ cafe }) => {
                       <span className="font-mono text-[14px] font-semibold">{visit.clinksCount}</span>
                     </span>
                   </button>
+                  </>
                 )}
               </div>
             );

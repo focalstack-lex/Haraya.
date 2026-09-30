@@ -19,6 +19,8 @@ import {
   Clock,
   Star,
   ChevronRight,
+  Flag,
+  Megaphone,
 } from 'lucide-react';
 import type { Cafe, AmenityKey, Bean } from '../../types/coffee';
 import { AMENITY_LABELS } from '../../types/coffee';
@@ -30,6 +32,9 @@ import { useCatalogVersion } from '../../hooks/useServiceVersions';
 import { AddToListSheet } from '../common/AddToListSheet';
 import { V60DripperIcon, FocusTimerIcon } from '../common/CustomIcons';
 import { CafeRecentVisitors } from './CafeRecentVisitors';
+import { CafeReviews } from './CafeReviews';
+import { ReportSheet, type ReportSubject } from './ReportSheet';
+import { activeNotice } from '../../services/placeMapping';
 
 const AMENITY_ICONS: Record<AmenityKey, React.ComponentType<{ className?: string }>> = {
   fastWifi: Wifi,
@@ -135,9 +140,11 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
   const [isListSheetOpen, setIsListSheetOpen] = useState(false);
   const galleryRef = useRef<HTMLDivElement>(null);
   const [activeImage, setActiveImage] = useState(0);
+  const [reportSubject, setReportSubject] = useState<ReportSubject | null>(null);
 
   useEffect(() => {
     setActiveImage(0);
+    setReportSubject(null);
   }, [cafe?.id]);
 
   const menu = useMemo(
@@ -150,6 +157,10 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
   const openNow = isOpenNow(cafe.hours);
   const hoursKnown = hasListedHours(cafe.hours);
   const roasterBeans: Bean[] = cafe.isRoastery ? catalogService.getBeansByRoaster(cafe.id) : [];
+  const closed = Boolean(cafe.closed);
+  const notice = activeNotice(cafe);
+  // A spot only the contributor can see has nobody to report it to yet
+  const reportable = cafe.community?.status !== 'pending';
 
   return (
     <>
@@ -197,10 +208,10 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] font-sans">
               <span className={`font-semibold inline-flex items-center gap-1.5 ${
-                !hoursKnown ? 'text-ink-2' : openNow ? 'text-ok' : 'text-danger'
+                closed ? 'text-danger' : !hoursKnown ? 'text-ink-2' : openNow ? 'text-ok' : 'text-danger'
               }`}>
-                {hoursKnown && <span className={`h-2 w-2 rounded-full ${openNow ? 'bg-ok' : 'bg-danger'}`} />}
-                {!hoursKnown ? 'Hours not listed' : openNow ? 'Open now' : 'Closed'}
+                {!closed && hoursKnown && <span className={`h-2 w-2 rounded-full ${openNow ? 'bg-ok' : 'bg-danger'}`} />}
+                {closed ? 'Permanently closed' : !hoursKnown ? 'Hours not listed' : openNow ? 'Open now' : 'Closed'}
               </span>
               {cafe.verified && (
                 <span className="inline-flex items-center gap-1 text-ink-2">
@@ -220,6 +231,15 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
                 </span>
               )}
             </div>
+            {notice && (
+              <p className="rounded-row bg-tint/12 px-3.5 py-2.5 text-[15px] text-ink flex items-start gap-2">
+                <Megaphone className="w-4.5 h-4.5 shrink-0 mt-0.5 text-tint-ink" aria-hidden="true" />
+                <span className="min-w-0 break-words">
+                  <span className="font-semibold">From the owner: </span>
+                  {notice}
+                </span>
+              </p>
+            )}
             {cafe.description && <p className="text-[15px] font-sans text-ink/85 leading-relaxed">{cafe.description}</p>}
             {cafe.community?.tip && (
               <p className="rounded-row bg-canvas px-3.5 py-2.5 text-[15px] text-ink">
@@ -261,7 +281,7 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
               </button>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              {onCheckIn && (
+              {onCheckIn && (!closed || focusingHere) && (
                 <button
                   onClick={() => (focusingHere && onFinishSession ? onFinishSession() : onCheckIn(cafe))}
                   className={SECONDARY_ACTION}
@@ -273,7 +293,7 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
               {onRateCafe && (
                 <button
                   onClick={() => onRateCafe(cafe)}
-                  className={`${SECONDARY_ACTION} ${(onCheckIn ? 1 : 0) + (cafe.isRoastery && onSelectRoastery ? 1 : 0) === 0 ? 'col-span-2' : ''}`}
+                  className={`${SECONDARY_ACTION} ${(onCheckIn && (!closed || focusingHere) ? 1 : 0) + (cafe.isRoastery && onSelectRoastery ? 1 : 0) === 0 ? 'col-span-2' : ''}`}
                 >
                   <Star className="w-4 h-4" />
                   Rate
@@ -311,7 +331,9 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
             </section>
           )}
 
-          <CafeRecentVisitors cafe={cafe} />
+          <CafeReviews cafe={cafe} onReport={setReportSubject} />
+
+          <CafeRecentVisitors cafe={cafe} onReport={setReportSubject} />
 
           {cafe.brewMethods.length > 0 && (
           <section className="space-y-1.5">
@@ -354,8 +376,20 @@ export const CafeDetailModal: React.FC<CafeDetailModalProps> = ({
               </div>
             </section>
           )}
+
+          {reportable && (
+            <button
+              onClick={() => setReportSubject({ type: 'spot', id: cafe.id, label: cafe.name })}
+              className="min-h-11 mx-auto px-3 flex items-center justify-center gap-1.5 text-[14px] font-medium text-ink-2 ios-press"
+            >
+              <Flag className="w-4 h-4" />
+              Report a problem or suggest a fix
+            </button>
+          )}
         </div>
       </Modal>
+
+      <ReportSheet subject={reportSubject} onClose={() => setReportSubject(null)} />
 
       <AddToListSheet
         isOpen={isListSheetOpen}

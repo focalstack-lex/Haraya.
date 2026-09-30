@@ -9,7 +9,7 @@ export type LegalPage = 'privacy' | 'terms';
  * with guesses, and update the fact sections whenever data handling changes (Supabase, Aya).
  */
 
-const LAST_UPDATED = '28 September 2026';
+const LAST_UPDATED = '30 September 2026';
 
 const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
   <section className="space-y-2">
@@ -54,7 +54,28 @@ const Privacy: React.FC = () => (
         items={[
           <>
             <strong>Saves, ratings, lists, reminders and likes</strong>: kept on your device so the app remembers
-            your picks.
+            your picks. When you are signed in, your saved spots are also stored with your account so they follow
+            you to another device.
+          </>,
+          <>
+            <strong>Reviews</strong>: when you are signed in, a star rating and the words you write about a spot are
+            shown publicly on that spot with your display name.
+          </>,
+          <>
+            <strong>Check-ins</strong>: the spot, the time, what you logged about the visit, and your position at
+            the moment you checked in, used to confirm you were at the spot. Your position is never shown to anyone.
+          </>,
+          <>
+            <strong>Reports</strong>: when you report a spot, a check-in or a review, the reason and any details you
+            add, linked to your account so we can reply to you.
+          </>,
+          <>
+            <strong>Error reports</strong>: if the app fails, the error message, the page it happened on and your
+            browser type are sent to us so we can fix it. They are deleted after 30 days.
+          </>,
+          <>
+            <strong>Usage counts</strong>: which pages are opened, which cities are opened with no spots, and
+            searches that find nothing. These carry no account, device or IP address, and are deleted after 90 days.
           </>,
           <>
             <strong>Cup Check posts</strong>: your display name, caption, cup photo and flavor pins, to show your post
@@ -84,7 +105,8 @@ const Privacy: React.FC = () => (
           <>
             <strong>Location</strong>: read on your device when you tap Near me, Use my current location, or Navigate
             in Haraya. During navigation it updates while the walk is running and stops when you end it or arrive. It
-            is not stored and not sent to us. A spot's map pin is the place's location, not yours.
+            is not stored and not sent to us, except for the single position saved with a check-in (above). A spot's
+            map pin is the place's location, not yours.
           </>,
         ]}
       />
@@ -92,8 +114,9 @@ const Privacy: React.FC = () => (
 
     <Section title="Where your data is kept">
       <p>
-        Your account, the spots you add, place applications and place listings are stored in our database, hosted
-        by Supabase. Everything else
+        Your account, the spots you add, place applications, place listings, check-ins, reviews, reports, saved
+        spots (when signed in), error reports and usage counts are stored in our database, hosted by Supabase.
+        Photos that place owners upload are stored there too. Everything else
         above (saves, ratings, lists, reminders, likes and posts) is stored in your browser on this device, and
         clearing this site's data in your browser settings removes it.
       </p>
@@ -110,7 +133,10 @@ const Privacy: React.FC = () => (
           'Google Maps, Apple Maps, Waze and Google Calendar receive the destination only when you choose to open it there.',
         ]}
       />
-      <p>We do not use analytics, advertising or tracking cookies.</p>
+      <p>
+        We do not use advertising, tracking cookies or any outside analytics service. The usage counts described
+        above are kept in our own database and cannot be traced to you.
+      </p>
     </Section>
 
     <Section title="How long we keep it">
@@ -123,7 +149,9 @@ const Privacy: React.FC = () => (
       <p>
         Under the Data Privacy Act of 2012 (Republic Act No. 10173) you may ask to access, correct or erase your
         personal data, object to its processing, and receive a copy of it. You may also file a complaint with the
-        National Privacy Commission. Send requests to <Placeholder>privacy contact email</Placeholder>.
+        National Privacy Commission. You can download a copy of your data and delete your account yourself from
+        the Passport tab, under Your data. For anything else, send requests to{' '}
+        <Placeholder>privacy contact email</Placeholder>.
       </p>
     </Section>
   </>

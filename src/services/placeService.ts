@@ -6,6 +6,7 @@ import {
   cafeRowToCafe,
   describePlaceError,
   toApplicationInsertRow,
+  toCafeCreatePayload,
   toCafeUpdateRow,
   validateListing,
   validatePlaceApplication,
@@ -58,7 +59,41 @@ function writeCache(rows: CafeRow[]): void {
 }
 
 function publishToCatalog(): void {
-  catalogService.setListedCafes(listings.map(cafeRowToCafe));
+  const hidden = new Set(listings.filter((row) => row.status === 'hidden').map((row) => row.id));
+  catalogService.setListedCafes(listings.filter((row) => row.status !== 'hidden').map(cafeRowToCafe), hidden);
+}
+
+/** True once the photo, announcement and status columns exist (20260930020000 applied). */
+const isExtended = (): boolean => listings.some((row) => row.status !== undefined);
+
+export type ListingStatus = 'listed' | 'hidden' | 'closed';
+
+export interface ListingStats {
+  visitsTotal: number;
+  visits30d: number;
+  focusMinutes30d: number;
+  reviewsTotal: number;
+  ratingAverage: number | null;
+}
+
+const PHOTO_BUCKET = 'place-photos';
+const PHOTO_MAX_EDGE = 1600;
+const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
+/** Shrinks a photo in the browser so a phone camera shot uploads as a small JPEG. */
+async function shrinkPhoto(file: File): Promise<Blob> {
+  const bitmap = await createImageBitmap(file);
+  const scale = Math.min(1, PHOTO_MAX_EDGE / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+  canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+  const context = canvas.getContext('2d');
+  if (!context) throw new Error('This browser cannot prepare the photo.');
+  context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  bitmap.close();
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('This browser cannot prepare the photo.'))), 'image/jpeg', 0.82);
+  });
 }
 
 export const placeService = {
@@ -77,6 +112,12 @@ export const placeService = {
 
   getLoadError(): string | null {
     return loadError;
+  },
+
+  /** One row of the cafes table as a Cafe, hidden ones included, so an admin can still edit a hidden listing. */
+  getListingAsCafe(cafeId: string): Cafe | null {
+    const row = listings.find((entry) => entry.id === cafeId);
+    return row ? cafeRowToCafe(row) : null;
   },
 
   /** True for a cafe that comes from the cafes table (not curated, community or browser-only records). */
@@ -158,17 +199,60 @@ export const placeService = {
   },
 
   async updateMyListing(input: ListingInput): Promise<void> {
-    if (!supabase) throw new Error('The Place Portal is not available right now.');
     const profile = sessionService.getProfile();
     if (!profile?.cafe_profile_id) throw new Error('This account has no listing to edit yet.');
+    await placeService.updateListing(profile.cafe_profile_id, input);
+  },
+
+  /** Saves a listing. Row Level Security allows it for that listing's owner and for admins. */
+  async updateListing(cafeId: string, input: ListingInput): Promise<void> {
+    if (!supabase) throw new Error('The Place Portal is not available right now.');
     const problem = validateListing(input);
     if (problem) throw new Error(problem);
-    const { error } = await supabase.from('cafes').update(toCafeUpdateRow(input)).eq('id', profile.cafe_profile_id);
+    const { error } = await supabase.from('cafes').update(toCafeUpdateRow(input, isExtended())).eq('id', cafeId);
     if (error) {
       console.warn('Haraya: listing update failed', error.message);
       throw new Error(describePlaceError(error.message));
     }
     await placeService.refresh();
+  },
+
+  /** True when photos and announcements can be saved (the latest database update is applied). */
+  supportsPhotos(): boolean {
+    return isExtended();
+  },
+
+  /** Uploads one photo for a listing and returns its public link. The caller adds it to the listing and saves. */
+  async uploadPhoto(cafeId: string, file: File): Promise<string> {
+    if (!supabase) throw new Error('Photo upload is not available right now.');
+    if (!PHOTO_TYPES.includes(file.type)) throw new Error('Use a JPEG, PNG or WebP photo.');
+    if (file.size > 12 * 1024 * 1024) throw new Error('That photo is too large. Pick one under 12 MB.');
+    const blob = await shrinkPhoto(file);
+    const path = `${cafeId}/${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}.jpg`;
+    const { error } = await supabase.storage.from(PHOTO_BUCKET).upload(path, blob, { contentType: 'image/jpeg', cacheControl: '31536000' });
+    if (error) {
+      console.warn('Haraya: photo upload failed', error.message);
+      throw new Error(/bucket|not found/i.test(error.message) ? 'Photo upload needs the latest database update, which is not applied yet.' : 'Could not upload the photo. Try again.');
+    }
+    return supabase.storage.from(PHOTO_BUCKET).getPublicUrl(path).data.publicUrl;
+  },
+
+  /** Check-ins and reviews for a listing; its owner and admins only. Null when it cannot be read. */
+  async getStats(cafeId: string): Promise<ListingStats | null> {
+    if (!supabase) return null;
+    const { data, error } = await supabase.rpc('listing_stats', { target: cafeId });
+    const row = Array.isArray(data) ? data[0] : data;
+    if (error || !row) {
+      if (error) console.warn('Haraya: listing stats failed', error.message);
+      return null;
+    }
+    return {
+      visitsTotal: Number(row.visits_total) || 0,
+      visits30d: Number(row.visits_30d) || 0,
+      focusMinutes30d: Number(row.focus_minutes_30d) || 0,
+      reviewsTotal: Number(row.reviews_total) || 0,
+      ratingAverage: row.rating_average === null || row.rating_average === undefined ? null : Number(row.rating_average),
+    };
   },
 
   // Admin side ------------------------------------------------------------------------------------------
@@ -194,6 +278,48 @@ export const placeService = {
     await placeService.refresh();
     // The reviewer might be the applicant on a test account; keep their own role current
     await sessionService.refreshProfile();
+  },
+
+  /** Every row of the cafes table, hidden ones included, for the Control Room. Empty unless the caller is an admin. */
+  getAllListingRows(): CafeRow[] {
+    return sessionService.isAdmin() ? listings : [];
+  },
+
+  /** Adds a place straight to the catalog, unverified until an admin verifies it. Returns the new id. */
+  async createListing(input: ListingInput): Promise<string> {
+    if (!supabase || !sessionService.isAdmin()) throw new Error('Only admins can add places.');
+    const problem = validateListing(input);
+    if (problem) throw new Error(problem);
+    const { data, error } = await supabase.rpc('admin_create_cafe', { payload: toCafeCreatePayload(input), is_verified: false });
+    if (error) {
+      console.warn('Haraya: place creation failed', error.message);
+      throw new Error(describePlaceError(error.message));
+    }
+    await placeService.refresh();
+    return String(data);
+  },
+
+  /** Adds many places at once. All or nothing: the database cancels the import on the first bad row. */
+  async importListings(inputs: ListingInput[]): Promise<number> {
+    if (!supabase || !sessionService.isAdmin()) throw new Error('Only admins can import places.');
+    const { data, error } = await supabase.rpc('admin_import_cafes', { places: inputs.map(toCafeCreatePayload) });
+    if (error) {
+      console.warn('Haraya: import failed', error.message);
+      throw new Error(describePlaceError(error.message));
+    }
+    await placeService.refresh();
+    return Number(data) || 0;
+  },
+
+  /** Listed shows the place, hidden takes it off the app, closed keeps it findable as shut for good. */
+  async setStatus(cafeId: string, status: ListingStatus): Promise<void> {
+    if (!supabase || !sessionService.isAdmin()) throw new Error('Only admins can change a listing.');
+    const { error } = await supabase.rpc('admin_set_cafe_status', { target: cafeId, new_status: status });
+    if (error) {
+      console.warn('Haraya: status change failed', error.message);
+      throw new Error(describePlaceError(error.message));
+    }
+    await placeService.refresh();
   },
 
   async setVerified(cafeId: string, verified: boolean): Promise<void> {

@@ -22,6 +22,8 @@ export interface Profile {
   is_public_passport?: boolean;
   /** Focus minutes across all visits, kept by a database trigger. */
   total_focus_minutes?: number;
+  /** Set while an admin has restricted the account (20260930020000); it cannot post anywhere. */
+  suspended_at?: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -105,6 +105,15 @@ export const userPrefsService = {
     return nowSaved;
   },
 
+  /** Adds spots saved on another device (from the account) without removing any saved here. */
+  addSavedCafes(cafeIds: string[]): void {
+    const saved = this.getSavedCafes();
+    const added = cafeIds.filter((id) => !saved.includes(id));
+    if (added.length === 0) return;
+    writeJson(KEYS.SAVED_CAFES, [...saved, ...added]);
+    notify();
+  },
+
   getSavedBeans(): string[] {
     return readJson<string[]>(KEYS.SAVED_BEANS, []);
   },

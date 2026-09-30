@@ -49,6 +49,9 @@ import { sessionService, RESET_RETURN_TAB } from './services/sessionService';
 import { spotService } from './services/spotService';
 import { placeService } from './services/placeService';
 import { visitService } from './services/visitService';
+import { accountService } from './services/accountService';
+import { notificationService } from './services/notificationService';
+import { trackEvent } from './services/telemetry';
 import { useCatalogVersion, usePrefsVersion, useCommunityVersion, useSessionVersion, useSpotVersion, usePlaceVersion, useVisitVersion } from './hooks/useServiceVersions';
 import { buildHash, isLandingEntry, parseHash, setHash } from './utils/router';
 import { distanceKm } from './utils/geo';
@@ -195,7 +198,7 @@ export const App: React.FC = () => {
     };
     sessionService
       .start()
-      .then(() => Promise.all([spotService.start(), placeService.start(), visitService.start()]))
+      .then(() => Promise.all([spotService.start(), placeService.start(), visitService.start(), notificationService.start(), accountService.startSavedSync()]))
       .then(() => {
         // A failed load skips pruning rather than deleting saves on a flaky connection
         if (!spotService.getLoadError() && !placeService.getLoadError()) prune();
@@ -338,6 +341,8 @@ export const App: React.FC = () => {
   const toggleSaveCafe = (cafe: Cafe) => {
     const saved = userPrefsService.toggleSavedCafe(cafe);
     if (saved) catalogService.recordSave(cafe.id);
+    // Signed in, the save follows the account to other devices
+    void accountService.pushSaved(cafe.id, saved);
   };
 
   const toggleVibe = (id: VibeFilterId) => {
@@ -443,6 +448,16 @@ export const App: React.FC = () => {
   }, [allCafes]);
   const cityIsEmpty = selectedCity !== 'All Davao Region' && !cityCounts[selectedCity];
 
+  // Anonymous counts for the Control Room: which pages are opened, which cities come up empty, and which
+  // searches find nothing (the places people expect and Haraya does not have yet)
+  useEffect(() => {
+    if (!isLanding) trackEvent('tab_view', activeTab);
+  }, [activeTab, isLanding]);
+
+  useEffect(() => {
+    if (cityIsEmpty && allCafes.length > 0) trackEvent('city_empty', selectedCity);
+  }, [cityIsEmpty, selectedCity, allCafes.length]);
+
 
   const cafes = useMemo(() => {
     let list = allCafes;
@@ -472,6 +487,14 @@ export const App: React.FC = () => {
   }, [allCafes, selectedCity, feedMode, searchQuery, vibeFilters, priceRangeId, sortKey, cityCentroid]);
 
   const selectedCafe = selectedCafeId ? catalogService.getCafeById(selectedCafeId) ?? null : null;
+
+  // Waits for the visitor to stop typing, so half-typed words are not counted
+  useEffect(() => {
+    const query = searchQuery.trim();
+    if (query.length < 3 || cafes.length > 0 || allCafes.length === 0) return;
+    const timer = window.setTimeout(() => trackEvent('search_no_results', query), 1500);
+    return () => window.clearTimeout(timer);
+  }, [searchQuery, cafes.length, allCafes.length]);
 
   // Spotlight shelves from real data only: study spots ranked by recorded saves, and approved community gems
   const studySpots = useMemo(

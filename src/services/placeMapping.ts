@@ -39,6 +39,8 @@ export const LISTING_LIMITS = {
   vibeTags: 8,
   menu: 60,
   menuItemName: 80,
+  images: 8,
+  notice: 200,
 } as const;
 
 export const LISTING_AMENITIES = Object.keys(AMENITY_LABELS) as AmenityKey[];
@@ -107,6 +109,10 @@ export interface CafeRow {
   save_count: number;
   view_count: number;
   created_at: string;
+  /** listed, hidden or closed (20260930020000); absent until that migration is applied. */
+  status?: string;
+  notice?: string;
+  notice_until?: string | null;
 }
 
 /** The fields an owner edits on their listing. */
@@ -127,9 +133,14 @@ export interface ListingInput {
   hours: WeeklyHours;
   menu: MenuItem[];
   vibeTags: string[];
+  /** Photo links, first one is the cover. Empty means the placeholder is shown. */
+  images: string[];
+  /** Announcement shown on the spot, and the last day it shows (YYYY-MM-DD, or empty for no end). */
+  notice: string;
+  noticeUntil: string;
 }
 
-const PLACEHOLDER_PHOTO = '/placeholders/no-photo.svg';
+export const PLACEHOLDER_PHOTO = '/placeholders/no-photo.svg';
 const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
 const MENU_CATEGORIES: MenuItem['category'][] = ['Espresso Bar', 'Filter', 'Signature', 'Pastry'];
 
@@ -265,6 +276,40 @@ export function cafeRowToCafe(row: CafeRow): Cafe {
     saveCount: row.save_count,
     viewCount: row.view_count,
     dateAdded: row.created_at.slice(0, 10),
+    ...(row.status === 'closed' ? { closed: true } : {}),
+    ...(row.notice && row.notice.trim() ? { notice: { text: row.notice.trim(), until: row.notice_until ?? null } } : {}),
+  };
+}
+
+/** The announcement to show today, or null when there is none or its last day has passed. */
+export function activeNotice(cafe: Cafe, today: string = new Date().toISOString().slice(0, 10)): string | null {
+  if (!cafe.notice) return null;
+  if (cafe.notice.until && cafe.notice.until < today) return null;
+  return cafe.notice.text;
+}
+
+/** A blank listing for the Control Room's "Add a place" form. */
+export function emptyListing(): ListingInput {
+  return {
+    name: '',
+    isRoastery: false,
+    city: 'Davao City',
+    district: 'Poblacion',
+    address: '',
+    lat: null,
+    lng: null,
+    description: '',
+    signature: '',
+    amenities: [],
+    brewMethods: [],
+    priceLevel: 2,
+    wifiMbps: 0,
+    hours: emptyHours(),
+    menu: [],
+    vibeTags: [],
+    images: [],
+    notice: '',
+    noticeUntil: '',
   };
 }
 
@@ -288,6 +333,9 @@ export function listingFromCafe(cafe: Cafe): ListingInput {
     hours: { ...cafe.hours },
     menu: cafe.menu.map((item) => ({ ...item })),
     vibeTags: [...cafe.vibeTags],
+    images: cafe.images.filter((image) => image !== PLACEHOLDER_PHOTO),
+    notice: cafe.notice?.text ?? '',
+    noticeUntil: cafe.notice?.until ?? '',
   };
 }
 
@@ -320,6 +368,9 @@ export function validateListing(input: ListingInput): string | null {
       return `Check the hours for ${day}.`;
     }
   }
+  if (input.images.length > LISTING_LIMITS.images) return `Keep it to ${LISTING_LIMITS.images} photos.`;
+  if (input.notice.trim().length > LISTING_LIMITS.notice) return `Keep the announcement under ${LISTING_LIMITS.notice} characters.`;
+  if (input.noticeUntil && !/^\d{4}-\d{2}-\d{2}$/.test(input.noticeUntil)) return 'Check the last day of the announcement.';
   if (input.menu.length > LISTING_LIMITS.menu) return `Keep the menu under ${LISTING_LIMITS.menu} items.`;
   for (const item of input.menu) {
     if (!item.name.trim()) return 'Every menu item needs a name.';
@@ -329,9 +380,20 @@ export function validateListing(input: ListingInput): string | null {
   return null;
 }
 
-/** Update payload for the owner's cafes row: only the columns owners are granted. */
-export function toCafeUpdateRow(input: ListingInput) {
+/**
+ * Update payload for a cafes row: only the columns owners are granted. `extended` adds the photo and
+ * announcement columns, which exist once 20260930020000 is applied.
+ */
+export function toCafeUpdateRow(input: ListingInput, extended: boolean = false) {
   return {
+    ...(extended
+      ? {
+          images: input.images,
+          logo_url: input.images[0] ?? '',
+          notice: input.notice.trim(),
+          notice_until: input.notice.trim() && input.noticeUntil ? input.noticeUntil : null,
+        }
+      : {}),
     name: input.name.trim(),
     is_roastery: input.isRoastery,
     city: input.city,
@@ -356,12 +418,23 @@ export function toCafeUpdateRow(input: ListingInput) {
   };
 }
 
+/** Payload for admin_create_cafe(): the full listing, photos and announcement included. */
+export function toCafeCreatePayload(input: ListingInput) {
+  return toCafeUpdateRow(input, false);
+}
+
 /** Friendly text for errors raised by the database trigger and constraints. */
 export function describePlaceError(message: string): string {
   if (message.includes('pending_application')) return 'Your application is already waiting for review.';
   if (message.includes('daily_limit')) return 'You can send up to 3 applications a day. Try again tomorrow.';
   if (message.includes('already_reviewed')) return 'This application was already reviewed.';
   if (message.includes('own_role')) return 'You cannot change your own role.';
+  if (message.includes('own_account')) return 'You cannot restrict your own account.';
+  if (message.includes('account_suspended')) return 'This account is restricted and cannot post right now.';
+  if (message.includes('import_too_large')) return 'Import up to 200 places at a time.';
+  if (message.includes('import_row')) return message.slice(message.indexOf('Row')).replace(/\s*\(.*$/, '') + '. Nothing was imported; fix that row and try again.';
+  if (message.includes('last_admin')) return 'Make another account an admin before deleting this one.';
+  if (/schema cache|does not exist|Could not find/i.test(message)) return 'This needs the latest database update, which is not applied yet.';
   if (message.includes('Sign in')) return 'Sign in again to continue.';
   if (message.includes('violates check constraint')) return 'Some details are outside what Haraya accepts. Check the form and try again.';
   if (message.includes('permission denied') || message.includes('42501')) return 'This account is not allowed to do that.';

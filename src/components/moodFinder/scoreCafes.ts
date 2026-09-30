@@ -159,6 +159,8 @@ const clockAfter = (now: Date, minutes: number): string => {
 const distanceScore = (km: number) => (km <= 0.5 ? 1 : Math.max(0, (15 - km) / 14.5));
 
 const passesFilters = (cafe: Cafe, request: MoodRequest, mustHaves: MustHaveId[], now: Date): boolean => {
+  // A place that has shut for good is never suggested
+  if (cafe.closed) return false;
   if (!mustHaves.every((id) => MUST_HAVE_TEST[id](cafe, now))) return false;
   if (request.maxPrice !== null && cafe.priceLevel > request.maxPrice) return false;
   if (request.district !== null && cafe.district !== request.district) return false;

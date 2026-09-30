@@ -7,6 +7,8 @@ import App from './App.tsx'
 import { registerSW } from 'virtual:pwa-register'
 import { createBackgroundUpdate } from './utils/backgroundUpdate'
 import { installPrompt } from './components/install/installPromptStore'
+import { ErrorBoundary } from './components/common/ErrorBoundary'
+import { installErrorReporting } from './services/telemetry'
 
 // A new version waits until the visitor has been away for a while, then activates; the next open is fresh
 const UPDATE_AFTER_HIDDEN_MS = 10 * 60 * 1000
@@ -32,9 +34,13 @@ const updateSW = registerSW({
 
 // beforeinstallprompt can fire before React mounts, so start listening now
 installPrompt.listen(window)
+// Uncaught errors are reported to the Control Room from the first moment
+installErrorReporting()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
   </StrictMode>,
 )

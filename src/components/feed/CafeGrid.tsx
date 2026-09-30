@@ -81,8 +81,8 @@ const CafeCard: React.FC<{
           </p>
 
           <div className="flex items-center justify-between gap-2 ios-footnote font-medium">
-            <p className={!hoursKnown ? 'text-ink-2' : openNow ? 'text-ok' : 'text-danger'}>
-              {!hoursKnown ? 'Hours not listed' : openNow ? 'Open now' : 'Closed'}
+            <p className={cafe.closed ? 'text-danger' : !hoursKnown ? 'text-ink-2' : openNow ? 'text-ok' : 'text-danger'}>
+              {cafe.closed ? 'Permanently closed' : !hoursKnown ? 'Hours not listed' : openNow ? 'Open now' : 'Closed'}
             </p>
             {rating && (
               <span className="shrink-0 text-tint-ink inline-flex items-center gap-1" aria-label={`Your rating: ${rating.rating} of 5`}>

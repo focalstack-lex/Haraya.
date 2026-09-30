@@ -136,6 +136,10 @@ export interface Cafe {
   dateAdded: string;
   /** Present only on community-added spots. */
   community?: CommunityMeta;
+  /** True when the place has shut for good; it stays findable but takes no check-ins. */
+  closed?: boolean;
+  /** The owner's announcement (a closure, holiday hours), with the last day it applies. */
+  notice?: { text: string; until: string | null };
 }
 
 export interface RoastProfile {

@@ -71,6 +71,25 @@ site's URL to Supabase Auth redirect URLs (email links land on `/` with `?code=`
 whether new password sign-ups must confirm their email (Supabase Auth setting; the app handles
 both).
 
+## Control Room, moderation and account tools
+
+Added 2026-09-30 by `supabase/migrations/20260930020000_admin_tools_moderation_accounts.sql`. Until that
+migration is applied the app keeps working as before and these tools say they are waiting for it.
+
+- **Places** (`#/tab/admin`, Places): add a place, import many from a CSV sheet (`src/services/placeImport.ts`),
+  edit any listing with the owner's editor, verify it, hide it or mark it closed for good.
+- **Reports**: visitors report a spot, a check-in or a review from the spot page; admins resolve or dismiss, and
+  can remove a check-in or review. Restricting an account (Users) stops it from posting anywhere.
+- **Health**: error reports from visitors' browsers, anonymous usage counts (searches with no results, empty
+  cities, pages opened) and the audit log of admin actions. All kept in Haraya's own database
+  (`src/services/telemetry.ts`); no outside tracker.
+- **Accounts**: saved spots follow the account, reviews are public, the Passport shows updates (a reviewed spot,
+  a closed report, a Cup Clink), and Your data offers a download and account deletion.
+- **Place owners**: photos (Supabase Storage bucket `place-photos`), an announcement, and listing numbers.
+
+`.github/workflows/ci.yml` runs lint, the code map check, tests, the dependency audit and the build on every push
+and pull request.
+
 ## Ecosystem bridge
 
 The header switcher links between Haraya (coffee) and Habi (fashion). The Habi target URL is

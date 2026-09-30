@@ -49,6 +49,8 @@ let version = 0;
 let communitySpots: Cafe[] = [];
 /** Public listings from the cafes table, supplied by placeService (owner-managed, admin-verified). */
 let listedCafes: Cafe[] = [];
+/** Ids an admin has hidden; they also take the built-in copy of that spot off the catalog. */
+let hiddenCafeIds: ReadonlySet<string> = new Set();
 
 function readJson<T>(key: string, fallback: T): T {
   try {
@@ -111,9 +113,9 @@ export const catalogService = {
     for (const cafe of [...CURATED_CAFES, ...DIGOS_CAFES, ...this.getCustomCafes(), ...listedCafes, ...communitySpots]) {
       byId.set(cafe.id, cafe);
     }
-    return [...byId.values()].map((cafe) =>
-      cafe.id in verifications ? { ...cafe, verified: verifications[cafe.id] } : cafe
-    );
+    return [...byId.values()]
+      .filter((cafe) => !hiddenCafeIds.has(cafe.id))
+      .map((cafe) => (cafe.id in verifications ? { ...cafe, verified: verifications[cafe.id] } : cafe));
   },
 
   /** Replaces the community spots shown on the map and feed; called by spotService after each load. */
@@ -123,8 +125,9 @@ export const catalogService = {
   },
 
   /** Replaces the public listings shown on the map and feed; called by placeService after each load. */
-  setListedCafes(cafes: Cafe[]): void {
+  setListedCafes(cafes: Cafe[], hiddenIds: ReadonlySet<string> = new Set()): void {
     listedCafes = cafes;
+    hiddenCafeIds = hiddenIds;
     notify();
   },
 

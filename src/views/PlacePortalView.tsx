@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { BadgeCheck, Clock, ExternalLink, LogIn, Plus, ShieldCheck, Store, Trash2, XCircle } from 'lucide-react';
+import { BadgeCheck, Clock, ExternalLink, ImagePlus, LogIn, Plus, ShieldCheck, Store, Trash2, X, XCircle } from 'lucide-react';
 import { LargeTitle } from '../components/common/LargeTitle';
 import { AyaMascot } from '../components/common/AyaMascot';
 import { Chip, ErrorNote, Field, PrimaryButton, SecondaryButton, SelectInput, TextArea, TextInput } from '../components/common/FormControls';
 import { LocationPicker } from '../components/community/LocationPicker';
-import { placeService } from '../services/placeService';
+import { placeService, type ListingStats } from '../services/placeService';
 import { sessionService } from '../services/sessionService';
 import { usePlaceVersion, useSessionVersion, useCatalogVersion } from '../hooks/useServiceVersions';
 import {
@@ -12,6 +12,7 @@ import {
   LISTING_AMENITIES,
   LISTING_LIMITS,
   PLACE_TYPES,
+  emptyListing,
   listingFromCafe,
   placeTypeLabel,
   validateListing,
@@ -382,15 +383,128 @@ const MenuEditor: React.FC<{ value: MenuItem[]; onChange: (menu: MenuItem[]) => 
   );
 };
 
-/** The approved owner's dashboard: the live listing and everything they can change on it. */
-const ListingEditor: React.FC<{ onViewPlace: (cafeId: string) => void }> = ({ onViewPlace }) => {
+/** Photos of the place: upload from the phone, remove, and the first one is the cover. */
+const PhotoEditor: React.FC<{ cafeId: string; value: string[]; onChange: (images: string[]) => void }> = ({ cafeId, value, onChange }) => {
+  const [busy, setBusy] = useState(false);
+  const [problem, setProblem] = useState('');
+  const full = value.length >= LISTING_LIMITS.images;
+
+  const pick = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    // Clear the input so choosing the same file again still fires change
+    event.target.value = '';
+    if (!file) return;
+    setBusy(true);
+    setProblem('');
+    try {
+      onChange([...value, await placeService.uploadPhoto(cafeId, file)]);
+    } catch (cause) {
+      setProblem(cause instanceof Error ? cause.message : 'Could not upload the photo.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <ul className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+        {value.map((src, index) => (
+          <li key={src} className="relative aspect-square rounded-row overflow-hidden bg-sunken">
+            <img src={src} alt={`Photo ${index + 1}`} className="w-full h-full object-cover" />
+            {index === 0 && (
+              <span className="absolute left-1.5 bottom-1.5 h-5 px-2 rounded-full ios-material-dark text-surface text-[11px] font-semibold flex items-center">
+                Cover
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={() => onChange(value.filter((entry) => entry !== src))}
+              aria-label={`Remove photo ${index + 1}`}
+              className="absolute top-0 right-0 h-11 w-11 flex items-center justify-center ios-press"
+            >
+              <span className="h-7 w-7 rounded-full ios-material-dark text-surface flex items-center justify-center">
+                <X className="w-4 h-4" strokeWidth={2.5} />
+              </span>
+            </button>
+          </li>
+        ))}
+        {!full && (
+          <li>
+            <label className={`aspect-square rounded-row ios-fill flex flex-col items-center justify-center gap-1 text-tint-ink text-[13px] font-semibold cursor-pointer ios-press ${busy ? 'opacity-60' : ''}`}>
+              <ImagePlus className="w-5 h-5" />
+              {busy ? 'Uploading' : 'Add photo'}
+              <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => void pick(event)} disabled={busy} className="sr-only" />
+            </label>
+          </li>
+        )}
+      </ul>
+      {problem && <ErrorNote message={problem} />}
+      <p className="ios-footnote text-ink-2 px-1">
+        Up to {LISTING_LIMITS.images} photos. The first is the cover. Save the listing to publish the changes.
+      </p>
+    </div>
+  );
+};
+
+/** Check-ins and reviews for the listing, for its owner. Hidden when the numbers cannot be read. */
+const ListingStatsRow: React.FC<{ cafeId: string; views: number; saves: number }> = ({ cafeId, views, saves }) => {
+  const [stats, setStats] = useState<ListingStats | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    void placeService.getStats(cafeId).then((value) => {
+      if (active) setStats(value);
+    });
+    return () => {
+      active = false;
+    };
+  }, [cafeId]);
+
+  const cells: { label: string; value: string }[] = [
+    { label: 'Views', value: views.toLocaleString() },
+    { label: 'Saves', value: saves.toLocaleString() },
+    ...(stats
+      ? [
+          { label: 'Check-ins, 30 days', value: stats.visits30d.toLocaleString() },
+          { label: 'Check-ins, all time', value: stats.visitsTotal.toLocaleString() },
+          { label: 'Focus hours, 30 days', value: (stats.focusMinutes30d / 60).toFixed(1) },
+          { label: 'Reviews', value: stats.ratingAverage === null ? '0' : `${stats.reviewsTotal} (${stats.ratingAverage.toFixed(1)} of 5)` },
+        ]
+      : []),
+  ];
+
+  return (
+    <dl className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+      {cells.map((cell) => (
+        <div key={cell.label} className="rounded-row ios-fill px-3.5 py-2.5">
+          <dt className="ios-footnote text-ink-2">{cell.label}</dt>
+          <dd className="font-mono text-[17px] font-semibold text-ink">{cell.value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+};
+
+interface ListingEditorProps {
+  onViewPlace: (cafeId: string) => void;
+  /** Control Room use: a listing id to edit, or 'new' to add a place. Left out, the owner edits their own. */
+  target?: string;
+  /** Called with the listing id after a successful save from the Control Room. */
+  onDone?: (cafeId: string) => void;
+}
+
+/** The live listing and everything that can change on it: the owner's dashboard, and the Control Room's place form. */
+export const ListingEditor: React.FC<ListingEditorProps> = ({ onViewPlace, target, onDone }) => {
   useCatalogVersion();
-  const cafe = placeService.getMyCafe();
-  const [input, setInput] = useState<ListingInput | null>(() => (cafe ? listingFromCafe(cafe) : null));
+  usePlaceVersion();
+  const creating = target === 'new';
+  const cafe = creating ? null : target ? placeService.getListingAsCafe(target) : placeService.getMyCafe();
+  const [input, setInput] = useState<ListingInput | null>(() => (creating ? emptyListing() : cafe ? listingFromCafe(cafe) : null));
   const [loadedId, setLoadedId] = useState<string | null>(cafe?.id ?? null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [saved, setSaved] = useState(false);
+  const extended = placeService.supportsPhotos();
 
   // A listing that arrives after the first render (or a different one) replaces the draft
   useEffect(() => {
@@ -400,10 +514,10 @@ const ListingEditor: React.FC<{ onViewPlace: (cafeId: string) => void }> = ({ on
     }
   }, [cafe, loadedId]);
 
-  if (!cafe || !input) {
+  if (!input || (!creating && !cafe)) {
     return (
       <div className={CARD}>
-        <p className="text-[15px] text-ink-2">Your listing is loading. If this stays, refresh the page.</p>
+        <p className="text-[15px] text-ink-2">The listing is loading. If this stays, refresh the page.</p>
       </div>
     );
   }
@@ -421,7 +535,14 @@ const ListingEditor: React.FC<{ onViewPlace: (cafeId: string) => void }> = ({ on
     setBusy(true);
     setError('');
     try {
-      await placeService.updateMyListing(input);
+      if (creating) {
+        onDone?.(await placeService.createListing(input));
+      } else if (target) {
+        await placeService.updateListing(target, input);
+        onDone?.(target);
+      } else {
+        await placeService.updateMyListing(input);
+      }
       setSaved(true);
     } catch (cause) {
       setSaved(false);
@@ -434,6 +555,7 @@ const ListingEditor: React.FC<{ onViewPlace: (cafeId: string) => void }> = ({ on
   return (
     <div className="space-y-5">
       {/* Listing header */}
+      {cafe && (
       <div className="ios-group ios-card-shadow">
         <div className="ios-group-row py-3.5">
           <img src={cafe.logoUrl} alt="" className="h-12 w-12 rounded-row object-cover shrink-0 bg-sunken" />
@@ -457,8 +579,31 @@ const ListingEditor: React.FC<{ onViewPlace: (cafeId: string) => void }> = ({ on
           </button>
         </div>
       </div>
+      )}
+
+      {cafe && <ListingStatsRow cafeId={cafe.id} views={cafe.viewCount} saves={cafe.saveCount} />}
 
       <div className={`${CARD} space-y-5`}>
+        {cafe && extended && (
+          <fieldset className="space-y-2">
+            <legend className={GROUP_LABEL}>Photos</legend>
+            <PhotoEditor cafeId={cafe.id} value={input.images} onChange={(images) => set('images', images)} />
+          </fieldset>
+        )}
+
+        {extended && !creating && (
+          <div className="space-y-3">
+            <Field label="Announcement (optional)" hint={`Shown at the top of your page: a closure, holiday hours, an event. ${input.notice.length} of ${LISTING_LIMITS.notice}`}>
+              <TextArea value={input.notice} onChange={(value) => set('notice', value)} rows={2} maxLength={LISTING_LIMITS.notice} placeholder="e.g. Closed on October 12 for a private event." />
+            </Field>
+            {input.notice.trim() && (
+              <Field label="Show it until (optional)" hint="Leave empty to keep it up until you remove it.">
+                <TextInput type="date" value={input.noticeUntil} onChange={(value) => set('noticeUntil', value)} />
+              </Field>
+            )}
+          </div>
+        )}
+
         <div className="space-y-3">
           <Field label="Name">
             <TextInput value={input.name} onChange={(value) => set('name', value)} />
@@ -476,7 +621,7 @@ const ListingEditor: React.FC<{ onViewPlace: (cafeId: string) => void }> = ({ on
               onChange={(event) => set('isRoastery', event.target.checked)}
               className="accent-tint h-5 w-5 shrink-0"
             />
-            <span className="text-[14px] text-ink">We roast our own beans</span>
+            <span className="text-[14px] text-ink">{target ? 'Roasts its own beans' : 'We roast our own beans'}</span>
           </label>
         </div>
 
@@ -565,15 +710,16 @@ const ListingEditor: React.FC<{ onViewPlace: (cafeId: string) => void }> = ({ on
         {error && <ErrorNote message={error} />}
         {saved && !error && (
           <p role="status" className="ios-footnote text-ok bg-ok/10 rounded-row px-3.5 py-2.5">
-            Saved. Your listing is updated for everyone.
+            Saved. The listing is updated for everyone.
           </p>
         )}
         <PrimaryButton onClick={() => void save()} disabled={busy} className="w-full">
-          {busy ? 'Saving' : 'Save listing'}
+          {busy ? 'Saving' : creating ? 'Add place' : 'Save listing'}
         </PrimaryButton>
-        <p className="ios-footnote text-ink-2">
-          Photos are not collected yet; your listing shows a placeholder until photo uploads are added.
-        </p>
+        {creating && <p className="ios-footnote text-ink-2">The place goes live at once, unverified. Add its photos after it is saved.</p>}
+        {!creating && !extended && (
+          <p className="ios-footnote text-ink-2">Photos and announcements arrive with the next database update; until then the listing shows a placeholder photo.</p>
+        )}
       </div>
     </div>
   );

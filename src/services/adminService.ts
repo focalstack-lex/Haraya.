@@ -62,4 +62,15 @@ export const adminService = {
     }
     await adminService.refresh();
   },
+
+  /** Restricts or restores an account. A restricted account can still sign in and browse, but cannot post. */
+  async setSuspended(profileId: string, suspended: boolean): Promise<void> {
+    if (!supabase || !sessionService.isAdmin()) throw new Error('Only admins can restrict accounts.');
+    const { error } = await supabase.rpc('admin_set_profile_suspended', { target: profileId, suspended });
+    if (error) {
+      console.warn('Haraya: restricting the account failed', error.message);
+      throw new Error(describePlaceError(error.message));
+    }
+    await adminService.refresh();
+  },
 };

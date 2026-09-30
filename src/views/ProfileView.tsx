@@ -23,6 +23,7 @@ import { RateCafeModal } from '../components/cafe/RateCafeModal';
 import { LargeTitle } from '../components/common/LargeTitle';
 import { PrimaryButton } from '../components/common/FormControls';
 import { AyaMascot } from '../components/common/AyaMascot';
+import { AccountDataSection, NotificationsCard } from '../components/account/AccountPanels';
 
 export type ProfileSection = 'diary' | 'passport' | 'saved';
 
@@ -351,6 +352,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           {privacyError}
         </p>
       )}
+
+      <NotificationsCard />
 
       {/* Segmented control */}
       <div className="flex p-0.5 rounded-control ios-fill" role="tablist" aria-label="Passport sections">
@@ -725,6 +728,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
             </a>
           </div>
         </section>
+
+        <AccountDataSection />
 
         {user && (
           <div className="ios-group">

@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-30 : commit d763bb2 : fingerprint 2ba54e231e7301d1
+Generated 2026-09-30 : commit d2a6706 : fingerprint ec1fc69332ffc345
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -14,31 +14,42 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `scripts/generate-code-map.mjs` (212 lines) : One-line purpose per file, inferred from its path and leading doc comment.
 - `scripts/make-email-logo.mjs` (30 lines) : Builds public/brand/haraya-email-logo.png: the wordmark on its own linen tile with rounded corners.
 - `scripts/verify-google-auth.mjs` (109 lines) : scripts module: verify-google-auth
-- `src/App.tsx` (870 lines) : Older links: the roaster portal is now the Place Portal. The Passport tab also answers to its own name.
-  - L78 : SharedList
-  - L104 : App
+- `src/App.tsx` (893 lines) : Older links: the roaster portal is now the Place Portal. The Passport tab also answers to its own name.
+  - L81 : SharedList
+  - L107 : App
 - `src/index.css` (747 lines) : src entry point
-- `src/main.tsx` (41 lines) : src entry point
+- `src/main.tsx` (47 lines) : src entry point
 - `vite.config.ts` (43 lines) : . module: vite.config
+
+## src/components/account/
+
+- `src/components/account/AccountPanels.tsx` (171 lines) : Updates for the signed-in visitor: a spot or application was reviewed, a report was closed, someone
 
 ## src/components/admin/
 
-- `src/components/admin/AdminDashboard.tsx` (465 lines) : A public listing from the cafes table (not a curated, community or legacy browser-only cafe).
-  - L16 : AdminDashboardProps
-  - L21 : AdminTab
-  - L325 : AdminDashboard
+- `src/components/admin/AdminDashboard.tsx` (444 lines) : A public listing from the cafes table (not a curated, community or legacy browser-only cafe).
+  - L18 : AdminDashboardProps
+  - L23 : AdminTab
+  - L292 : AdminDashboard
+- `src/components/admin/AdminPanels.tsx` (637 lines) : Shown once where a tool depends on the newest migration and the database does not have it yet.
+  - L25 : NeedsUpdateNote
+  - L177 : PlacesPanel
+  - L400 : ReportsPanel
+  - L518 : HealthPanel
 - `src/components/admin/SpotReviewQueue.tsx` (86 lines) : Admin review of community spot submissions: approve to publish, reject with a note to the contributor.
 
 ## src/components/cafe/
 
 - `src/components/cafe/BeanDetailModal.tsx` (201 lines) : Grouped list on the white sheet: the linen canvas tone lets the inset group read as a group.
-- `src/components/cafe/CafeDetailModal.tsx` (368 lines) : Full cafe detail: snap gallery, live open status, actions (directions, save, rate,
-  - L50 : AmenityBadges
-  - L72 : MenuSheet
-  - L99 : CafeDetailModalProps
-  - L121 : CafeDetailModal
-- `src/components/cafe/CafeRecentVisitors.tsx` (143 lines) : "Focused 2h 15m, Americano, quiet" or "Quick stamp"
-- `src/components/cafe/RateCafeModal.tsx` (134 lines) : src/components/cafe module: RateCafeModal
+- `src/components/cafe/CafeDetailModal.tsx` (402 lines) : Full cafe detail: snap gallery, live open status, actions (directions, save, rate,
+  - L55 : AmenityBadges
+  - L77 : MenuSheet
+  - L104 : CafeDetailModalProps
+  - L126 : CafeDetailModal
+- `src/components/cafe/CafeRecentVisitors.tsx` (155 lines) : "Focused 2h 15m, Americano, quiet" or "Quick stamp"
+- `src/components/cafe/CafeReviews.tsx` (74 lines) : Public reviews on a spot page: the average, then the newest few with their words. Shows nothing until
+- `src/components/cafe/RateCafeModal.tsx` (161 lines) : src/components/cafe module: RateCafeModal
+- `src/components/cafe/ReportSheet.tsx` (95 lines) : Reasons that fit each kind of thing; a check-in or a review cannot be "closed for good".
 
 ## src/components/common/
 
@@ -52,6 +63,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L244 : AyaMascot
 - `src/components/common/BrandLogo.tsx` (36 lines) : Haraya logo cut from the brand master (Haraya Files/LOGO.webp) with the background keyed out,
 - `src/components/common/CustomIcons.tsx` (242 lines) : Haraya Custom Icon Set: high-precision vector icons tailored for the Davao
+- `src/components/common/ErrorBoundary.tsx` (53 lines) : Catches a crash while drawing the app, reports it, and offers a way back instead of a blank page.
 - `src/components/common/FormControls.tsx` (272 lines) : Shared form primitives for Haraya: an iOS-style sheet (bottom sheet with a
 - `src/components/common/ImageUploadField.tsx` (83 lines) : File input that stores the image as a dataURL with type and size validation.
 - `src/components/common/LargeTitle.tsx` (46 lines) : iOS large title: the first thing on every primary page, left aligned.
@@ -147,7 +159,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/components/moodFinder/parseQuery.test.ts` (50 lines) : src/components/moodFinder module: parseQuery.test
 - `src/components/moodFinder/parseQuery.ts` (85 lines) : Deterministic reading of a typed request ("quiet place to study, not too pricey, near Matina").
 - `src/components/moodFinder/scoreCafes.test.ts` (167 lines) : src/components/moodFinder module: scoreCafes.test
-- `src/components/moodFinder/scoreCafes.ts` (241 lines) : The mood finder's matcher. Pure: the same catalog, request and context always give the same
+- `src/components/moodFinder/scoreCafes.ts` (243 lines) : The mood finder's matcher. Pure: the same catalog, request and context always give the same
 - `src/components/moodFinder/useLocation.ts` (70 lines) : insecure: the page is not https (or localhost), so the browser refuses location before asking anyone.
 - `src/components/moodFinder/weather.ts` (63 lines) : Current Davao weather from Open-Meteo (free, no key). Fixed city coordinates, never the
 
@@ -194,47 +206,64 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/hooks/useFocusSession.test.ts` (76 lines) : src/hooks module: useFocusSession.test
 - `src/hooks/useFocusSession.ts` (237 lines) : The running Deep Focus Session. It lives in localStorage (haraya_active_focus) so a refresh, a tab change or
 - `src/hooks/useOnline.ts` (19 lines) : True while the browser reports a network connection; re-renders when it drops or comes back.
-- `src/hooks/useServiceVersions.ts` (48 lines) : Subscriber-version hooks: each service exposes a monotonically increasing
+- `src/hooks/useServiceVersions.ts` (63 lines) : Subscriber-version hooks: each service exposes a monotonically increasing
 
 ## src/services/
 
-- `src/services/adminService.ts` (66 lines) : Control Room account management: the list of profiles (readable by admins only, per Row Level
+- `src/services/accountService.ts` (127 lines) : The account's own data: keeping saved spots on the account so they follow the visitor to another
+- `src/services/adminService.ts` (77 lines) : Control Room account management: the list of profiles (readable by admins only, per Row Level
 - `src/services/catalogService.test.ts` (37 lines) : src/services module: catalogService.test
-- `src/services/catalogService.ts` (369 lines) : Catalog layer over roaster-created and admin-moderated records kept in
+- `src/services/catalogService.ts` (372 lines) : Catalog layer over roaster-created and admin-moderated records kept in
   - L31 : CafeMetrics
   - L38 : MetricsStore
-  - L53 : readJson
-  - L62 : writeJson
-  - L71 : notify
-  - L76 : makeCatalogId
-  - L84 : deriveStatus
-  - L89 : catalogService
+  - L55 : readJson
+  - L64 : writeJson
+  - L73 : notify
+  - L78 : makeCatalogId
+  - L86 : deriveStatus
+  - L91 : catalogService
 - `src/services/communityService.ts` (154 lines) : Cup Check community layer: browser-created posts, likes, and comments. Likes are stored per browser (no accounts needed to
+- `src/services/moderationService.ts` (280 lines) : Reports from visitors and the Control Room's moderation data: the report queue, recent check-ins,
+- `src/services/notificationService.ts` (99 lines) : In-app notifications (table notifications, 20260930020000): written by database triggers when a spot or
+- `src/services/placeImport.test.ts` (76 lines) : src/services module: placeImport.test
+- `src/services/placeImport.ts` (163 lines) : Bulk import for the Control Room: a sheet saved as CSV becomes a list of listings to review before they
 - `src/services/placeMapping.test.ts` (159 lines) : src/services module: placeMapping.test
-- `src/services/placeMapping.ts` (370 lines) : Place Portal data: the application a place owner sends (place_applications), the public listing row
+- `src/services/placeMapping.ts` (443 lines) : Place Portal data: the application a place owner sends (place_applications), the public listing row
   - L12 : PLACE_TYPES
   - L17 : PlaceType
   - L20 : REGION_BOUNDS
   - L22 : APPLICATION_LIMITS
   - L31 : LISTING_LIMITS
-  - L44 : LISTING_AMENITIES
-  - L46 : City
-  - L48 : PlaceApplicationInput
-  - L63 : PlaceApplicationRow
-  - L85 : CafeRow
-  - L113 : ListingInput
-  - L147 : placeTypeLabel
-  - L151 : emptyHours
-  - L160 : validatePlaceApplication
-  - L185 : toApplicationInsertRow
-  - L204 : parseHours
-  - L219 : parseMenu
-  - L239 : cafeRowToCafe
-  - L272 : listingFromCafe
-  - L295 : validateListing
-  - L333 : toCafeUpdateRow
-  - L360 : describePlaceError
-- `src/services/placeService.ts` (209 lines) : Public listings (table cafes) and Place Portal applications (table place_applications). Listings are
+  - L46 : LISTING_AMENITIES
+  - L48 : City
+  - L50 : PlaceApplicationInput
+  - L65 : PlaceApplicationRow
+  - L87 : CafeRow
+  - L119 : ListingInput
+  - L143 : PLACEHOLDER_PHOTO
+  - L158 : placeTypeLabel
+  - L162 : emptyHours
+  - L171 : validatePlaceApplication
+  - L196 : toApplicationInsertRow
+  - L215 : parseHours
+  - L230 : parseMenu
+  - L250 : cafeRowToCafe
+  - L285 : activeNotice
+  - L292 : emptyListing
+  - L317 : listingFromCafe
+  - L343 : validateListing
+  - L387 : toCafeUpdateRow
+  - ... 2 more anchors
+- `src/services/placeService.ts` (335 lines) : Public listings (table cafes) and Place Portal applications (table place_applications). Listings are
+  - L36 : notify
+  - L41 : readCache
+  - L53 : writeCache
+  - L61 : publishToCatalog
+  - L69 : ListingStatus
+  - L71 : ListingStats
+  - L84 : shrinkPhoto
+  - L99 : placeService
+- `src/services/reviewService.ts` (115 lines) : Public reviews of a spot (table spot_reviews, 20260930020000): a star rating with optional words, one per
 - `src/services/roasterService.ts` (115 lines) : Roaster-facing facade over the catalog: everything an approved roaster or
 - `src/services/sessionService.test.ts` (35 lines) : src/services module: sessionService.test
 - `src/services/sessionService.ts` (582 lines) : The signed-in account: Supabase Auth session plus the caller's row in public.profiles (role, status,
@@ -258,7 +287,8 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/services/spotMapping.test.ts` (116 lines) : src/services module: spotMapping.test
 - `src/services/spotMapping.ts` (178 lines) : Community spot submissions: the row shape stored in Supabase (spot_submissions), the form input, the
 - `src/services/spotService.ts` (172 lines) : Add a Spot backed by Supabase (table spot_submissions). Row Level Security decides what each caller can
-- `src/services/userPrefsService.ts` (372 lines) : Buyer-side preferences kept per browser: saved cafes and beans, custom coffee
+- `src/services/telemetry.ts` (73 lines) : Error reports and anonymous usage events, kept in Haraya's own database and read in the Control Room
+- `src/services/userPrefsService.ts` (381 lines) : Buyer-side preferences kept per browser: saved cafes and beans, custom coffee
   - L20 : CafeRating
   - L27 : CustomList
   - L35 : SharedList
@@ -285,8 +315,8 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/types/
 
-- `src/types/auth.ts` (65 lines) : Accounts. Real sign-in is Supabase Auth; the row in public.profiles carries the role. The legacy
-- `src/types/coffee.ts` (261 lines) : Haraya domain model: Davao Region cafes and study spots (listed or added by the community), plus the
+- `src/types/auth.ts` (67 lines) : Accounts. Real sign-in is Supabase Auth; the row in public.profiles carries the role. The legacy
+- `src/types/coffee.ts` (265 lines) : Haraya domain model: Davao Region cafes and study spots (listed or added by the community), plus the
 
 ## src/utils/
 
@@ -313,19 +343,21 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/views/LandingView.tsx` (339 lines) : Landing page shown at the bare URL (see `isLandingEntry` in utils/router.ts). It showcases the app with real
   - L14 : LandingViewProps
   - L106 : LandingView
-- `src/views/LegalView.tsx` (206 lines) : Privacy Notice and Terms. Statements of fact describe what the code does today; anything that needs a
+- `src/views/LegalView.tsx` (234 lines) : Privacy Notice and Terms. Statements of fact describe what the code does today; anything that needs a
 - `src/views/LoginView.tsx` (359 lines) : What the page is doing: the two account modes, the two email-link flows, and the new-password form.
   - L12 : LoginMode
   - L14 : LoginViewProps
   - L63 : LoginView
-- `src/views/PlacePortalView.tsx` (680 lines) : What the portal offers, for visitors who are not signed in or have not applied.
-  - L27 : PlacePortalViewProps
-  - L583 : PlacePortalView
-- `src/views/ProfileView.tsx` (750 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
-  - L27 : ProfileSection
-  - L29 : ProfileViewProps
-  - L140 : StampEntry
-  - L151 : ProfileView
+- `src/views/PlacePortalView.tsx` (826 lines) : What the portal offers, for visitors who are not signed in or have not applied.
+  - L28 : PlacePortalViewProps
+  - L488 : ListingEditorProps
+  - L497 : ListingEditor
+  - L729 : PlacePortalView
+- `src/views/ProfileView.tsx` (755 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
+  - L28 : ProfileSection
+  - L30 : ProfileViewProps
+  - L141 : StampEntry
+  - L152 : ProfileView
 - `src/views/SavedView.tsx` (319 lines) : Tasting journal: bookmarked cafes and beans, drop alerts, custom shareable lists.
   - L13 : SavedTab
   - L15 : SavedViewProps

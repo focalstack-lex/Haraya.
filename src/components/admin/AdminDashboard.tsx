@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { BadgeCheck, Check, ClipboardList, ExternalLink, LogIn, MapPin, ShieldCheck, Store, Users, X } from 'lucide-react';
+import { Activity, BadgeCheck, Check, ClipboardList, ExternalLink, Flag, LogIn, MapPin, ShieldCheck, Store, Users, X } from 'lucide-react';
 import { LargeTitle } from '../common/LargeTitle';
 import { ErrorNote, PrimaryButton } from '../common/FormControls';
 import { SpotReviewQueue } from './SpotReviewQueue';
+import { HealthPanel, PlacesPanel, ReportsPanel } from './AdminPanels';
 import { sessionService } from '../../services/sessionService';
 import { spotService } from '../../services/spotService';
 import { placeService } from '../../services/placeService';
 import { adminService } from '../../services/adminService';
 import { catalogService } from '../../services/catalogService';
+import { moderationService } from '../../services/moderationService';
 import { placeTypeLabel, type PlaceApplicationRow } from '../../services/placeMapping';
-import { useAdminVersion, useCatalogVersion, usePlaceVersion, useSessionVersion, useSpotVersion } from '../../hooks/useServiceVersions';
+import { useAdminVersion, useModerationVersion, usePlaceVersion, useSessionVersion, useSpotVersion } from '../../hooks/useServiceVersions';
 import type { Profile, ProfileRole } from '../../types/auth';
 
 interface AdminDashboardProps {
@@ -18,7 +20,7 @@ interface AdminDashboardProps {
   onOpenLogin: () => void;
 }
 
-type AdminTab = 'overview' | 'spots' | 'places' | 'users';
+type AdminTab = 'overview' | 'spots' | 'places' | 'reports' | 'users' | 'health';
 
 const CARD = 'rounded-card bg-surface ios-card-shadow p-4 sm:p-5';
 
@@ -173,66 +175,6 @@ const ApplicationQueue: React.FC<{ rows: PlaceApplicationRow[]; onViewCafe: (caf
   );
 };
 
-/** Every public listing with its verified badge toggle. */
-const ListingsPanel: React.FC<{ onViewCafe: (cafeId: string) => void }> = ({ onViewCafe }) => {
-  useCatalogVersion();
-  const [busyId, setBusyId] = useState<string | null>(null);
-  const [error, setError] = useState('');
-  const listed = catalogService.getCafes().filter(isListedPlace);
-
-  const toggleVerified = async (cafeId: string, verified: boolean) => {
-    setBusyId(cafeId);
-    setError('');
-    try {
-      await placeService.setVerified(cafeId, !verified);
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Could not update verification.');
-    } finally {
-      setBusyId(null);
-    }
-  };
-
-  return (
-    <section className="space-y-2" aria-labelledby="listings-title">
-      <h2 id="listings-title" className="ios-title px-1">
-        Listed places <span className="font-mono text-ink-2">({listed.length})</span>
-      </h2>
-      {error && <ErrorNote message={error} />}
-      {listed.length === 0 ? (
-        <p className="px-1 text-[14px] text-ink-2">No listings yet. Approved place applications appear here.</p>
-      ) : (
-        <ul className="ios-group ios-card-shadow">
-          {listed.map((cafe) => (
-            <li key={cafe.id} className="ios-group-row">
-              <img src={cafe.logoUrl} alt="" className="h-10 w-10 rounded-control object-cover shrink-0 bg-sunken" />
-              <span className="flex-1 min-w-0">
-                <span className="block text-[15px] text-ink truncate">{cafe.name}</span>
-                <span className="block ios-footnote text-ink-2 truncate">
-                  {cafe.district}, {cafe.city}
-                </span>
-              </span>
-              <button
-                onClick={() => void toggleVerified(cafe.id, cafe.verified)}
-                disabled={busyId === cafe.id}
-                aria-pressed={cafe.verified}
-                className={`h-9 px-3 rounded-full text-[13px] font-semibold inline-flex items-center gap-1 disabled:opacity-50 ios-press ${
-                  cafe.verified ? 'bg-ok text-surface' : 'ios-fill text-ink'
-                }`}
-              >
-                <BadgeCheck className="w-3.5 h-3.5" />
-                {cafe.verified ? 'Verified' : 'Unverified'}
-              </button>
-              <button onClick={() => onViewCafe(cafe.id)} aria-label={`View ${cafe.name}`} className="h-11 w-11 -mr-2 flex items-center justify-center text-tint-ink ios-press">
-                <ExternalLink className="w-4 h-4" />
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
-  );
-};
-
 /** Accounts and roles. The database refuses a change to the caller's own role. */
 const UsersPanel: React.FC<{ profiles: Profile[] }> = ({ profiles }) => {
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -247,6 +189,18 @@ const UsersPanel: React.FC<{ profiles: Profile[] }> = ({ profiles }) => {
       await adminService.setRole(profileId, role);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Could not change the role.');
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const setSuspended = async (profileId: string, suspended: boolean) => {
+    setBusyId(profileId);
+    setError('');
+    try {
+      await adminService.setSuspended(profileId, suspended);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Could not update the account.');
     } finally {
       setBusyId(null);
     }
@@ -278,7 +232,7 @@ const UsersPanel: React.FC<{ profiles: Profile[] }> = ({ profiles }) => {
           {shown.map((profile) => {
             const self = profile.id === me;
             return (
-              <li key={profile.id} className="ios-group-row">
+              <li key={profile.id} className="ios-group-row flex-wrap">
                 <span className="h-9 w-9 shrink-0 rounded-full bg-tint/15 text-tint-ink flex items-center justify-center text-[14px] font-semibold" aria-hidden="true">
                   {(profile.name || profile.email)[0]?.toUpperCase() ?? '?'}
                 </span>
@@ -286,6 +240,7 @@ const UsersPanel: React.FC<{ profiles: Profile[] }> = ({ profiles }) => {
                   <span className="block text-[15px] text-ink truncate">
                     {profile.name || profile.email}
                     {self ? ' (you)' : ''}
+                    {profile.suspended_at && <span className="text-danger font-semibold"> · Restricted</span>}
                   </span>
                   <span className="block ios-footnote text-ink-2 truncate">
                     {profile.email}
@@ -309,6 +264,17 @@ const UsersPanel: React.FC<{ profiles: Profile[] }> = ({ profiles }) => {
                     ))}
                   </select>
                 </label>
+                {!self && profile.role !== 'admin' && (
+                  <button
+                    onClick={() => void setSuspended(profile.id, !profile.suspended_at)}
+                    disabled={busyId === profile.id}
+                    className={`h-9 px-3 shrink-0 rounded-full ios-fill text-[13px] font-semibold disabled:opacity-50 ios-press ${
+                      profile.suspended_at ? 'text-tint-ink' : 'text-danger'
+                    }`}
+                  >
+                    {profile.suspended_at ? 'Restore' : 'Restrict'}
+                  </button>
+                )}
               </li>
             );
           })}
@@ -316,17 +282,19 @@ const UsersPanel: React.FC<{ profiles: Profile[] }> = ({ profiles }) => {
       )}
       <p className="px-1 ios-footnote text-ink-2">
         Place owner is granted automatically when a place application is approved. Setting it here does not create a listing.
+        A restricted account can still sign in and browse, but cannot add spots, check in, review or report.
       </p>
     </section>
   );
 };
 
-/** Control Room: spot and place review queues, listings, accounts. Admin role comes from the database. */
+/** Control Room: review queues, the place catalog, reports, accounts and health. Admin role comes from the database. */
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewCafe, onOpenLogin }) => {
   useSessionVersion();
   useSpotVersion();
   usePlaceVersion();
   useAdminVersion();
+  useModerationVersion();
   const [tab, setTab] = useState<AdminTab>('overview');
 
   const user = sessionService.getUser();
@@ -337,6 +305,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewCafe, onOp
     void adminService.refresh();
     void placeService.refresh();
     void spotService.refresh();
+    void moderationService.refresh();
   }, [admin]);
 
   if (!sessionService.isAvailable()) {
@@ -385,13 +354,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewCafe, onOp
   const pendingApplications = applications.filter((row) => row.status === 'pending');
   const profiles = adminService.getProfiles();
   const listed = catalogService.getCafes().filter(isListedPlace);
+  const openReports = moderationService.getOpenReports();
+  const errorCount = moderationService.getErrors().length;
   const communityLive = catalogService.getCafes().filter((cafe) => cafe.community?.status === 'approved');
 
   const tabs: { id: AdminTab; label: string; count?: number }[] = [
     { id: 'overview', label: 'Overview' },
     { id: 'spots', label: 'Spots', count: spotQueue.length },
     { id: 'places', label: 'Places', count: pendingApplications.length },
+    { id: 'reports', label: 'Reports', count: openReports.length },
     { id: 'users', label: 'Users' },
+    { id: 'health', label: 'Health', count: errorCount },
   ];
 
   return (
@@ -406,7 +379,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewCafe, onOp
         }
       />
 
-      <div className="flex p-0.5 rounded-control ios-fill" role="tablist" aria-label="Control Room sections">
+      <div className="flex p-0.5 rounded-control ios-fill overflow-x-auto scrollbar-none" role="tablist" aria-label="Control Room sections">
         {tabs.map((entry) => {
           const active = tab === entry.id;
           return (
@@ -415,7 +388,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewCafe, onOp
               role="tab"
               aria-selected={active}
               onClick={() => setTab(entry.id)}
-              className="relative flex-1 h-8 px-2 rounded-[8px] text-[13px] font-semibold font-sans whitespace-nowrap"
+              className="relative flex-1 shrink-0 h-8 px-3 rounded-[8px] text-[13px] font-semibold font-sans whitespace-nowrap"
             >
               {active && (
                 <motion.span
@@ -440,6 +413,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewCafe, onOp
             <StatCard label="Place applications" value={pendingApplications.length} icon={ClipboardList} onClick={() => setTab('places')} />
             <StatCard label="Listed places" value={listed.length} icon={Store} onClick={() => setTab('places')} />
             <StatCard label="Community spots live" value={communityLive.length} icon={BadgeCheck} />
+            <StatCard label="Open reports" value={openReports.length} icon={Flag} onClick={() => setTab('reports')} />
+            <StatCard label="Errors reported" value={errorCount} icon={Activity} onClick={() => setTab('health')} />
             <StatCard label="Accounts" value={profiles.length} icon={Users} onClick={() => setTab('users')} />
             <StatCard label="Admins" value={profiles.filter((profile) => profile.role === 'admin').length} icon={ShieldCheck} />
           </div>
@@ -454,11 +429,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewCafe, onOp
       {tab === 'places' && (
         <div className="space-y-6">
           <ApplicationQueue rows={applications} onViewCafe={onViewCafe} />
-          <ListingsPanel onViewCafe={onViewCafe} />
+          <PlacesPanel onViewCafe={onViewCafe} />
         </div>
       )}
 
+      {tab === 'reports' && <ReportsPanel onViewCafe={onViewCafe} />}
+
       {tab === 'users' && <UsersPanel profiles={profiles} />}
+
+      {tab === 'health' && <HealthPanel />}
     </div>
   );
 };

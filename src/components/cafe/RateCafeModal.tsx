@@ -3,6 +3,9 @@ import { Star, Trash2 } from 'lucide-react';
 import type { Cafe } from '../../types/coffee';
 import { Modal, ModalHeader, Field, TextArea, PrimaryButton, SecondaryButton } from '../common/FormControls';
 import { userPrefsService } from '../../services/userPrefsService';
+import { reviewService, REVIEW_BODY_LIMIT } from '../../services/reviewService';
+import { useSessionVersion } from '../../hooks/useServiceVersions';
+import { ErrorNote } from '../common/FormControls';
 
 interface RateCafeModalProps {
   cafe: Cafe | null;
@@ -24,6 +27,11 @@ export const RateCafeModal: React.FC<RateCafeModalProps> = ({ cafe, isOpen, onCl
   const [rating, setRating] = useState<number>(5);
   const [hoverRating, setHoverRating] = useState<number | null>(null);
   const [note, setNote] = useState<string>('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  useSessionVersion();
+  // Signed in, the rating and its words are posted as a public review; signed out, they stay on the device
+  const posting = reviewService.canPost();
 
   useEffect(() => {
     if (cafe && isOpen) {
@@ -35,12 +43,25 @@ export const RateCafeModal: React.FC<RateCafeModalProps> = ({ cafe, isOpen, onCl
         setRating(5);
         setNote('');
       }
+      setError('');
     }
   }, [cafe, isOpen]);
 
   if (!cafe) return null;
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    setError('');
+    if (posting) {
+      setBusy(true);
+      try {
+        await reviewService.save(cafe.id, rating, note);
+      } catch (cause) {
+        setError(cause instanceof Error ? cause.message : 'Could not post the review.');
+        setBusy(false);
+        return;
+      }
+      setBusy(false);
+    }
     userPrefsService.setRating(cafe.id, rating, note);
     onRated?.();
     onClose();
@@ -48,6 +69,7 @@ export const RateCafeModal: React.FC<RateCafeModalProps> = ({ cafe, isOpen, onCl
 
   const handleRemove = () => {
     userPrefsService.removeRating(cafe.id);
+    if (posting) void reviewService.removeMine(cafe.id);
     onRated?.();
     onClose();
   };
@@ -97,19 +119,24 @@ export const RateCafeModal: React.FC<RateCafeModalProps> = ({ cafe, isOpen, onCl
         </div>
 
         {/* Tasting note */}
-        <Field label="Personal tasting note (optional)">
+        <Field
+          label={posting ? 'Your review (optional)' : 'Personal tasting note (optional)'}
+          hint={posting ? 'Shown on this spot with your name, for everyone.' : 'Kept on this device. Sign in to post it as a public review.'}
+        >
           <TextArea
             value={note}
             onChange={setNote}
             rows={3}
+            maxLength={REVIEW_BODY_LIMIT}
             placeholder="e.g. Excellent Mt. Apo V60 pour over. Quiet atmosphere with great natural light."
           />
         </Field>
 
         {/* Actions */}
         <div className="space-y-2">
-          <PrimaryButton onClick={handleSave} className="w-full">
-            Save rating
+          {error && <ErrorNote message={error} />}
+          <PrimaryButton onClick={() => void handleSave()} disabled={busy} className="w-full">
+            {busy ? 'Posting' : posting ? 'Post review' : 'Save rating'}
           </PrimaryButton>
           <div className={`grid gap-2 ${isExisting ? 'grid-cols-2' : 'grid-cols-1'}`}>
             {isExisting && (
