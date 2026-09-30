@@ -488,6 +488,26 @@ html {
   animation-delay: -1.3s;
 }
 
+/* A ring pulsing out from Aya while she looks for the visitor on the map (MapAyaOverlay).
+   The last frame is invisible, so the reduced-motion rule below leaves no ring. */
+.aya-ping {
+  position: absolute;
+  inset: 14%;
+  border-radius: 9999px;
+  border: 2px solid var(--color-tint);
+  opacity: 0;
+  animation: aya-ping 1.8s ease-out infinite;
+}
+
+.aya-ping-late {
+  animation-delay: -0.9s;
+}
+
+@keyframes aya-ping {
+  0% { transform: scale(0.7); opacity: 0.45; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+
 /* Aya rises out of the Discover mood card once, with a small overshoot */
 .aya-rise {
   animation: aya-rise 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
