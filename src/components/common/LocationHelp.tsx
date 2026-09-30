@@ -13,8 +13,8 @@ export const LocationHelp: React.FC<LocationHelpProps> = ({ problem, onRetry }) 
   return (
     <div className="w-full flex items-start gap-3">
       <div className="flex-1 min-w-0 space-y-0.5">
-        <p className="text-[14px] font-semibold text-[#13191F]">{title}</p>
-        <p className="ios-footnote text-[#594C3D]">
+        <p className="text-[14px] font-semibold text-ink">{title}</p>
+        <p className="ios-footnote text-ink-2">
           {steps}
           {problem !== 'insecure' && ' Haraya picks it up when you come back.'}
         </p>
@@ -23,7 +23,7 @@ export const LocationHelp: React.FC<LocationHelpProps> = ({ problem, onRetry }) 
         <button
           type="button"
           onClick={onRetry}
-          className="shrink-0 h-8 px-3 rounded-full ios-fill text-[14px] font-semibold text-[#7D5C3D] ios-press"
+          className="shrink-0 h-8 px-3 rounded-full ios-fill text-[14px] font-semibold text-tint-ink ios-press"
         >
           Try again
         </button>

@@ -39,29 +39,29 @@ export const MapPreviewCard: React.FC<MapPreviewCardProps> = ({ cafe, km, onView
     <div
       role="dialog"
       aria-label={cafe.name}
-      className="absolute left-2.5 right-2.5 bottom-7 sm:right-auto sm:w-[360px] z-[600] rounded-[16px] bg-[#FFFDF9] shadow-[0_2px_4px_rgba(19,25,31,0.08),0_12px_32px_-8px_rgba(19,25,31,0.35)] p-3"
+      className="absolute left-2.5 right-2.5 bottom-7 sm:right-auto sm:w-[360px] z-[600] rounded-[16px] bg-surface shadow-[0_2px_4px_rgba(19,25,31,0.08),0_12px_32px_-8px_rgba(19,25,31,0.35)] p-3"
     >
       <div className="flex gap-3">
-        <img src={cafe.logoUrl || cafe.images[0]} alt="" className="h-16 w-16 shrink-0 rounded-full object-cover bg-[#13191F]" />
+        <img src={cafe.logoUrl || cafe.images[0]} alt="" className="h-16 w-16 shrink-0 rounded-full object-cover bg-ink" />
         <div className="min-w-0 flex-1 pr-7 space-y-0.5">
-          <h3 className="ios-headline text-[#13191F] truncate">{cafe.name}</h3>
-          <p className="ios-footnote text-[#594C3D] line-clamp-2">{cafe.address || `${cafe.district}, ${cafe.city}`}</p>
+          <h3 className="ios-headline text-ink truncate">{cafe.name}</h3>
+          <p className="ios-footnote text-ink-2 line-clamp-2">{cafe.address || `${cafe.district}, ${cafe.city}`}</p>
           <p className="ios-footnote">
             {status === 'open' ? (
               <>
-                <span className="font-medium text-[#3E5C48]">
+                <span className="font-medium text-ok">
                   Open until <span className="font-mono">{clockAfter(now, minutesLeft)}</span>
                 </span>
                 {minutesLeft <= CLOSING_SOON_MIN && (
-                  <span className="text-[#8C3A2E]">
+                  <span className="text-danger">
                     , closes in <span className="font-mono">{minutesLeft}</span> min
                   </span>
                 )}
               </>
             ) : status === 'closed' ? (
               <>
-                <span className="font-medium text-[#8C3A2E]">Closed now</span>
-                <span className="text-[#594C3D]">
+                <span className="font-medium text-danger">Closed now</span>
+                <span className="text-ink-2">
                   {today.open && today.close ? (
                     <>
                       {' '}
@@ -73,11 +73,11 @@ export const MapPreviewCard: React.FC<MapPreviewCardProps> = ({ cafe, km, onView
                 </span>
               </>
             ) : (
-              <span className="font-medium text-[#594C3D]">Hours not listed</span>
+              <span className="font-medium text-ink-2">Hours not listed</span>
             )}
           </p>
           {km !== null && (
-            <p className="ios-footnote text-[#594C3D]">
+            <p className="ios-footnote text-ink-2">
               <span className="font-mono">{formatKm(km)}</span> away
               {km <= NEARBY_RADIUS_KM && (
                 <>
@@ -94,7 +94,7 @@ export const MapPreviewCard: React.FC<MapPreviewCardProps> = ({ cafe, km, onView
         aria-label="Close preview"
         className="absolute top-1 right-1 h-11 w-11 flex items-center justify-center ios-press"
       >
-        <span className="h-7 w-7 rounded-full bg-[#766046]/15 flex items-center justify-center text-[#594C3D]">
+        <span className="h-7 w-7 rounded-full bg-shade/15 flex items-center justify-center text-ink-2">
           <X className="w-3.5 h-3.5" strokeWidth={2.5} />
         </span>
       </button>
@@ -103,7 +103,7 @@ export const MapPreviewCard: React.FC<MapPreviewCardProps> = ({ cafe, km, onView
           <button
             type="button"
             onClick={() => onDirections(cafe)}
-            className="h-10 flex-1 px-4 rounded-full bg-[#906D4B] text-[#FFFDF9] text-[15px] font-semibold hover:bg-[#7D5C3D] inline-flex items-center justify-center gap-1.5 ios-press"
+            className="h-10 flex-1 px-4 rounded-full bg-tint text-surface text-[15px] font-semibold hover:bg-tint-ink inline-flex items-center justify-center gap-1.5 ios-press"
           >
             <Navigation className="w-4 h-4" />
             Get directions
@@ -112,7 +112,7 @@ export const MapPreviewCard: React.FC<MapPreviewCardProps> = ({ cafe, km, onView
         <button
           type="button"
           onClick={() => onView(cafe.id)}
-          className="h-10 flex-1 px-4 rounded-full ios-fill text-[15px] font-semibold text-[#7D5C3D] hover:bg-[#766046]/20 ios-press"
+          className="h-10 flex-1 px-4 rounded-full ios-fill text-[15px] font-semibold text-tint-ink hover:bg-shade/20 ios-press"
         >
           View details
         </button>

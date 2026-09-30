@@ -50,9 +50,9 @@ const MapControl: React.FC<{ label: string; onClick: () => void; children: React
 );
 
 const STATUS_TEXT_COLORS: Record<PinStatus, string> = {
-  open: 'text-[#3E5C48]',
-  closed: 'text-[#8C3A2E]',
-  unknown: 'text-[#594C3D]',
+  open: 'text-ok',
+  closed: 'text-danger',
+  unknown: 'text-ink-2',
 };
 
 interface RowHandlers {
@@ -76,18 +76,18 @@ const VenueRow: React.FC<RowHandlers & { cafe: Cafe; km?: number }> = ({ cafe, k
         onFocus={() => onHover(cafe.id)}
         onBlur={() => onHover(null)}
         aria-current={active || undefined}
-        className={`ios-group-row !px-3 ${active ? 'bg-[#766046]/[0.08]' : ''}`}
+        className={`ios-group-row !px-3 ${active ? 'bg-shade/[0.08]' : ''}`}
       >
-        <img src={cafe.images[0]} alt="" loading="lazy" className="h-11 w-11 shrink-0 rounded-[10px] object-cover bg-[#13191F]" />
+        <img src={cafe.images[0]} alt="" loading="lazy" className="h-11 w-11 shrink-0 rounded-control object-cover bg-ink" />
         <span className="flex-1 min-w-0">
-          <span className="block ios-headline text-[#13191F] truncate">{cafe.name}</span>
-          <span className="block ios-footnote text-[#594C3D] truncate">
+          <span className="block ios-headline text-ink truncate">{cafe.name}</span>
+          <span className="block ios-footnote text-ink-2 truncate">
             {cafe.district}, {cafe.city}
             <span className={`ml-1.5 font-medium ${STATUS_TEXT_COLORS[status]}`}>{PIN_STATUS_LABELS[status]}</span>
           </span>
         </span>
         {km !== undefined && (
-          <span className="shrink-0 text-right ios-footnote text-[#594C3D]">
+          <span className="shrink-0 text-right ios-footnote text-ink-2">
             <span className="block font-mono">{formatKm(km)}</span>
             {km <= NEARBY_RADIUS_KM && (
               <span className="flex items-center justify-end gap-0.5" aria-label={`${walkMinutes(km)} minute walk`}>
@@ -97,7 +97,7 @@ const VenueRow: React.FC<RowHandlers & { cafe: Cafe; km?: number }> = ({ cafe, k
             )}
           </span>
         )}
-        <ChevronRight className="w-4 h-4 shrink-0 text-[#6E6150]/60" />
+        <ChevronRight className="w-4 h-4 shrink-0 text-ink-3/60" />
       </button>
     </li>
   );
@@ -633,11 +633,11 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({
             />
             <div
               aria-hidden="true"
-              className={`pointer-events-none absolute inset-0 z-[700] flex items-center justify-center bg-[#13191F]/35 transition-opacity duration-200 ${
+              className={`pointer-events-none absolute inset-0 z-[700] flex items-center justify-center bg-ink/35 transition-opacity duration-200 ${
                 wheelHint ? 'opacity-100' : 'opacity-0'
               }`}
             >
-              <p className="px-4 text-center text-[17px] font-semibold text-[#FFFDF9]">Use {ZOOM_KEY} + scroll to zoom the map</p>
+              <p className="px-4 text-center text-[17px] font-semibold text-surface">Use {ZOOM_KEY} + scroll to zoom the map</p>
             </div>
             {previewCafe && (
               <MapPreviewCard
@@ -687,10 +687,10 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({
 
           {/* Why the nearby spots are not showing yet, kept small under the map */}
           {!navTarget && (!online || locationStatus !== 'idle' && locationStatus !== 'granted') && (
-            <div role="status" className="ios-group flex items-center gap-2.5 px-4 py-2.5 text-[14px] leading-snug text-[#594C3D]">
+            <div role="status" className="ios-group flex items-center gap-2.5 px-4 py-2.5 text-[14px] leading-snug text-ink-2">
               {!online ? (
                 <>
-                  <WifiOff className="w-4 h-4 shrink-0 text-[#7D5C3D]" strokeWidth={2} />
+                  <WifiOff className="w-4 h-4 shrink-0 text-tint-ink" strokeWidth={2} />
                   <span>You're offline. Connect to the internet and the cafes near you will show up on the map automatically.</span>
                 </>
               ) : locationStatus === 'locating' ? (
