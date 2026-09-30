@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-30 : commit be3caca : fingerprint 95148484e190214f
+Generated 2026-09-30 : commit c4bc78d : fingerprint 94d884ddc746bbc7
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -111,7 +111,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/map/
 
-- `src/components/map/DavaoCoffeeMap.tsx` (975 lines) : Floating map control: a round bar-material button inside a 44px hit area.
+- `src/components/map/DavaoCoffeeMap.tsx` (979 lines) : Floating map control: a round bar-material button inside a 44px hit area.
   - L58 : RowHandlers
   - L131 : DavaoCoffeeMapProps
   - L149 : DavaoCoffeeMap
@@ -125,7 +125,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/components/map/MapPreviewCard.tsx` (123 lines) : Inside the last hour the card counts down, so a visitor does not walk to a door that is about to shut.
 - `src/components/map/nearby.test.ts` (31 lines) : src/components/map module: nearby.test
 - `src/components/map/nearby.ts` (21 lines) : Spots this close to the visitor show up on their own when the map opens.
-- `src/components/map/RouteLoader.tsx` (50 lines) : Holds a loading phase on screen for at least MIN_LOADER_MS after it first appears, so a quick answer does not
+- `src/components/map/RouteLoader.tsx` (122 lines) : Holds a loading phase on screen for at least MIN_LOADER_MS after it first appears, so a quick answer does not
 - `src/components/map/routeLoadPhase.test.ts` (34 lines) : src/components/map module: routeLoadPhase.test
 - `src/components/map/routeLoadPhase.ts` (22 lines) : What the walk is still waiting for before the first route can be drawn; null once there is nothing to wait for.
 - `src/components/map/routeMath.test.ts` (53 lines) : src/components/map module: routeMath.test

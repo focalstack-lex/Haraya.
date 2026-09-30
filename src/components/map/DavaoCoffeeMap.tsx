@@ -31,7 +31,7 @@ import { ROUTE_ATTRIBUTION, useWalkingRoute } from './walkingRoute';
 import { externalMapLinks } from './DirectionsActionSheet';
 import { AyaMascot } from '../common/AyaMascot';
 import { routeLoadPhase } from './routeLoadPhase';
-import { RouteLoader, useHeldPhase } from './RouteLoader';
+import { MapAyaOverlay, RouteLoader, useHeldPhase } from './RouteLoader';
 import { Chip } from '../common/FormControls';
 import { LocationHelp } from '../common/LocationHelp';
 import { LargeTitle } from '../common/LargeTitle';
@@ -180,6 +180,11 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({
   // "near me" the visitor may have moved
   const { position: myPosition, status: locationStatus, request: requestLocation } = useLocation({ maximumAgeMs: 0, highAccuracy: true });
   const framedNearbyFix = useRef<GeoPoint | null>(null);
+  // Aya covers the map for either wait: the walk's first fix and route, or the fix for the nearby view
+  const overlayPhase = useHeldPhase(loadPhase ?? (!navTarget && locationStatus === 'locating' ? 'locating' : null));
+  const overlaySucceeded = navTarget
+    ? Boolean(nav.position) && nav.status !== 'denied' && nav.status !== 'unavailable'
+    : Boolean(myPosition) && locationStatus === 'granted';
   const [filters, setFilters] = useState<ReadonlySet<MapFilterId>>(() => new Set());
   const visibleCafes = useMemo(
     () => (filters.size === 0 ? cafes : cafes.filter((cafe) => matchesMapFilters(cafe, filters))),
@@ -649,6 +654,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({
             >
               <p className="px-4 text-center text-[17px] font-semibold text-surface">Use {ZOOM_KEY} + scroll to zoom the map</p>
             </div>
+            <MapAyaOverlay phase={overlayPhase} succeeded={overlaySucceeded} />
             {previewCafe && (
               <MapPreviewCard
                 cafe={previewCafe}
@@ -696,15 +702,13 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({
           </div>
 
           {/* Why the nearby spots are not showing yet, kept small under the map */}
-          {!navTarget && (!online || locationStatus !== 'idle' && locationStatus !== 'granted') && (
+          {!navTarget && (!online || (locationStatus !== 'idle' && locationStatus !== 'granted' && locationStatus !== 'locating')) && (
             <div role="status" className="ios-group flex items-center gap-2.5 px-4 py-2.5 text-[14px] leading-snug text-ink-2">
               {!online ? (
                 <>
                   <WifiOff className="w-4 h-4 shrink-0 text-tint-ink" strokeWidth={2} />
                   <span>You're offline. Connect to the internet and the cafes near you will show up on the map automatically.</span>
                 </>
-              ) : locationStatus === 'locating' ? (
-                <span>Finding the cafes near you</span>
               ) : (
                 (locationStatus === 'denied' || locationStatus === 'unavailable' || locationStatus === 'insecure') && (
                   <LocationHelp problem={locationStatus} onRetry={showNearMe} />
