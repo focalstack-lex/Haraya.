@@ -402,26 +402,6 @@ export const sessionService = {
     return { needsConfirmation: false };
   },
 
-  /**
-   * Sends the confirmation email again for an account that never opened the first one. Supabase rate-limits
-   * this per address, and answers the same way whether or not the address exists.
-   */
-  async resendConfirmation(email: string, returnTab: string = 'profile'): Promise<void> {
-    if (!supabase) throw new Error('Accounts are not available right now.');
-    const trimmed = email.trim().toLowerCase();
-    if (!EMAIL_PATTERN.test(trimmed)) throw new Error('Enter a valid email address.');
-    rememberReturnTab(returnTab);
-    const { error } = await supabase.auth.resend({
-      type: 'signup',
-      email: trimmed,
-      options: { emailRedirectTo: getAuthRedirectUrl() },
-    });
-    if (error) {
-      console.warn('Haraya: resend confirmation failed', error.message);
-      throw new Error(describeAuthError(error.message, 'Could not resend the confirmation email. Try again.'));
-    }
-  },
-
   /** The sign-up waiting on its confirmation link, while it is fresh and nobody is signed in. */
   getPendingConfirmation(): PendingConfirmation | null {
     if (!pendingConfirmation || user) return null;

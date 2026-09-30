@@ -1,23 +1,24 @@
-import React, { useState } from 'react';
-import { ArrowUpRight, ChevronRight, LogIn, MailPlus, UserRoundPen } from 'lucide-react';
+import React from 'react';
+import { ArrowUpRight, ChevronRight, LogIn, TriangleAlert, UserRoundPen } from 'lucide-react';
 import { BrandLogo } from '../components/common/BrandLogo';
 import { AyaMascot } from '../components/common/AyaMascot';
-import { ErrorNote } from '../components/common/FormControls';
-import { sessionService } from '../services/sessionService';
 import { inboxFor } from '../utils/inbox';
+import { suggestEmail } from '../utils/emailTypos';
 
 /**
  * The only screen an unconfirmed sign-up sees: it replaces the whole app (every tab, the portal included) until
- * the confirmation link is opened. Reading order: what to do, which address, the way into the inbox, then the
- * three ways out (send again, already confirmed, wrong address). This is a guide, not the lock: the lock is
- * Supabase refusing a session to an unconfirmed address.
+ * the confirmation link is opened. Reading order: what to do, which address, the way into the inbox, then the way
+ * out for someone who already confirmed on another device. Changing the address is offered only when the address
+ * looks mistyped (see suggestEmail), because that is the one case where the email cannot have arrived; there is
+ * no "send again" (a resend just sends one more email to the same inbox). This is a guide, not the lock: the lock
+ * is Supabase refusing a session to an unconfirmed address.
  */
 
 interface ConfirmEmailViewProps {
   email: string;
   /** Opens the sign-in form for someone who confirmed on another device. */
   onSignIn: () => void;
-  /** Forgets this sign-up and opens the create-account form. */
+  /** Forgets this sign-up and opens the create-account form. Offered only for a mistyped address. */
   onChangeEmail: () => void;
 }
 
@@ -28,25 +29,9 @@ const RowIcon: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 );
 
 export const ConfirmEmailView: React.FC<ConfirmEmailViewProps> = ({ email, onSignIn, onChangeEmail }) => {
-  const [busy, setBusy] = useState(false);
-  const [resent, setResent] = useState(false);
-  const [error, setError] = useState('');
   const inbox = inboxFor(email);
-
-  const resend = async () => {
-    if (busy) return;
-    setBusy(true);
-    setError('');
-    try {
-      await sessionService.resendConfirmation(email);
-      setResent(true);
-    } catch (cause) {
-      setResent(false);
-      setError(cause instanceof Error ? cause.message : 'Could not resend the confirmation email.');
-    } finally {
-      setBusy(false);
-    }
-  };
+  // A mistyped domain (gmial.com) means the email went nowhere: say so, and only then offer to change the address
+  const suggestion = suggestEmail(email);
 
   return (
     <div className="min-h-screen flex flex-col bg-canvas text-ink font-sans">
@@ -66,7 +51,15 @@ export const ConfirmEmailView: React.FC<ConfirmEmailViewProps> = ({ email, onSig
             creating your account. Haraya opens once your email is confirmed.
           </p>
 
-          {inbox ? (
+          {suggestion ? (
+            <div className="mt-6 rounded-row bg-danger/10 px-4 py-3 flex gap-3" role="alert">
+              <TriangleAlert className="w-5 h-5 shrink-0 mt-0.5 text-danger" strokeWidth={2.2} aria-hidden="true" />
+              <p className="text-[15px] leading-[1.45] text-ink">
+                That address looks mistyped, so the email may never arrive. Did you mean{' '}
+                <span className="font-semibold [overflow-wrap:anywhere]">{suggestion}</span>?
+              </p>
+            </div>
+          ) : inbox ? (
             <a
               href={inbox.url}
               target="_blank"
@@ -86,23 +79,7 @@ export const ConfirmEmailView: React.FC<ConfirmEmailViewProps> = ({ email, onSig
             Use this device and this browser, so the link brings you back signed in. It can land in spam.
           </p>
 
-          <div className="mt-6 space-y-2" aria-live="polite">
-            {error && <ErrorNote message={error} />}
-            {resent && !error && (
-              <p role="status" className="ios-footnote text-ok bg-ok/10 rounded-row px-3.5 py-2.5">
-                Sent again to {email}.
-              </p>
-            )}
-          </div>
-
-          <div className="mt-2 ios-group ios-card-shadow">
-            <button type="button" onClick={() => void resend()} disabled={busy} className="ios-group-row ios-press disabled:opacity-50">
-              <RowIcon>
-                <MailPlus className="w-4 h-4" strokeWidth={2.2} />
-              </RowIcon>
-              <span className="flex-1 text-[15px]">{busy ? 'Sending' : 'Send the link again'}</span>
-              <ChevronRight className="w-4 h-4 shrink-0 text-ink-3/60" strokeWidth={2.5} />
-            </button>
+          <div className="mt-6 ios-group ios-card-shadow">
             <button type="button" onClick={onSignIn} className="ios-group-row ios-press">
               <RowIcon>
                 <LogIn className="w-4 h-4" strokeWidth={2.2} />
@@ -110,13 +87,15 @@ export const ConfirmEmailView: React.FC<ConfirmEmailViewProps> = ({ email, onSig
               <span className="flex-1 text-[15px]">I confirmed it, sign me in</span>
               <ChevronRight className="w-4 h-4 shrink-0 text-ink-3/60" strokeWidth={2.5} />
             </button>
-            <button type="button" onClick={onChangeEmail} className="ios-group-row ios-press">
-              <RowIcon>
-                <UserRoundPen className="w-4 h-4" strokeWidth={2.2} />
-              </RowIcon>
-              <span className="flex-1 text-[15px]">Wrong address, use another email</span>
-              <ChevronRight className="w-4 h-4 shrink-0 text-ink-3/60" strokeWidth={2.5} />
-            </button>
+            {suggestion && (
+              <button type="button" onClick={onChangeEmail} className="ios-group-row ios-press">
+                <RowIcon>
+                  <UserRoundPen className="w-4 h-4" strokeWidth={2.2} />
+                </RowIcon>
+                <span className="flex-1 text-[15px]">Wrong address, use another email</span>
+                <ChevronRight className="w-4 h-4 shrink-0 text-ink-3/60" strokeWidth={2.5} />
+              </button>
+            )}
           </div>
         </div>
       </main>
