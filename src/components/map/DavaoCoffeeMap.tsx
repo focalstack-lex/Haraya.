@@ -9,7 +9,7 @@ import { useOnline } from '../../hooks/useOnline';
 import { useLocation } from '../moodFinder/useLocation';
 import { NEARBY_RADIUS_KM, describeDistance, splitByDistance, walkMinutesFor, type SpotDistance } from './nearby';
 import { ROAD_DISTANCE_ATTRIBUTION, useRoadDistances } from './roadDistance';
-import { fixQuality, formatAccuracy } from './locationQuality';
+import { fixQuality, formatAccuracy } from '../../utils/locationQuality';
 import {
   CLUSTER_RADIUS_PX,
   PHOTO_PIN_PX,

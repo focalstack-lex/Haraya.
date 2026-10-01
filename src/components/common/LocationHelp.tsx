@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatAccuracy } from '../map/locationQuality';
+import { formatAccuracy } from '../../utils/locationQuality';
 import { devicePlatform, locationFix, type LocationProblem } from './locationFix';
 
 interface LocationHelpProps {

@@ -1,5 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { APPROXIMATE_M, fixQuality, formatAccuracy, GOOD_FIX_M, isBetterFix, PRECISE_M } from './locationQuality';
+import { CHECK_IN_RADIUS_M } from './geo';
+import {
+  APPROXIMATE_M,
+  checkInVerdict,
+  fixQuality,
+  formatAccuracy,
+  GOOD_FIX_M,
+  isBetterFix,
+  isDecisiveForCheckIn,
+  PRECISE_M,
+} from './locationQuality';
 
 describe('fixQuality', () => {
   it('calls a GPS or Wi-Fi fix precise, a cell-tower fix approximate and a network guess rough', () => {
@@ -47,5 +57,41 @@ describe('formatAccuracy', () => {
 
   it('admits when the radius is unknown', () => {
     expect(formatAccuracy(Number.NaN)).toBe('an unknown distance');
+  });
+});
+
+describe('checkInVerdict', () => {
+  it('is near inside the circle, whatever the accuracy', () => {
+    expect(checkInVerdict(40, 8)).toBe('near');
+    expect(checkInVerdict(CHECK_IN_RADIUS_M, 1_800)).toBe('near');
+  });
+
+  it('trusts a street-accurate fix outside the circle', () => {
+    expect(checkInVerdict(150, 30)).toBe('far');
+    expect(checkInVerdict(2_000, PRECISE_M)).toBe('far');
+  });
+
+  it('is unsure when a wide fix could still be at the spot', () => {
+    // A 1.8 km network fix 2 km off, and a Digos visitor placed in Davao City
+    expect(checkInVerdict(2_000, 1_800)).toBe('unsure');
+    expect(checkInVerdict(45_000, 45_000)).toBe('unsure');
+    expect(checkInVerdict(500, Number.NaN)).toBe('unsure');
+  });
+
+  it('calls a wide fix far when even twice its radius misses the circle', () => {
+    expect(checkInVerdict(10_000, 1_800)).toBe('far');
+  });
+});
+
+describe('isDecisiveForCheckIn', () => {
+  it('settles on a tight fix, a near fix at street accuracy, or a plainly far one', () => {
+    expect(isDecisiveForCheckIn(400, GOOD_FIX_M)).toBe(true);
+    expect(isDecisiveForCheckIn(60, 120)).toBe(true);
+    expect(isDecisiveForCheckIn(10_000, 1_800)).toBe(true);
+  });
+
+  it('waits on a wide fix, near or not', () => {
+    expect(isDecisiveForCheckIn(60, 900)).toBe(false);
+    expect(isDecisiveForCheckIn(2_000, 1_800)).toBe(false);
   });
 });
