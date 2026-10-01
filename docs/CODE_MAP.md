@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-10-01 : commit a29b792 : fingerprint 28b5f8fdcb869ff6
+Generated 2026-10-01 : commit 7a35f9b : fingerprint 8dd656b80b40b671
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -75,15 +75,16 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/admin/
 
-- `src/components/admin/AdminDashboard.tsx` (444 lines) : A public listing from the cafes table (not a curated, community or legacy browser-only cafe).
-  - L18 : AdminDashboardProps
-  - L23 : AdminTab
-  - L292 : AdminDashboard
+- `src/components/admin/AdminDashboard.tsx` (448 lines) : A public listing from the cafes table (not a curated, community or legacy browser-only cafe).
+  - L19 : AdminDashboardProps
+  - L24 : AdminTab
+  - L293 : AdminDashboard
 - `src/components/admin/AdminPanels.tsx` (637 lines) : Shown once where a tool depends on the newest migration and the database does not have it yet.
   - L25 : NeedsUpdateNote
   - L177 : PlacesPanel
   - L400 : ReportsPanel
   - L518 : HealthPanel
+- `src/components/admin/PromoPanel.tsx` (108 lines) : The early coffee offer, from the admin side: the first confirmed accounts in the order the pre-registration page
 - `src/components/admin/SpotReviewQueue.tsx` (86 lines) : Admin review of community spot submissions: approve to publish, reject with a note to the contributor.
 
 ## src/components/cafe/
@@ -273,8 +274,8 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L86 : deriveStatus
   - L91 : catalogService
 - `src/services/communityService.ts` (154 lines) : Cup Check community layer: browser-created posts, likes, and comments. Likes are stored per browser (no accounts needed to
-- `src/services/earlyRegistrationService.test.ts` (26 lines) : src/services module: earlyRegistrationService.test
-- `src/services/earlyRegistrationService.ts` (41 lines) : The soft-launch promo count (20261001020000_early_registration_30_slots.sql): how many of the early slots are
+- `src/services/earlyRegistrationService.test.ts` (52 lines) : src/services module: earlyRegistrationService.test
+- `src/services/earlyRegistrationService.ts` (90 lines) : The soft-launch promo count (20261001020000_early_registration_30_slots.sql): how many of the early slots are
 - `src/services/moderationService.ts` (280 lines) : Reports from visitors and the Control Room's moderation data: the report queue, recent check-ins,
 - `src/services/notificationService.ts` (99 lines) : In-app notifications (table notifications, 20260930020000): written by database triggers when a spot or
 - `src/services/placeImport.test.ts` (76 lines) : src/services module: placeImport.test

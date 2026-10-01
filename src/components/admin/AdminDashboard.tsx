@@ -5,6 +5,7 @@ import { LargeTitle } from '../common/LargeTitle';
 import { ErrorNote, PrimaryButton } from '../common/FormControls';
 import { SpotReviewQueue } from './SpotReviewQueue';
 import { HealthPanel, PlacesPanel, ReportsPanel } from './AdminPanels';
+import { PromoPanel } from './PromoPanel';
 import { sessionService } from '../../services/sessionService';
 import { spotService } from '../../services/spotService';
 import { placeService } from '../../services/placeService';
@@ -20,7 +21,7 @@ interface AdminDashboardProps {
   onOpenLogin: () => void;
 }
 
-type AdminTab = 'overview' | 'spots' | 'places' | 'reports' | 'users' | 'health';
+type AdminTab = 'overview' | 'spots' | 'places' | 'reports' | 'users' | 'promo' | 'health';
 
 const CARD = 'rounded-card bg-surface ios-card-shadow p-4 sm:p-5';
 
@@ -288,7 +289,7 @@ const UsersPanel: React.FC<{ profiles: Profile[] }> = ({ profiles }) => {
   );
 };
 
-/** Control Room: review queues, the place catalog, reports, accounts and health. Admin role comes from the database. */
+/** Control Room: review queues, the place catalog, reports, accounts, the early coffee list and health. Admin role comes from the database. */
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewCafe, onOpenLogin }) => {
   useSessionVersion();
   useSpotVersion();
@@ -364,6 +365,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewCafe, onOp
     { id: 'places', label: 'Places', count: pendingApplications.length },
     { id: 'reports', label: 'Reports', count: openReports.length },
     { id: 'users', label: 'Users' },
+    { id: 'promo', label: 'Promo' },
     { id: 'health', label: 'Health', count: errorCount },
   ];
 
@@ -436,6 +438,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onViewCafe, onOp
       {tab === 'reports' && <ReportsPanel onViewCafe={onViewCafe} />}
 
       {tab === 'users' && <UsersPanel profiles={profiles} />}
+
+      {tab === 'promo' && <PromoPanel />}
 
       {tab === 'health' && <HealthPanel />}
     </div>
