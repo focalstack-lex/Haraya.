@@ -24,7 +24,7 @@ import { RateCafeModal } from './components/cafe/RateCafeModal';
 import { WelcomeModal } from './components/common/WelcomeModal';
 import { AccountSetupModal } from './components/common/AccountSetupModal';
 import { LandingView } from './views/LandingView';
-import { PreRegistrationView } from './views/PreRegistrationView';
+import { PreRegistrationFooter, PreRegistrationView } from './views/PreRegistrationView';
 import { BrandLogo } from './components/common/BrandLogo';
 import { PRE_REGISTRATION } from './config/launch';
 import { ConfirmEmailView } from './views/ConfirmEmailView';
@@ -699,7 +699,7 @@ export const App: React.FC = () => {
     );
   }
 
-  // Soft launch: everyone but admins sees pre-registration in place of the landing page and every tab. Only the
+  // Soft launch: everyone but admins sees pre-registration in place of every tab. Only the
   // create-account page and the legal pages it links to open, inside a bare shell with no app navigation. Sign-in
   // is not offered anywhere; the one way in is the unlinked Control Room address (#/tab/admin), which shows the
   // full sign-in form to a signed-out visitor. Anyone but an admin who signs in there still lands here.
@@ -732,13 +732,25 @@ export const App: React.FC = () => {
         </div>
       );
     }
+    const openSignUp = () => {
+      setLoginIntent({ mode: 'signup', returnTab: 'feed' });
+      setActiveTab(LOGIN_TAB_ID);
+      window.scrollTo({ top: 0 });
+    };
+    // A signed-out visitor (the Facebook post links to the bare URL) gets the full landing page with every call to
+    // action turned into Pre-register now; a registered account sees that it is registered and its place in the order
+    if (!user) {
+      return (
+        <>
+          <LandingView onEnter={openSignUp} cityCounts={cityCounts} onPreRegister={openSignUp} />
+          <PreRegistrationFooter onOpenLegal={setActiveTab} />
+        </>
+      );
+    }
     return (
       <PreRegistrationView
-        registeredEmail={user ? (user.email ?? sessionService.getDisplayName()) : null}
-        onRegister={() => {
-          setLoginIntent({ mode: 'signup', returnTab: 'feed' });
-          setActiveTab(LOGIN_TAB_ID);
-        }}
+        registeredEmail={user.email ?? sessionService.getDisplayName()}
+        onRegister={openSignUp}
         onSignOut={() => void sessionService.signOut()}
         onOpenLegal={setActiveTab}
       />

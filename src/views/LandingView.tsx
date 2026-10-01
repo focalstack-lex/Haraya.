@@ -3,12 +3,16 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, Clock3, Footprints, MapPin, Smile, Stamp } from 'lucide-react';
 import { BrandLogo } from '../components/common/BrandLogo';
 import { AyaMascot } from '../components/common/AyaMascot';
+import { EarlyCoffeeOffer } from '../components/common/EarlyCoffeeOffer';
 import { DAVAO_CITIES } from '../types/coffee';
 
 /**
  * Landing page shown at the bare URL (see `isLandingEntry` in utils/router.ts). It showcases the app with real
  * screenshots captured from the running app (public/landing/, 375x812 at 2x) and states only what the app does:
  * no store badges (there is no native app), no counts, no testimonials. Every call to action enters the app.
+ * During pre-registration (onPreRegister set) the same page is the front door for signed-out visitors: every call
+ * to action reads Pre-register now and opens the create-account form, the coffee offer sits under the hero, and
+ * nothing that would open the closed app is offered (no See the map, no city links, no Add a hidden spot).
  */
 
 interface LandingViewProps {
@@ -16,6 +20,8 @@ interface LandingViewProps {
   onEnter: (tab: string, city?: string) => void;
   /** Spots listed per city, so a city with none says so instead of opening an empty page unannounced. */
   cityCounts?: Record<string, number>;
+  /** Pre-registration: when set, every call to action opens the create-account form instead of the app. */
+  onPreRegister?: () => void;
 }
 
 const SCREEN = { width: 750, height: 1624 };
@@ -103,8 +109,11 @@ const Benefit: React.FC<{ icon: React.ComponentType<{ className?: string; stroke
   </div>
 );
 
-export const LandingView: React.FC<LandingViewProps> = ({ onEnter, cityCounts }) => {
+export const LandingView: React.FC<LandingViewProps> = ({ onEnter, cityCounts, onPreRegister }) => {
   const reduceMotion = useReducedMotion();
+  const preRegistering = onPreRegister !== undefined;
+  // Every main call to action: into the app on a tab, or to the create-account form during pre-registration
+  const enter = (tab: string) => (onPreRegister ? onPreRegister() : onEnter(tab));
 
   // In-page links scroll instead of setting a hash, because the hash is the app's router
   const scrollTo = (id: string) => {
@@ -137,8 +146,8 @@ export const LandingView: React.FC<LandingViewProps> = ({ onEnter, cityCounts })
               </button>
             ))}
           </nav>
-          <button onClick={() => onEnter('feed')} className={`${primaryButton} !h-11 !px-5 !text-[15px]`}>
-            Open Haraya
+          <button onClick={() => enter('feed')} className={`${primaryButton} !h-11 !px-5 !text-[15px]`}>
+            {preRegistering ? 'Pre-register now' : 'Open Haraya'}
           </button>
         </div>
       </header>
@@ -154,16 +163,19 @@ export const LandingView: React.FC<LandingViewProps> = ({ onEnter, cityCounts })
               Cafes, study spots and hidden gems across the Davao Region, with which ones are open right now.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3">
-              <button onClick={() => onEnter('feed')} className={`${primaryButton} w-full sm:w-auto`}>
-                Open Haraya
+              <button onClick={() => enter('feed')} className={`${primaryButton} w-full sm:w-auto`}>
+                {preRegistering ? 'Pre-register now' : 'Open Haraya'}
                 <ArrowRight className="w-4.5 h-4.5" strokeWidth={2.4} />
               </button>
-              <button onClick={() => onEnter('map')} className={`${secondaryButton} w-full sm:w-auto`}>
-                <MapPin className="w-4.5 h-4.5 text-tint-ink" strokeWidth={2.2} />
-                See the map
-              </button>
+              {!preRegistering && (
+                <button onClick={() => onEnter('map')} className={`${secondaryButton} w-full sm:w-auto`}>
+                  <MapPin className="w-4.5 h-4.5 text-tint-ink" strokeWidth={2.2} />
+                  See the map
+                </button>
+              )}
             </div>
             <p className="mt-4 text-[14px] text-ink-3">Free, and nothing to install. It runs in your phone's browser.</p>
+            {preRegistering && <EarlyCoffeeOffer className="mt-8" />}
           </div>
 
           <div className="relative mt-12 sm:mt-16 max-w-5xl mx-auto px-4">
@@ -262,8 +274,8 @@ export const LandingView: React.FC<LandingViewProps> = ({ onEnter, cityCounts })
                   </li>
                 ))}
               </ol>
-              <button onClick={() => onEnter('feed')} className={`${primaryButton} mt-10 w-full sm:w-auto`}>
-                Start with a mood
+              <button onClick={() => enter('feed')} className={`${primaryButton} mt-10 w-full sm:w-auto`}>
+                {preRegistering ? 'Pre-register now' : 'Start with a mood'}
                 <ArrowRight className="w-4.5 h-4.5" strokeWidth={2.4} />
               </button>
             </div>
@@ -275,28 +287,43 @@ export const LandingView: React.FC<LandingViewProps> = ({ onEnter, cityCounts })
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="font-cooper text-[30px] sm:text-[40px] font-bold leading-[1.1] tracking-[-0.03em]">Across the Davao Region</h2>
             <p className="mt-4 max-w-[52ch] text-[17px] leading-[1.55] text-ink-2">
-              Pick a city and Discover opens there. Locals add the quiet corners, and Haraya reviews every spot before it goes up.
+              {preRegistering ? '' : 'Pick a city and Discover opens there. '}Locals add the quiet corners, and Haraya reviews every spot before it
+              goes up.
             </p>
             <ul className="mt-10 grid grid-cols-1 min-[360px]:grid-cols-2 sm:grid-cols-3 gap-3">
-              {CITIES.map((city) => (
-                <li key={city}>
-                  <button
-                    onClick={() => onEnter('feed', city)}
-                    className="group w-full min-h-14 px-4 py-2.5 rounded-row bg-surface ios-card-shadow flex items-center gap-3 text-left ios-press focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tint"
-                  >
-                    <MapPin className="w-4.5 h-4.5 shrink-0 text-tint-ink" strokeWidth={2.2} />
-                    <span className="flex-1 min-w-0">
-                      <span className="block text-[16px] font-medium">{city}</span>
-                      {cityCounts && (
-                        <span className="block text-[13px] text-ink-2">
-                          {cityCounts[city] ? `${cityCounts[city]} ${cityCounts[city] === 1 ? 'spot' : 'spots'}` : 'No spots yet. Add the first.'}
+              {CITIES.map((city) => {
+                const count = cityCounts && (
+                  <span className="block text-[13px] text-ink-2">
+                    {cityCounts[city] ? `${cityCounts[city]} ${cityCounts[city] === 1 ? 'spot' : 'spots'}` : 'No spots yet. Add the first.'}
+                  </span>
+                );
+                return (
+                  <li key={city}>
+                    {preRegistering ? (
+                      // The app is closed, so a city is a fact here, not a link
+                      <div className="w-full min-h-14 px-4 py-2.5 rounded-row bg-surface ios-card-shadow flex items-center gap-3">
+                        <MapPin className="w-4.5 h-4.5 shrink-0 text-tint-ink" strokeWidth={2.2} />
+                        <span className="flex-1 min-w-0">
+                          <span className="block text-[16px] font-medium">{city}</span>
+                          {count}
                         </span>
-                      )}
-                    </span>
-                    <ArrowRight className="w-4 h-4 shrink-0 text-ink-3 transition-transform group-hover:translate-x-0.5" strokeWidth={2.2} />
-                  </button>
-                </li>
-              ))}
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => onEnter('feed', city)}
+                        className="group w-full min-h-14 px-4 py-2.5 rounded-row bg-surface ios-card-shadow flex items-center gap-3 text-left ios-press focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tint"
+                      >
+                        <MapPin className="w-4.5 h-4.5 shrink-0 text-tint-ink" strokeWidth={2.2} />
+                        <span className="flex-1 min-w-0">
+                          <span className="block text-[16px] font-medium">{city}</span>
+                          {count}
+                        </span>
+                        <ArrowRight className="w-4 h-4 shrink-0 text-ink-3 transition-transform group-hover:translate-x-0.5" strokeWidth={2.2} />
+                      </button>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </div>
         </section>
@@ -310,22 +337,26 @@ export const LandingView: React.FC<LandingViewProps> = ({ onEnter, cityCounts })
                   Your next cup is close.
                 </h2>
                 <p className="mt-4 max-w-[44ch] text-[17px] leading-[1.55] text-surface/80">
-                  Open Haraya, tell Aya how you feel, and go. Know a spot that is missing? Add it for everyone.
+                  {preRegistering
+                    ? 'Haraya opens soon. Pre-register now and your account is ready the day it opens.'
+                    : 'Open Haraya, tell Aya how you feel, and go. Know a spot that is missing? Add it for everyone.'}
                 </p>
                 <div className="mt-8 flex flex-col sm:flex-row gap-3">
                   <button
-                    onClick={() => onEnter('feed')}
+                    onClick={() => enter('feed')}
                     className="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-full bg-surface text-ink text-[16px] font-semibold hover:bg-sunken ios-press focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-star transition-colors"
                   >
-                    Open Haraya
+                    {preRegistering ? 'Pre-register now' : 'Open Haraya'}
                     <ArrowRight className="w-4.5 h-4.5" strokeWidth={2.4} />
                   </button>
-                  <button
-                    onClick={() => onEnter('submit')}
-                    className="inline-flex items-center justify-center h-12 px-6 rounded-full bg-surface/12 text-surface text-[16px] font-semibold hover:bg-surface/20 ios-press focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-star transition-colors"
-                  >
-                    Add a hidden spot
-                  </button>
+                  {!preRegistering && (
+                    <button
+                      onClick={() => onEnter('submit')}
+                      className="inline-flex items-center justify-center h-12 px-6 rounded-full bg-surface/12 text-surface text-[16px] font-semibold hover:bg-surface/20 ios-press focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-star transition-colors"
+                    >
+                      Add a hidden spot
+                    </button>
+                  )}
                 </div>
               </div>
               <AyaMascot pose="clink" size={180} alt="" className="self-center md:self-end shrink-0" />

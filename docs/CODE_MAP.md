@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-10-01 : commit f374c00 : fingerprint ba07c4975916e24c
+Generated 2026-10-01 : commit a29b792 : fingerprint 28b5f8fdcb869ff6
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -62,7 +62,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `scripts/generate-code-map.mjs` (215 lines) : One-line purpose per file, inferred from its path and leading doc comment.
 - `scripts/make-email-logo.mjs` (30 lines) : Builds public/brand/haraya-email-logo.png: the wordmark on its own linen tile with rounded corners.
 - `scripts/verify-google-auth.mjs` (109 lines) : scripts module: verify-google-auth
-- `src/App.tsx` (950 lines) : Older links: the roaster portal is now the Place Portal. The Passport tab also answers to its own name.
+- `src/App.tsx` (962 lines) : Older links: the roaster portal is now the Place Portal. The Passport tab also answers to its own name.
   - L84 : SharedList
   - L110 : App
 - `src/index.css` (747 lines) : src entry point
@@ -111,6 +111,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L244 : AyaMascot
 - `src/components/common/BrandLogo.tsx` (36 lines) : Haraya logo cut from the brand master (Haraya Files/LOGO.webp) with the background keyed out,
 - `src/components/common/CustomIcons.tsx` (242 lines) : Haraya Custom Icon Set: high-precision vector icons tailored for the Davao
+- `src/components/common/EarlyCoffeeOffer.tsx` (60 lines) : The soft-launch coffee offer, shared by the pre-registration page and the landing page while pre-registration is
 - `src/components/common/ErrorBoundary.tsx` (53 lines) : Catches a crash while drawing the app, reports it, and offers a way back instead of a blank page.
 - `src/components/common/FormControls.tsx` (272 lines) : Shared form primitives for Haraya: an iOS-style sheet (bottom sheet with a
 - `src/components/common/ImageUploadField.tsx` (83 lines) : File input that stores the image as a dataURL with type and size validation.
@@ -393,10 +394,10 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L305 : AddSpotView
 - `src/views/CommunityView.tsx` (74 lines) : Cup Check community feed: one-to-three column masonry of today's brews.
 - `src/views/ConfirmEmailView.tsx` (107 lines) : The only screen an unconfirmed sign-up sees: it replaces the whole app (every tab, the portal included) until
-- `src/views/LandingView.tsx` (339 lines) : Landing page shown at the bare URL (see `isLandingEntry` in utils/router.ts). It showcases the app with real
-  - L14 : LandingViewProps
-  - L28 : Phone
-  - L106 : LandingView
+- `src/views/LandingView.tsx` (370 lines) : Landing page shown at the bare URL (see `isLandingEntry` in utils/router.ts). It showcases the app with real
+  - L18 : LandingViewProps
+  - L34 : Phone
+  - L112 : LandingView
 - `src/views/LegalView.tsx` (234 lines) : Privacy Notice and Terms. Statements of fact describe what the code does today; anything that needs a
 - `src/views/LoginView.tsx` (346 lines) : What the page is doing: the two account modes, the two email-link flows, and the new-password form.
   - L11 : LoginMode
@@ -407,7 +408,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L488 : ListingEditorProps
   - L497 : ListingEditor
   - L729 : PlacePortalView
-- `src/views/PreRegistrationView.tsx` (162 lines) : The soft-launch page: while PRE_REGISTRATION is on it replaces the landing page and every tab for everyone but
+- `src/views/PreRegistrationView.tsx` (129 lines) : The soft-launch page: while PRE_REGISTRATION is on it replaces the landing page and every tab for everyone but
 - `src/views/ProfileView.tsx` (755 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
   - L28 : ProfileSection
   - L30 : ProfileViewProps

@@ -92,8 +92,10 @@ and pull request.
 
 ## Soft launch (pre-registration)
 
-Until launch the app is closed: every visitor except admins sees the pre-registration page
-(`src/views/PreRegistrationView.tsx`), can create an account, and sees the early coffee offer: 3 of the first 30
+Until launch the app is closed for everyone except admins. A signed-out visitor (the Facebook post links to the bare
+URL) sees the full landing page (`src/views/LandingView.tsx`) with every call to action reading Pre-register now; a
+signed-in account sees the pre-registration page (`src/views/PreRegistrationView.tsx`) with its place in the order.
+Both show the early coffee offer: 3 of the first 30
 confirmed accounts will have the opportunity of a coffee at a selected coffee shop, to be announced. The order comes
 from `early_registration_status()` in `supabase/migrations/20261001020000_early_registration_30_slots.sql`. To open the app, set `VITE_LAUNCH_MODE=open`
 in the Vercel environment and redeploy.

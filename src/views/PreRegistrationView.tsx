@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowRight, CircleCheck, Coffee, LogOut } from 'lucide-react';
+import { ArrowRight, CircleCheck, LogOut } from 'lucide-react';
 import { BrandLogo } from '../components/common/BrandLogo';
 import { AyaMascot } from '../components/common/AyaMascot';
 import { Phone } from './LandingView';
-import { EARLY_COFFEE_SLOTS, EARLY_COFFEE_WINNERS } from '../config/launch';
-import { fetchEarlyRegistrationStatus, type EarlyRegistrationStatus } from '../services/earlyRegistrationService';
+import { EarlyCoffeeOffer } from '../components/common/EarlyCoffeeOffer';
 
 /**
  * The soft-launch page: while PRE_REGISTRATION is on it replaces the landing page and every tab for everyone but
@@ -28,26 +27,6 @@ const primaryButton =
 
 export const PreRegistrationView: React.FC<PreRegistrationViewProps> = ({ registeredEmail, onRegister, onSignOut, onOpenLegal }) => {
   const reduceMotion = useReducedMotion();
-  const [status, setStatus] = useState<EarlyRegistrationStatus | null>(null);
-
-  // Read again when the account changes, so a new sign-up sees its own place in the order
-  useEffect(() => {
-    let current = true;
-    void fetchEarlyRegistrationStatus().then((next) => {
-      if (current) setStatus(next);
-    });
-    return () => {
-      current = false;
-    };
-  }, [registeredEmail]);
-
-  const statusLine = !status
-    ? null
-    : status.position !== null && status.position <= status.slots
-      ? `You are number ${status.position} of the ${status.slots}.`
-      : status.claimed >= status.slots
-        ? `All ${status.slots} places are taken.`
-        : `${status.slots - status.claimed} of ${status.slots} places left.`;
   const rise = (delay: number) =>
     reduceMotion
       ? { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: 0.3 } }
@@ -102,24 +81,7 @@ export const PreRegistrationView: React.FC<PreRegistrationViewProps> = ({ regist
             )}
 
             {/* The early offer: a notice, not a badge, so it sits under the action it rewards */}
-            <div className="mt-8 mx-auto max-w-xl rounded-sheet bg-ink text-surface px-5 py-5 sm:px-6 flex items-center gap-4 text-left">
-              <span className="h-11 w-11 shrink-0 rounded-row bg-surface/12 text-star flex items-center justify-center" aria-hidden="true">
-                <Coffee className="w-5 h-5" strokeWidth={2.2} />
-              </span>
-              <div>
-                <p className="text-[15px] sm:text-[16px] leading-[1.5]">
-                  <span className="font-semibold">
-                    {EARLY_COFFEE_WINNERS} of the first {EARLY_COFFEE_SLOTS} registered accounts
-                  </span>{' '}
-                  will have the opportunity to get a coffee at a selected coffee shop, to be announced.
-                </p>
-                {statusLine && (
-                  <p className="mt-1 text-[14px] font-semibold text-star" role="status">
-                    {statusLine}
-                  </p>
-                )}
-              </div>
-            </div>
+            <EarlyCoffeeOffer refreshKey={registeredEmail} className="mt-8" />
           </div>
 
           <div className="relative mt-12 sm:mt-16 max-w-5xl mx-auto px-4">
@@ -143,19 +105,24 @@ export const PreRegistrationView: React.FC<PreRegistrationViewProps> = ({ regist
         </section>
       </main>
 
-      <footer className="bg-ink text-surface/80">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-[14px]">
-          <p>Haraya, for the Davao Region.</p>
-          <div className="flex items-center gap-4">
-            <button onClick={() => onOpenLegal('privacy')} className="min-h-11 font-medium text-surface hover:underline underline-offset-2">
-              Privacy Notice
-            </button>
-            <button onClick={() => onOpenLegal('terms')} className="min-h-11 font-medium text-surface hover:underline underline-offset-2">
-              Terms
-            </button>
-          </div>
-        </div>
-      </footer>
+      <PreRegistrationFooter onOpenLegal={onOpenLegal} />
     </div>
   );
 };
+
+/** The pre-registration footer: the legal pages the create-account form agrees to, and nothing that opens the app. */
+export const PreRegistrationFooter: React.FC<{ onOpenLegal: (page: 'privacy' | 'terms') => void }> = ({ onOpenLegal }) => (
+  <footer className="bg-ink text-surface/80">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-[14px]">
+      <p>Haraya, for the Davao Region.</p>
+      <div className="flex items-center gap-4">
+        <button onClick={() => onOpenLegal('privacy')} className="min-h-11 font-medium text-surface hover:underline underline-offset-2">
+          Privacy Notice
+        </button>
+        <button onClick={() => onOpenLegal('terms')} className="min-h-11 font-medium text-surface hover:underline underline-offset-2">
+          Terms
+        </button>
+      </div>
+    </div>
+  </footer>
+);
