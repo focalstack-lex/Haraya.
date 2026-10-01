@@ -44,20 +44,20 @@ export function formatAccuracy(accuracyM: number): string {
 export type CheckInVerdict = 'near' | 'far' | 'unsure';
 
 /**
- * Whether a fix puts the device inside a check-in circle. The reported accuracy is roughly a 68% radius, so a wide
- * fix that lands outside only counts as far when even twice its radius cannot reach the circle; otherwise it is
- * unsure, and the visitor is told the fix is too wide instead of being told they are kilometres away.
+ * Whether a fix puts the device inside a check-in circle. The reported accuracy is roughly a 68% radius, so:
+ * near needs the fix inside the circle and at street accuracy (a network guess that happens to land on a downtown
+ * cafe does not unlock a check-in); far needs a GPS-tight fix, or one so far off that even twice its radius cannot
+ * reach the circle. Anything else is unsure, and the visitor is told the fix is too wide instead of being told
+ * they are 130 m or 2 km away.
  */
 export function checkInVerdict(distanceM: number, accuracyM: number, radiusM: number = CHECK_IN_RADIUS_M): CheckInVerdict {
-  if (distanceM <= radiusM) return 'near';
   const spread = accuracyM >= 0 && Number.isFinite(accuracyM) ? accuracyM : Infinity;
-  if (spread <= PRECISE_M || distanceM - 2 * spread > radiusM) return 'far';
+  if (distanceM <= radiusM) return spread <= PRECISE_M ? 'near' : 'unsure';
+  if (spread <= GOOD_FIX_M || distanceM - 2 * spread > radiusM) return 'far';
   return 'unsure';
 }
 
-/** A fix that settles a check-in without waiting for a tighter one: tight, near at street accuracy, or plainly far. */
+/** A fix that settles a check-in without waiting for a tighter one: any fix that is not unsure. */
 export function isDecisiveForCheckIn(distanceM: number, accuracyM: number, radiusM: number = CHECK_IN_RADIUS_M): boolean {
-  if (accuracyM >= 0 && accuracyM <= GOOD_FIX_M) return true;
-  const verdict = checkInVerdict(distanceM, accuracyM, radiusM);
-  return verdict === 'far' || (verdict === 'near' && accuracyM <= PRECISE_M);
+  return checkInVerdict(distanceM, accuracyM, radiusM) !== 'unsure';
 }

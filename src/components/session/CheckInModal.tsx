@@ -147,7 +147,14 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({ cafe, onClose, onDir
               location is only accurate to {formatAccuracy(phase.fix.accuracy)}.
             </p>
             <div className="w-full rounded-row bg-canvas px-4 py-3 text-left">
-              <LocationHelp problem={fixQuality(phase.fix.accuracy) === 'rough' ? 'rough' : 'approximate'} accuracyM={phase.fix.accuracy} />
+              {fixQuality(phase.fix.accuracy) === 'precise' ? (
+                // Precise location is on but the GPS has not locked on (indoors, on Wi-Fi): a window helps, settings do not
+                <p className="ios-footnote text-ink-2">
+                  Your phone is placing you by Wi-Fi, not GPS. Step near a window or the door for a few seconds, then Check again.
+                </p>
+              ) : (
+                <LocationHelp problem={fixQuality(phase.fix.accuracy) === 'rough' ? 'rough' : 'approximate'} accuracyM={phase.fix.accuracy} />
+              )}
             </div>
             <div className="w-full flex flex-col sm:flex-row gap-2 pt-1">
               <PrimaryButton onClick={locate} className="inline-flex items-center justify-center gap-2 w-full sm:flex-1">
