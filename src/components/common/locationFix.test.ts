@@ -33,4 +33,18 @@ describe('locationFix', () => {
   it('explains a page that is not https the same way on every device', () => {
     expect(locationFix('insecure', 'android')).toEqual(locationFix('insecure', 'desktop'));
   });
+
+  it('points a phone with a wide fix at its precise location switch, with the radius in the title', () => {
+    const android = locationFix('approximate', 'android', 'about 2 km');
+    expect(android.title).toBe('Your location is approximate (about 2 km)');
+    expect(android.steps).toContain('Use precise location');
+    expect(locationFix('approximate', 'ios').steps).toContain('Precise Location');
+    expect(locationFix('approximate', 'ios').title).toBe('Your location is approximate');
+  });
+
+  it('tells a phone with a network guess to get a GPS fix, and a computer that it can only guess', () => {
+    expect(locationFix('rough', 'android', 'about 45 km').steps).toContain('GPS');
+    expect(locationFix('rough', 'desktop').steps).toContain('open Haraya on your phone');
+    expect(locationFix('rough', 'desktop').steps).toBe(locationFix('approximate', 'desktop').steps);
+  });
 });
