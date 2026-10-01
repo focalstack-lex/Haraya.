@@ -188,8 +188,12 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({
   const { position: myPosition, status: locationStatus, refining, request: requestLocation } = useLocation({ maximumAgeMs: 0, highAccuracy: true });
   // How wide the fix is: the ring under the dot, and a note when it is only a neighbourhood or a guess
   const fixGrade = myPosition ? fixQuality(myPosition.accuracy) : null;
-  // Road distances for every listed spot, so a filter never asks the router again
-  const roadKm = useRoadDistances(myPosition, cafes);
+  // Road distances for every listed spot, so a filter never asks the router again. The router gets a position
+  // only when it is worth routing from: settled or street-accurate (not the phone's first wide guess), never a
+  // town-wide guess, and not during a walk, which has its own route.
+  const roadOrigin =
+    myPosition && !navTarget && fixGrade !== 'rough' && (!refining || fixGrade === 'precise') ? myPosition : null;
+  const roadKm = useRoadDistances(roadOrigin, cafes);
   const framedNearbyFix = useRef<GeoPoint | null>(null);
   // Aya covers the map for either wait: the walk's first fix and route, or the fix for the nearby view
   const overlayPhase = loadPhase ?? (!navTarget && locationStatus === 'locating' ? 'locating' : null);
@@ -417,7 +421,11 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({
     framedRoute.current = false;
     setFollowMe(true);
     if (navTarget) startNav({ lat: navTarget.lat, lng: navTarget.lng });
-    else stopNav();
+    else {
+      stopNav();
+      // Back from a walk: the nearby view frames the next fix again, even if the visitor barely moved
+      framedNearbyFix.current = null;
+    }
   }, [navTarget, startNav, stopNav]);
 
   // Destination pin while navigating. Declared after the trail effect so its framing wins.

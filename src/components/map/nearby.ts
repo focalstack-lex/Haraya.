@@ -16,9 +16,9 @@ export interface SpotDistance<T> extends Distance {
 }
 
 /**
- * Every spot with its distance from the visitor, nearest first by straight line, split at the nearby radius.
- * Road distances, when known, ride along for display; the split stays on the straight line so it matches the
- * ring drawn on the map and works offline.
+ * Every spot with its distance from the visitor, split at the nearby radius, each side nearest first by the
+ * distance it shows (by road when known). The split stays on the straight line so it matches the ring drawn on
+ * the map and works offline.
  */
 export function splitByDistance<T extends GeoPoint & { id: string }>(
   spots: T[],
@@ -26,11 +26,16 @@ export function splitByDistance<T extends GeoPoint & { id: string }>(
   radiusKm: number = NEARBY_RADIUS_KM,
   roadKm: ReadonlyMap<string, number> | null = null
 ): { nearby: SpotDistance<T>[]; farther: SpotDistance<T>[] } {
-  const ranked = spots
-    .map((spot) => ({ spot, km: distanceKm(from, spot), roadKm: roadKm?.get(spot.id) ?? null }))
-    .sort((a, b) => a.km - b.km);
-  const cut = ranked.findIndex((entry) => entry.km > radiusKm);
-  return cut === -1 ? { nearby: ranked, farther: [] } : { nearby: ranked.slice(0, cut), farther: ranked.slice(cut) };
+  const nearby: SpotDistance<T>[] = [];
+  const farther: SpotDistance<T>[] = [];
+  for (const spot of spots) {
+    const entry = { spot, km: distanceKm(from, spot), roadKm: roadKm?.get(spot.id) ?? null };
+    (entry.km <= radiusKm ? nearby : farther).push(entry);
+  }
+  const shown = (entry: Distance) => entry.roadKm ?? entry.km;
+  nearby.sort((a, b) => shown(a) - shown(b));
+  farther.sort((a, b) => shown(a) - shown(b));
+  return { nearby, farther };
 }
 
 /** The distance to show, and which kind it is: "20.8 km" "by road", or "14.2 km" "straight line". */
@@ -40,7 +45,11 @@ export function describeDistance(distance: Distance): { value: string; note: str
     : { value: formatKm(distance.km), note: 'straight line' };
 }
 
-/** Walking estimate along the roads, or along the straight line with the usual detour allowance. */
+/**
+ * Walking estimate. The road figure follows the car network (one-way streets, no footpaths), so a walk is taken
+ * as the shorter of it and the straight line with the usual detour allowance.
+ */
 export function walkMinutesFor(distance: Distance): number {
-  return walkMinutes(distance.roadKm ?? distance.km * DETOUR_FACTOR);
+  const onFoot = distance.km * DETOUR_FACTOR;
+  return walkMinutes(distance.roadKm === null ? onFoot : Math.min(distance.roadKm, onFoot));
 }

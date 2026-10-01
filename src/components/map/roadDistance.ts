@@ -111,20 +111,37 @@ export function resetRoadDistanceState(): void {
 
 /**
  * Kilometres by road from the visitor to each spot, by spot id, or null until the router answers (and when it
- * cannot). Asks again only when the visitor moves more than REFETCH_AFTER_KM or the catalog changes; a filter on
- * the list does not ask again, so pass every spot, not the filtered ones. Distances measured from somewhere else
- * are never shown: after a move the list reads "straight line" until the new answer is in.
+ * cannot). Asks again only when the visitor moves more than REFETCH_AFTER_KM or the catalog changes, or once a
+ * failure pause ends; a filter on the list does not ask again, so pass every spot, not the filtered ones.
+ * Distances measured from somewhere else are never shown: after a move the list reads "straight line" until the
+ * new answer is in. Pass null to send nothing (no fix yet, a fix too wide to be worth routing, a walk running).
  */
 export function useRoadDistances<T extends GeoPoint & { id: string }>(from: GeoPoint | null, spots: T[]): ReadonlyMap<string, number> | null {
   const [result, setResult] = useState<RoadDistances | null>(null);
+  /** Bumped to ask again once a failure pause ends, when nothing else would. */
+  const [retry, setRetry] = useState(0);
+  const retryTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const inFlight = useRef<{ controller: AbortController; origin: GeoPoint; ids: string } | null>(null);
   const ids = spots.map((spot) => spot.id).join(',');
 
   useEffect(() => {
-    if (!from || spots.length === 0 || fitsHere(result, from, ids) || readCache(from, ids)) return;
+    if (!from || spots.length === 0 || fitsHere(result, from, ids)) return;
+    const cached = readCache(from, ids);
+    if (cached) {
+      // Held in state, the answer outlives the cache's TTL for as long as the visitor stays put
+      setResult(cached);
+      return;
+    }
     const pending = inFlight.current;
     if (pending && pending.ids === ids && distanceKm(pending.origin, from) < REFETCH_AFTER_KM) return;
-    if (Date.now() < pausedUntil) return;
+    const wait = pausedUntil - Date.now();
+    if (wait > 0) {
+      retryTimer.current ??= setTimeout(() => {
+        retryTimer.current = undefined;
+        setRetry((count) => count + 1);
+      }, wait);
+      return;
+    }
 
     pending?.controller.abort();
     const controller = new AbortController();
@@ -135,6 +152,8 @@ export function useRoadDistances<T extends GeoPoint & { id: string }>(from: GeoP
       inFlight.current = null;
       if (!metres) {
         pausedUntil = Date.now() + FAILURE_PAUSE_MS;
+        // Runs the effect again, which waits out the pause and then asks once more
+        setRetry((count) => count + 1);
         return;
       }
       const byId = new Map<string, number>();
@@ -145,12 +164,14 @@ export function useRoadDistances<T extends GeoPoint & { id: string }>(from: GeoP
       writeCache(next);
       setResult(next);
     });
-  }, [from, spots, ids, result]);
+  }, [from, spots, ids, result, retry]);
 
   useEffect(
     () => () => {
       inFlight.current?.controller.abort();
       inFlight.current = null;
+      clearTimeout(retryTimer.current);
+      retryTimer.current = undefined;
     },
     []
   );
