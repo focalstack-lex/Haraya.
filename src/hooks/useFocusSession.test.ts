@@ -59,6 +59,19 @@ describe('boundary exit', () => {
   it('treats exactly 150 m as still inside', () => {
     expect(nextOutsideCount(1, 150)).toBe(0);
   });
+
+  it('does not let a wide indoor fix end a session, nor reset the count', () => {
+    // A Wi-Fi or cell fix 900 m wide that lands 400 m away
+    expect(nextOutsideCount(0, 400, 900)).toBe(0);
+    expect(nextOutsideCount(1, 400, 900)).toBe(1);
+    expect(nextOutsideCount(1, 400, 25)).toBe(EXIT_FIXES);
+    // Back inside resets, however wide
+    expect(nextOutsideCount(1, 60, 900)).toBe(0);
+  });
+
+  it('counts a missing radius as too wide to tell', () => {
+    expect(nextOutsideCount(1, 400, Number.NaN)).toBe(1);
+  });
 });
 
 describe('sessionToVisitInput', () => {

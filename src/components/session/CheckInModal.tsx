@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Navigation, RotateCw, LocateFixed } from 'lucide-react';
 import type { Cafe } from '../../types/coffee';
 import { Modal, ModalHeader, PrimaryButton, SecondaryButton, ErrorNote } from '../common/FormControls';
@@ -6,6 +6,9 @@ import { AyaMascot } from '../common/AyaMascot';
 import { FocusTimerIcon, RubberStampIcon } from '../common/CustomIcons';
 import { PassportStamp } from '../passport/PassportStamp';
 import { calculateDistanceMeters, CHECK_IN_RADIUS_M, formatKm, type GeoPoint } from '../../utils/geo';
+import { watchBestFix, type Fix } from '../../utils/bestFix';
+import { checkInVerdict, fixQuality, formatAccuracy, isDecisiveForCheckIn, REFINE_WINDOW_MS } from '../../utils/locationQuality';
+import { LocationHelp } from '../common/LocationHelp';
 import { focusSessionStore, useActiveFocusSession } from '../../hooks/useFocusSession';
 import { visitService } from '../../services/visitService';
 import { sessionService } from '../../services/sessionService';
@@ -23,44 +26,72 @@ interface CheckInModalProps {
 }
 
 type Phase =
-  | { kind: 'locating' }
+  /** fix: the widest-yet fix while a tighter one is awaited, or null before the first */
+  | { kind: 'locating'; fix: Fix | null }
   | { kind: 'denied' }
   | { kind: 'unavailable' }
+  /** The best fix was too wide to say whether the device is at the spot */
+  | { kind: 'unsure'; fix: Fix; distance: number }
   | { kind: 'located'; device: GeoPoint; distance: number }
   | { kind: 'stamped'; stampedAt: string; synced: boolean };
 
 /**
- * Check in at a spot. The device position is read once, in memory, and compared with the spot: within
- * 120 m the visitor can start a Deep Focus Session or take a Quick Stamp; farther away the sheet shows the
- * distance and offers directions instead. Aya cheers on arrival and holds up a map pin when it is too far.
+ * Check in at a spot. The device position is read in memory and compared with the spot: within 120 m the
+ * visitor can start a Deep Focus Session or take a Quick Stamp; farther away the sheet shows the distance and
+ * offers directions instead. Aya cheers on arrival and holds up a map pin when it is too far. The first answer
+ * on a phone is often a network fix kilometres wide, so the sheet listens until a fix settles it
+ * (isDecisiveForCheckIn) or the wait ends, and says the fix is too wide rather than "you are 2 km away" when it
+ * cannot tell.
  */
 export const CheckInModal: React.FC<CheckInModalProps> = ({ cafe, onClose, onDirections, onFocusStarted, onFinishActive, onOpenPassport }) => {
   const active = useActiveFocusSession();
-  const [phase, setPhase] = useState<Phase>({ kind: 'locating' });
+  const [phase, setPhase] = useState<Phase>({ kind: 'locating', fix: null });
+  const cancelFix = useRef<(() => void) | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   const locate = useCallback(() => {
     if (!cafe) return;
     setError(null);
+    cancelFix.current?.();
+    cancelFix.current = null;
     if (!('geolocation' in navigator)) {
       setPhase({ kind: 'unavailable' });
       return;
     }
-    setPhase({ kind: 'locating' });
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const device = { lat: position.coords.latitude, lng: position.coords.longitude };
-        setPhase({ kind: 'located', device, distance: calculateDistanceMeters(device.lat, device.lng, cafe.lat, cafe.lng) });
-      },
-      (geoError) => setPhase({ kind: geoError.code === geoError.PERMISSION_DENIED ? 'denied' : 'unavailable' }),
+    setPhase({ kind: 'locating', fix: null });
+    const distanceTo = (fix: Fix) => calculateDistanceMeters(fix.lat, fix.lng, cafe.lat, cafe.lng);
+    cancelFix.current = watchBestFix({
+      highAccuracy: true,
       // Always a fresh fix: a cached one could still say "far away" after the visitor walks up
-      { enableHighAccuracy: true, timeout: 15_000, maximumAge: 0 }
-    );
+      maximumAgeMs: 0,
+      timeoutMs: 15_000,
+      windowMs: REFINE_WINDOW_MS,
+      isGoodEnough: (fix) => isDecisiveForCheckIn(distanceTo(fix), fix.accuracy),
+      onFix: (fix) => setPhase({ kind: 'locating', fix }),
+      onSettled: (fix) => {
+        cancelFix.current = null;
+        const distance = distanceTo(fix);
+        setPhase(
+          checkInVerdict(distance, fix.accuracy) === 'unsure'
+            ? { kind: 'unsure', fix, distance }
+            : { kind: 'located', device: { lat: fix.lat, lng: fix.lng }, distance }
+        );
+      },
+      onError: (failure) => {
+        cancelFix.current = null;
+        setPhase({ kind: failure });
+      },
+    });
   }, [cafe]);
 
   useEffect(() => {
     if (cafe) locate();
+    // Closing the sheet or switching spots stops the GPS
+    return () => {
+      cancelFix.current?.();
+      cancelFix.current = null;
+    };
   }, [cafe, locate]);
 
   if (!cafe) return null;
@@ -101,6 +132,33 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({ cafe, onClose, onDir
           <div className="py-10 flex flex-col items-center gap-3 text-center" aria-live="polite">
             <LocateFixed className="w-7 h-7 text-tint animate-pulse" />
             <p className="text-[15px] text-ink-2">Checking where you are...</p>
+            {phase.fix && (
+              <p className="ios-footnote text-ink-2">Getting a precise fix, {formatAccuracy(phase.fix.accuracy)} so far.</p>
+            )}
+          </div>
+        );
+      case 'unsure':
+        return (
+          <div className="py-4 flex flex-col items-center gap-3 text-center">
+            <AyaMascot pose="wander" size={112} alt="" />
+            <h3 className="ios-title text-[19px] text-ink">Can't confirm you're here yet</h3>
+            <p className="text-[14px] text-ink-2 max-w-xs">
+              Check-ins open within <span className="font-mono">{CHECK_IN_RADIUS_M} m</span> of {cafe.name}, and your
+              location is only accurate to {formatAccuracy(phase.fix.accuracy)}.
+            </p>
+            <div className="w-full rounded-row bg-canvas px-4 py-3 text-left">
+              <LocationHelp problem={fixQuality(phase.fix.accuracy) === 'rough' ? 'rough' : 'approximate'} accuracyM={phase.fix.accuracy} />
+            </div>
+            <div className="w-full flex flex-col sm:flex-row gap-2 pt-1">
+              <PrimaryButton onClick={locate} className="inline-flex items-center justify-center gap-2 w-full sm:flex-1">
+                <RotateCw className="w-4 h-4" />
+                Check again
+              </PrimaryButton>
+              <SecondaryButton onClick={() => onDirections(cafe)} className="inline-flex items-center justify-center gap-2 w-full sm:flex-1">
+                <Navigation className="w-4 h-4" />
+                Get directions
+              </SecondaryButton>
+            </div>
           </div>
         );
       case 'denied':
