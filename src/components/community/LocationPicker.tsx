@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { TILE_URL, TILE_OPTIONS } from '../map/tiles';
 import L from 'leaflet';
 import { LocateFixed } from 'lucide-react';
+import { watchBestFix, type Fix } from '../../utils/bestFix';
+import { fixQuality, formatAccuracy, GOOD_FIX_M, REFINE_WINDOW_MS } from '../../utils/locationQuality';
 
 interface LocationPickerProps {
   lat: number | null;
@@ -12,8 +14,11 @@ interface LocationPickerProps {
 const DAVAO_CENTER: [number, number] = [7.07, 125.61];
 
 /**
- * Pin placement for Add a Spot: tap the map, or use the device location. The location is read once on
- * tap and only fills this form; it is not stored anywhere else.
+ * Pin placement for Add a Spot: tap the map, or use the device location. The location is read on tap and only
+ * fills this form; it is not stored anywhere else. The phone's first answer is often a network fix a kilometre or
+ * more wide, so the button listens for the GPS to tighten it (watchBestFix) and moves the pin as it does. A
+ * town-wide guess never moves the pin: a spot pinned in the wrong city is worse than none. A tap on the map
+ * stops the listening, so the visitor's own pin always wins.
  */
 export const LocationPicker: React.FC<LocationPickerProps> = ({ lat, lng, onChange }) => {
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -23,14 +28,25 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({ lat, lng, onChan
   onChangeRef.current = onChange;
   const [locating, setLocating] = useState(false);
   const [locateError, setLocateError] = useState('');
+  /** Set when the pin came from a fix too wide to trust as the entrance. */
+  const [locateNote, setLocateNote] = useState('');
+  const cancelFix = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     if (!canvasRef.current || mapRef.current) return;
     const map = L.map(canvasRef.current, { center: DAVAO_CENTER, zoom: 12, zoomControl: true, scrollWheelZoom: false });
     L.tileLayer(TILE_URL, TILE_OPTIONS).addTo(map);
-    map.on('click', (event: L.LeafletMouseEvent) => onChangeRef.current({ lat: event.latlng.lat, lng: event.latlng.lng }));
+    map.on('click', (event: L.LeafletMouseEvent) => {
+      cancelFix.current?.();
+      cancelFix.current = null;
+      setLocating(false);
+      setLocateNote('');
+      onChangeRef.current({ lat: event.latlng.lat, lng: event.latlng.lng });
+    });
     mapRef.current = map;
     return () => {
+      cancelFix.current?.();
+      cancelFix.current = null;
       map.remove();
       mapRef.current = null;
       markerRef.current = null;
@@ -62,25 +78,44 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({ lat, lng, onChan
       setLocateError('This browser cannot share a location. Tap the map instead.');
       return;
     }
+    cancelFix.current?.();
     setLocating(true);
     setLocateError('');
-    navigator.geolocation.getCurrentPosition(
-      (fix) => {
-        setLocating(false);
-        onChangeRef.current({ lat: fix.coords.latitude, lng: fix.coords.longitude });
-        mapRef.current?.setView([fix.coords.latitude, fix.coords.longitude], 17);
+    setLocateNote('');
+    const place = (fix: Fix) => {
+      onChangeRef.current({ lat: fix.lat, lng: fix.lng });
+      mapRef.current?.setView([fix.lat, fix.lng], fixQuality(fix.accuracy) === 'precise' ? 17 : 15);
+    };
+    cancelFix.current = watchBestFix({
+      highAccuracy: true,
+      maximumAgeMs: 30_000,
+      timeoutMs: 15_000,
+      windowMs: REFINE_WINDOW_MS,
+      isGoodEnough: (fix) => fix.accuracy <= GOOD_FIX_M,
+      onFix: (fix) => {
+        if (fixQuality(fix.accuracy) !== 'rough') place(fix);
       },
-      (error) => {
+      onSettled: (fix) => {
+        cancelFix.current = null;
         setLocating(false);
-        console.warn('Haraya: add a spot location error', error.code, error.message);
+        const quality = fixQuality(fix.accuracy);
+        if (quality === 'rough') {
+          setLocateError(`Your location is only a rough guess (${formatAccuracy(fix.accuracy)}). Tap the map where the entrance is.`);
+        } else if (quality === 'approximate') {
+          setLocateNote(`Your location is only accurate to ${formatAccuracy(fix.accuracy)}. Check the pin and tap the map where the entrance is.`);
+        }
+      },
+      onError: (failure) => {
+        cancelFix.current = null;
+        setLocating(false);
+        console.warn('Haraya: add a spot location error', failure);
         setLocateError(
-          error.code === error.PERMISSION_DENIED
+          failure === 'denied'
             ? 'Location is off for this site. Tap the map to place the pin.'
             : 'Could not get your location. Tap the map to place the pin.'
         );
       },
-      { enableHighAccuracy: true, timeout: 15_000, maximumAge: 30_000 }
-    );
+    });
   };
 
   return (
@@ -106,6 +141,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({ lat, lng, onChan
           'Tap the map where the entrance is.'
         )}
       </p>
+      {locateNote && <p className="ios-footnote text-ink">{locateNote}</p>}
       {locateError && <p className="ios-footnote text-danger">{locateError}</p>}
     </div>
   );
