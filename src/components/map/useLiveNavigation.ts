@@ -24,8 +24,9 @@ export interface LiveNavigation {
 
 /**
  * Walking navigation driven by navigator.geolocation.watchPosition with high accuracy. Positions stay in
- * memory for the session only: nothing is stored or sent anywhere. The watch is cleared on stop, on
- * arrival and on unmount so the GPS is not left running.
+ * memory for the session only and are never stored; the walk's start and end go to the routing service for
+ * the street route (walkingRoute.ts). The watch is cleared on stop, on arrival and on unmount so the GPS is not
+ * left running.
  */
 export function useLiveNavigation(): LiveNavigation {
   const [status, setStatus] = useState<LiveNavStatus>('idle');

@@ -13,7 +13,8 @@ export type LocatedPosition = Fix;
 
 /**
  * Asks for the visitor's position only when request() is called (the "Near me" tap).
- * The position stays in memory: it is never stored or sent anywhere.
+ * The position stays in memory and is never stored. This hook sends it nowhere; the map passes a settled fix to
+ * the routing service for road distances (roadDistance.ts).
  * A caller that needs where the visitor is right now (the map) can refuse a cached fix with maximumAgeMs and ask
  * for GPS with highAccuracy. A GPS request listens on for a while (watchBestFix, REFINE_WINDOW_MS) and keeps the
  * tightest fix, stopping early once one is within GOOD_FIX_M; `refining` is true during that wait. Without
