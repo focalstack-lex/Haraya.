@@ -10,8 +10,8 @@ import { fetchEarlyRegistrationStatus, type EarlyRegistrationStatus } from '../s
 /**
  * The soft-launch page: while PRE_REGISTRATION is on it replaces the landing page and every tab for everyone but
  * admins. Reading order: Haraya is not open yet, register now, the coffee offer for the first accounts, then a look
- * at the app. A signed-in visitor sees that they are registered instead of the register button. Only the sign-in
- * page and the legal pages open from here. The count under the offer comes from the database, which decides the
+ * at the app. A signed-in visitor sees that they are registered instead of the register button. Only the create-
+ * account page and the legal pages open from here; sign-in is not offered until launch. The count under the offer comes from the database, which decides the
  * order; without it the offer shows on its own.
  */
 
@@ -19,7 +19,6 @@ interface PreRegistrationViewProps {
   /** Email of the signed-in account, or null when signed out. */
   registeredEmail: string | null;
   onRegister: () => void;
-  onSignIn: () => void;
   onSignOut: () => void;
   onOpenLegal: (page: 'privacy' | 'terms') => void;
 }
@@ -27,7 +26,7 @@ interface PreRegistrationViewProps {
 const primaryButton =
   'inline-flex items-center justify-center gap-2 h-12 px-6 rounded-full bg-tint text-surface text-[16px] font-semibold hover:bg-tint-ink ios-press focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tint focus-visible:ring-offset-2 focus-visible:ring-offset-canvas transition-colors';
 
-export const PreRegistrationView: React.FC<PreRegistrationViewProps> = ({ registeredEmail, onRegister, onSignIn, onSignOut, onOpenLegal }) => {
+export const PreRegistrationView: React.FC<PreRegistrationViewProps> = ({ registeredEmail, onRegister, onSignOut, onOpenLegal }) => {
   const reduceMotion = useReducedMotion();
   const [status, setStatus] = useState<EarlyRegistrationStatus | null>(null);
 
@@ -59,17 +58,13 @@ export const PreRegistrationView: React.FC<PreRegistrationViewProps> = ({ regist
       <header className="sticky top-0 z-40 ios-material-bar ios-hairline-b">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           <BrandLogo className="h-10" eager />
-          {registeredEmail ? (
+          {registeredEmail && (
             <button
               onClick={onSignOut}
               className="h-11 px-4 rounded-full inline-flex items-center gap-2 text-[15px] font-medium text-ink-2 hover:text-ink hover:bg-shade/10 transition-colors"
             >
               <LogOut className="w-4 h-4" strokeWidth={2.2} />
               Sign out
-            </button>
-          ) : (
-            <button onClick={onSignIn} className="h-11 px-4 rounded-full text-[15px] font-medium text-ink-2 hover:text-ink hover:bg-shade/10 transition-colors">
-              Sign in
             </button>
           )}
         </div>

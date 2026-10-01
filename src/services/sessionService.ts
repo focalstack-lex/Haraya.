@@ -1,6 +1,7 @@
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../config/supabase';
 import type { PortalRole, Profile } from '../types/auth';
+import { GMAIL_ONLY_MESSAGE, isGmailAddress } from '../utils/gmailOnly';
 
 /**
  * The signed-in account: Supabase Auth session plus the caller's row in public.profiles (role, status,
@@ -205,12 +206,17 @@ function describeAuthError(message: string, fallback: string): string {
     return `Use a password of at least ${PASSWORD_MIN_LENGTH} characters.`;
   }
   if (text.includes('rate') || text.includes('too many')) return 'Too many attempts. Wait a minute and try again.';
+  // The database also refuses non-Gmail sign-ups (20261001010000), but the form checks first, so only a direct API
+  // call meets that refusal; Supabase words it as a generic database error, which is left to the fallback
+  if (text.includes('gmail')) return GMAIL_ONLY_MESSAGE;
+  // A sign-in link to an address with no account, where creating one is not allowed (not Gmail)
+  if (text.includes('signups not allowed for otp')) return `No account uses that email. ${GMAIL_ONLY_MESSAGE}`;
   if (
     text.includes('signups not allowed') ||
     text.includes('email signups are disabled') ||
     text.includes('email_provider_disabled')
   ) {
-    return 'Email sign-up is disabled in your Supabase project. Use Continue with Google above, or enable Email in Supabase Auth Providers.';
+    return 'Email sign-up is disabled in your Supabase project. Enable Email in Supabase Auth Providers.';
   }
   if (text.includes('same password') || text.includes('different from the old')) {
     return 'Choose a password you have not used before.';
@@ -377,6 +383,7 @@ export const sessionService = {
     if (!displayName) throw new Error('Add your name.');
     if (displayName.length > 80) throw new Error('Keep your name under 80 characters.');
     if (!EMAIL_PATTERN.test(trimmed)) throw new Error('Enter a valid email address.');
+    if (!isGmailAddress(trimmed)) throw new Error(GMAIL_ONLY_MESSAGE);
     if (password.length < PASSWORD_MIN_LENGTH) throw new Error(`Use a password of at least ${PASSWORD_MIN_LENGTH} characters.`);
     // Opening the confirmation link signs the visitor in and lands them here, not on Discover
     rememberReturnTab(returnTab);
@@ -459,9 +466,10 @@ export const sessionService = {
     const trimmed = email.trim().toLowerCase();
     if (!EMAIL_PATTERN.test(trimmed)) throw new Error('Enter a valid email address.');
     rememberReturnTab(returnTab);
+    // A link may sign in any existing account, but only a Gmail address may create one on first use
     const { error } = await supabase.auth.signInWithOtp({
       email: trimmed,
-      options: { emailRedirectTo: getAuthRedirectUrl(), shouldCreateUser: true },
+      options: { emailRedirectTo: getAuthRedirectUrl(), shouldCreateUser: isGmailAddress(trimmed) },
     });
     if (error) {
       console.warn('Haraya: sign-in link failed', error.message);

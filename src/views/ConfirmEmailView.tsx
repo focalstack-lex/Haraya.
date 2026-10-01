@@ -18,6 +18,8 @@ interface ConfirmEmailViewProps {
   email: string;
   /** Opens the sign-in form for someone who confirmed on another device. */
   onSignIn: () => void;
+  /** Label for that row; pre-registration has no sign-in, so it reads differently there. */
+  signInLabel?: string;
   /** Forgets this sign-up and opens the create-account form. Offered only for a mistyped address. */
   onChangeEmail: () => void;
 }
@@ -28,7 +30,7 @@ const RowIcon: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   </span>
 );
 
-export const ConfirmEmailView: React.FC<ConfirmEmailViewProps> = ({ email, onSignIn, onChangeEmail }) => {
+export const ConfirmEmailView: React.FC<ConfirmEmailViewProps> = ({ email, onSignIn, onChangeEmail, signInLabel = 'I confirmed it, sign me in' }) => {
   const inbox = inboxFor(email);
   // A mistyped domain (gmial.com) means the email went nowhere: say so, and only then offer to change the address
   const suggestion = suggestEmail(email);
@@ -84,7 +86,7 @@ export const ConfirmEmailView: React.FC<ConfirmEmailViewProps> = ({ email, onSig
               <RowIcon>
                 <LogIn className="w-4 h-4" strokeWidth={2.2} />
               </RowIcon>
-              <span className="flex-1 text-[15px]">I confirmed it, sign me in</span>
+              <span className="flex-1 text-[15px]">{signInLabel}</span>
               <ChevronRight className="w-4 h-4 shrink-0 text-ink-3/60" strokeWidth={2.5} />
             </button>
             {suggestion && (

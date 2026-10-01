@@ -3,7 +3,6 @@ import { KeyRound, LogOut, Mail, Store } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { LargeTitle } from '../components/common/LargeTitle';
 import { AyaMascot } from '../components/common/AyaMascot';
-import { GoogleIcon } from '../components/common/CustomIcons';
 import { ErrorNote, Field, PrimaryButton, SecondaryButton, TextInput } from '../components/common/FormControls';
 import { PASSWORD_MIN_LENGTH, sessionService } from '../services/sessionService';
 import { useSessionVersion } from '../hooks/useServiceVersions';
@@ -16,6 +15,8 @@ interface LoginViewProps {
   initialMode: LoginMode;
   onSignedIn: () => void;
   onBrowse: () => void;
+  /** Pre-registration: create account only, no sign-in, password-link or browse options. A reset link still works. */
+  signUpOnly?: boolean;
 }
 
 const CARD = 'rounded-card bg-surface ios-card-shadow p-4 sm:p-5';
@@ -60,9 +61,11 @@ const TermsNote: React.FC = () => (
 );
 
 /** Account entry for everyone: email and password, or a one-time link; password reset; new password. */
-export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, onBrowse }) => {
+export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, onBrowse, signUpOnly = false }) => {
   useSessionVersion();
-  const [mode, setMode] = useState<LoginMode>(initialMode);
+  // Sign-up only keeps a reset link working, and nothing else but the create-account form
+  const startMode = signUpOnly && initialMode !== 'reset' ? 'signup' : initialMode;
+  const [mode, setMode] = useState<LoginMode>(startMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -75,8 +78,8 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
   const recovering = sessionService.isRecovering();
 
   useEffect(() => {
-    setMode(initialMode);
-  }, [initialMode]);
+    setMode(startMode);
+  }, [startMode]);
 
   // A reset link that lands after the page loaded also switches to the new-password form
   useEffect(() => {
@@ -109,11 +112,6 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
       onSignedIn();
     }, 'Could not sign in.');
 
-  const signInWithGoogle = () =>
-    run(async () => {
-      await sessionService.signInWithGoogle('profile');
-    }, 'Could not start Google sign in.');
-
   const signUp = () =>
     run(async () => {
       const trimmedName = name.trim();
@@ -126,7 +124,16 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
       if (password !== confirmPassword) {
         throw new Error('Passwords do not match.');
       }
-      const { needsConfirmation } = await sessionService.signUpWithPassword(email, password, trimmedName);
+      let needsConfirmation: boolean;
+      try {
+        ({ needsConfirmation } = await sessionService.signUpWithPassword(email, password, trimmedName));
+      } catch (cause) {
+        // Sign-in is not offered during pre-registration, so do not send them looking for it
+        if (signUpOnly && cause instanceof Error && /already has an account/i.test(cause.message)) {
+          throw new Error('That email is already pre-registered.');
+        }
+        throw cause;
+      }
       // Waiting on the confirmation link: the session service marks it and the app shows ConfirmEmailView
       if (needsConfirmation) return;
       onSignedIn();
@@ -194,12 +201,13 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
     { id: 'signup', label: 'Create account' },
   ];
   const showSegments = mode === 'signin' || mode === 'signup';
+  const showModeSwitch = showSegments && !signUpOnly;
 
   return (
     <div className="max-w-md mx-auto px-4 pt-1 pb-8 sm:pt-4 space-y-5">
       <LargeTitle title={heading.title} subtitle={heading.subtitle} />
 
-      {showSegments && (
+      {showModeSwitch && (
         <div className="flex p-0.5 rounded-control ios-fill" role="tablist" aria-label="Account">
           {modes.map((entry) => {
             const active = mode === entry.id;
@@ -243,29 +251,6 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
             else void savePassword();
           }}
         >
-          {showSegments && (
-            <div className="space-y-3 pb-1">
-              <button
-                type="button"
-                onClick={() => void signInWithGoogle()}
-                disabled={busy}
-                className="w-full h-11 px-4 rounded-row bg-surface hover:bg-[#F5EFE6] border border-[#E6DEC9] text-ink text-[15px] font-semibold font-sans flex items-center justify-center gap-3 shadow-[0_1px_2px_rgba(19,25,31,0.05)] ios-press transition-colors disabled:opacity-50"
-              >
-                <GoogleIcon className="w-5 h-5 shrink-0" />
-                <span>Continue with Google</span>
-              </button>
-
-              <div className="relative flex items-center justify-center pt-1 pb-0.5">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-[#E6DEC9]" />
-                </div>
-                <span className="relative bg-surface px-2.5 text-[12px] font-medium text-[#7D7060]">
-                  or with email
-                </span>
-              </div>
-            </div>
-          )}
-
           {mode === 'signup' && (
             <Field label="Your name">
               <TextInput value={name} onChange={setName} placeholder="How Haraya greets you" />
@@ -273,8 +258,8 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
           )}
 
           {mode !== 'reset' && (
-            <Field label="Email">
-              <TextInput value={email} onChange={setEmail} type="email" placeholder="you@email.com" />
+            <Field label="Email" hint={mode === 'signup' ? 'Gmail only: new accounts need an address ending in @gmail.com.' : undefined}>
+              <TextInput value={email} onChange={setEmail} type="email" placeholder={mode === 'signup' ? 'you@gmail.com' : 'you@email.com'} />
             </Field>
           )}
 
@@ -346,13 +331,15 @@ export const LoginView: React.FC<LoginViewProps> = ({ initialMode, onSignedIn, o
         </form>
       )}
 
-      <button
-        onClick={onBrowse}
-        className="h-11 flex items-center justify-center gap-1.5 mx-auto px-3 text-[15px] font-medium font-sans text-tint-ink ios-press"
-      >
-        <Store className="w-4 h-4" />
-        Keep browsing
-      </button>
+      {!signUpOnly && (
+        <button
+          onClick={onBrowse}
+          className="h-11 flex items-center justify-center gap-1.5 mx-auto px-3 text-[15px] font-medium font-sans text-tint-ink ios-press"
+        >
+          <Store className="w-4 h-4" />
+          Keep browsing
+        </button>
+      )}
     </div>
   );
 };

@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-10-01 : commit d7d18cf : fingerprint 651c2c26ddaa5760
+Generated 2026-10-01 : commit 14d6507 : fingerprint 6f1416da7cc3c8c0
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -62,7 +62,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `scripts/generate-code-map.mjs` (215 lines) : One-line purpose per file, inferred from its path and leading doc comment.
 - `scripts/make-email-logo.mjs` (30 lines) : Builds public/brand/haraya-email-logo.png: the wordmark on its own linen tile with rounded corners.
 - `scripts/verify-google-auth.mjs` (109 lines) : scripts module: verify-google-auth
-- `src/App.tsx` (938 lines) : Older links: the roaster portal is now the Place Portal. The Passport tab also answers to its own name.
+- `src/App.tsx` (950 lines) : Older links: the roaster portal is now the Place Portal. The Passport tab also answers to its own name.
   - L84 : SharedList
   - L110 : App
 - `src/index.css` (747 lines) : src entry point
@@ -390,22 +390,22 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L21 : AddSpotViewProps
   - L305 : AddSpotView
 - `src/views/CommunityView.tsx` (74 lines) : Cup Check community feed: one-to-three column masonry of today's brews.
-- `src/views/ConfirmEmailView.tsx` (105 lines) : The only screen an unconfirmed sign-up sees: it replaces the whole app (every tab, the portal included) until
+- `src/views/ConfirmEmailView.tsx` (107 lines) : The only screen an unconfirmed sign-up sees: it replaces the whole app (every tab, the portal included) until
 - `src/views/LandingView.tsx` (339 lines) : Landing page shown at the bare URL (see `isLandingEntry` in utils/router.ts). It showcases the app with real
   - L14 : LandingViewProps
   - L28 : Phone
   - L106 : LandingView
 - `src/views/LegalView.tsx` (234 lines) : Privacy Notice and Terms. Statements of fact describe what the code does today; anything that needs a
-- `src/views/LoginView.tsx` (359 lines) : What the page is doing: the two account modes, the two email-link flows, and the new-password form.
+- `src/views/LoginView.tsx` (375 lines) : What the page is doing: the two account modes, the two email-link flows, and the new-password form.
   - L12 : LoginMode
   - L14 : LoginViewProps
-  - L63 : LoginView
+  - L65 : LoginView
 - `src/views/PlacePortalView.tsx` (826 lines) : What the portal offers, for visitors who are not signed in or have not applied.
   - L28 : PlacePortalViewProps
   - L488 : ListingEditorProps
   - L497 : ListingEditor
   - L729 : PlacePortalView
-- `src/views/PreRegistrationView.tsx` (165 lines) : The soft-launch page: while PRE_REGISTRATION is on it replaces the landing page and every tab for everyone but
+- `src/views/PreRegistrationView.tsx` (160 lines) : The soft-launch page: while PRE_REGISTRATION is on it replaces the landing page and every tab for everyone but
 - `src/views/ProfileView.tsx` (755 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
   - L28 : ProfileSection
   - L30 : ProfileViewProps

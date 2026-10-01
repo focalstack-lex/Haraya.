@@ -679,9 +679,17 @@ export const App: React.FC = () => {
       <ConfirmEmailView
         email={pendingConfirmation.email}
         onSignIn={() => {
+          // Pre-registration has no sign-in: a sign-up confirmed on another device is already counted, so this
+          // device just lets go of the pending state
+          if (PRE_REGISTRATION) {
+            sessionService.cancelPendingConfirmation();
+            setActiveTab('feed');
+            return;
+          }
           setGateBypassAt(pendingConfirmation.at);
           openLogin('profile');
         }}
+        signInLabel={PRE_REGISTRATION ? 'I already confirmed it' : undefined}
         onChangeEmail={() => {
           sessionService.cancelPendingConfirmation();
           setLoginIntent({ mode: 'signup', returnTab: 'profile' });
@@ -692,10 +700,14 @@ export const App: React.FC = () => {
   }
 
   // Soft launch: everyone but admins sees pre-registration in place of the landing page and every tab. Only the
-  // sign-in page (to register) and the legal pages it links to open, inside a bare shell with no app navigation.
+  // create-account page and the legal pages it links to open, inside a bare shell with no app navigation. Sign-in
+  // is not offered anywhere; the one way in is the unlinked Control Room address (#/tab/admin), which shows the
+  // full sign-in form to a signed-out visitor. Anyone but an admin who signs in there still lands here.
   if (PRE_REGISTRATION && !sessionService.isAdmin()) {
     const backToPreRegistration = () => setActiveTab('feed');
-    if (activeTab === LOGIN_TAB_ID || activeTab === 'privacy' || activeTab === 'terms') {
+    const user = sessionService.getUser();
+    const adminEntrance = activeTab === ADMIN_TAB_ID && !user;
+    if (activeTab === LOGIN_TAB_ID || adminEntrance || activeTab === 'privacy' || activeTab === 'terms') {
       return (
         <div className="min-h-screen flex flex-col bg-canvas text-ink font-sans">
           <header className="sticky top-0 z-40 ios-material-bar ios-hairline-b">
@@ -708,8 +720,10 @@ export const App: React.FC = () => {
           </header>
           <main className="flex-1 pb-16">
             <Suspense fallback={<PageLoading />}>
-              {activeTab === LOGIN_TAB_ID ? (
-                <LoginView initialMode={loginIntent.mode} onSignedIn={backToPreRegistration} onBrowse={backToPreRegistration} />
+              {adminEntrance ? (
+                <LoginView initialMode="signin" onSignedIn={() => setActiveTab(ADMIN_TAB_ID)} onBrowse={backToPreRegistration} />
+              ) : activeTab === LOGIN_TAB_ID ? (
+                <LoginView initialMode={loginIntent.mode} onSignedIn={backToPreRegistration} onBrowse={backToPreRegistration} signUpOnly />
               ) : (
                 <LegalView page={activeTab as 'privacy' | 'terms'} />
               )}
@@ -718,7 +732,6 @@ export const App: React.FC = () => {
         </div>
       );
     }
-    const user = sessionService.getUser();
     return (
       <PreRegistrationView
         registeredEmail={user ? (user.email ?? sessionService.getDisplayName()) : null}
@@ -726,7 +739,6 @@ export const App: React.FC = () => {
           setLoginIntent({ mode: 'signup', returnTab: 'feed' });
           setActiveTab(LOGIN_TAB_ID);
         }}
-        onSignIn={() => openLogin('feed')}
         onSignOut={() => void sessionService.signOut()}
         onOpenLegal={setActiveTab}
       />
