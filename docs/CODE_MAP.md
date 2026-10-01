@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-10-01 : commit 14d6507 : fingerprint 6f1416da7cc3c8c0
+Generated 2026-10-01 : commit 35bd233 : fingerprint 27a5c64a49348c67
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -317,24 +317,24 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/services/reviewService.ts` (115 lines) : Public reviews of a spot (table spot_reviews, 20260930020000): a star rating with optional words, one per
 - `src/services/roasterService.ts` (115 lines) : Roaster-facing facade over the catalog: everything an approved roaster or
 - `src/services/sessionService.test.ts` (35 lines) : src/services module: sessionService.test
-- `src/services/sessionService.ts` (582 lines) : The signed-in account: Supabase Auth session plus the caller's row in public.profiles (role, status,
-  - L14 : RESET_RETURN_TAB
-  - L37 : PASSWORD_MIN_LENGTH
-  - L40 : PendingConfirmation
-  - L50 : loadPendingConfirmation
-  - L74 : notify
-  - L79 : setPendingConfirmation
-  - L88 : clearPendingConfirmation
-  - L102 : rememberReturnTab
-  - L111 : readReturnTab
-  - L133 : getAuthRedirectUrl
-  - L175 : ConfirmationLinkType
-  - L177 : isConfirmationLinkType
-  - L182 : cleanAuthParams
-  - L197 : describeAuthError
-  - L222 : loadProfile
-  - L244 : setUser
-  - L252 : sessionService
+- `src/services/sessionService.ts` (590 lines) : The signed-in account: Supabase Auth session plus the caller's row in public.profiles (role, status,
+  - L15 : RESET_RETURN_TAB
+  - L38 : PASSWORD_MIN_LENGTH
+  - L41 : PendingConfirmation
+  - L51 : loadPendingConfirmation
+  - L75 : notify
+  - L80 : setPendingConfirmation
+  - L89 : clearPendingConfirmation
+  - L103 : rememberReturnTab
+  - L112 : readReturnTab
+  - L134 : getAuthRedirectUrl
+  - L176 : ConfirmationLinkType
+  - L178 : isConfirmationLinkType
+  - L183 : cleanAuthParams
+  - L198 : describeAuthError
+  - L228 : loadProfile
+  - L250 : setUser
+  - L258 : sessionService
 - `src/services/spotMapping.test.ts` (116 lines) : src/services module: spotMapping.test
 - `src/services/spotMapping.ts` (178 lines) : Community spot submissions: the row shape stored in Supabase (spot_submissions), the form input, the
 - `src/services/spotService.ts` (172 lines) : Add a Spot backed by Supabase (table spot_submissions). Row Level Security decides what each caller can
@@ -379,6 +379,8 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/utils/emailTypos.ts` (38 lines) : Spots an address whose domain is a near miss of a popular mail provider (gmial.com, gmail.con, hotmial.com).
 - `src/utils/geo.test.ts` (53 lines) : Meters per degree of latitude on the 6,371 km sphere.
 - `src/utils/geo.ts` (74 lines) : Distance and directions helpers for the coffee map and trails.
+- `src/utils/gmailOnly.test.ts` (23 lines) : src/utils module: gmailOnly.test
+- `src/utils/gmailOnly.ts` (15 lines) : New accounts are Gmail only. The form checks it so the visitor hears it before anything is sent, and the database
 - `src/utils/inbox.test.ts` (21 lines) : src/utils module: inbox.test
 - `src/utils/inbox.ts` (25 lines) : Where a visitor reads their mail, from the address they signed up with. Only providers with a stable web
 - `src/utils/router.ts` (90 lines) : Hash routes so cafes, beans, roasteries, drops, and shared lists have shareable
@@ -396,10 +398,10 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L28 : Phone
   - L106 : LandingView
 - `src/views/LegalView.tsx` (234 lines) : Privacy Notice and Terms. Statements of fact describe what the code does today; anything that needs a
-- `src/views/LoginView.tsx` (375 lines) : What the page is doing: the two account modes, the two email-link flows, and the new-password form.
-  - L12 : LoginMode
-  - L14 : LoginViewProps
-  - L65 : LoginView
+- `src/views/LoginView.tsx` (346 lines) : What the page is doing: the two account modes, the two email-link flows, and the new-password form.
+  - L11 : LoginMode
+  - L13 : LoginViewProps
+  - L64 : LoginView
 - `src/views/PlacePortalView.tsx` (826 lines) : What the portal offers, for visitors who are not signed in or have not applied.
   - L28 : PlacePortalViewProps
   - L488 : ListingEditorProps
