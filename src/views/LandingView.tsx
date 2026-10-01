@@ -25,7 +25,7 @@ const SCREEN = { width: 750, height: 1624 };
  * a 147x293 outline): 5-unit stroke, 19-unit corners, a 41x11 Dynamic Island 13 units from the top. The source is
  * too small to scale up as a bitmap, so it is redrawn as SVG in the same units and stays sharp at any size.
  */
-const Phone: React.FC<{ src: string; alt: string; className?: string; eager?: boolean }> = ({ src, alt, className = '', eager = false }) => (
+export const Phone: React.FC<{ src: string; alt: string; className?: string; eager?: boolean }> = ({ src, alt, className = '', eager = false }) => (
   <div className={`relative aspect-[147/293] drop-shadow-[0_24px_28px_rgba(19,25,31,0.22)] ${className}`}>
     {/* Screen: inset to the stroke's inner edge, with the matching inner corner radius */}
     <div className="absolute inset-[1.7%_3.4%] overflow-hidden rounded-[10%/5%] bg-canvas">

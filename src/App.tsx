@@ -24,6 +24,9 @@ import { RateCafeModal } from './components/cafe/RateCafeModal';
 import { WelcomeModal } from './components/common/WelcomeModal';
 import { AccountSetupModal } from './components/common/AccountSetupModal';
 import { LandingView } from './views/LandingView';
+import { PreRegistrationView } from './views/PreRegistrationView';
+import { BrandLogo } from './components/common/BrandLogo';
+import { PRE_REGISTRATION } from './config/launch';
 import { ConfirmEmailView } from './views/ConfirmEmailView';
 import { LargeTitle, CityMenu } from './components/common/LargeTitle';
 import { GuidedTour } from './components/tour/GuidedTour';
@@ -684,6 +687,48 @@ export const App: React.FC = () => {
           setLoginIntent({ mode: 'signup', returnTab: 'profile' });
           setActiveTab(LOGIN_TAB_ID);
         }}
+      />
+    );
+  }
+
+  // Soft launch: everyone but admins sees pre-registration in place of the landing page and every tab. Only the
+  // sign-in page (to register) and the legal pages it links to open, inside a bare shell with no app navigation.
+  if (PRE_REGISTRATION && !sessionService.isAdmin()) {
+    const backToPreRegistration = () => setActiveTab('feed');
+    if (activeTab === LOGIN_TAB_ID || activeTab === 'privacy' || activeTab === 'terms') {
+      return (
+        <div className="min-h-screen flex flex-col bg-canvas text-ink font-sans">
+          <header className="sticky top-0 z-40 ios-material-bar ios-hairline-b">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+              <BrandLogo className="h-10" eager />
+              <button onClick={backToPreRegistration} className="h-11 px-4 rounded-full text-[15px] font-medium text-ink-2 hover:text-ink hover:bg-shade/10 transition-colors">
+                Back
+              </button>
+            </div>
+          </header>
+          <main className="flex-1 pb-16">
+            <Suspense fallback={<PageLoading />}>
+              {activeTab === LOGIN_TAB_ID ? (
+                <LoginView initialMode={loginIntent.mode} onSignedIn={backToPreRegistration} onBrowse={backToPreRegistration} />
+              ) : (
+                <LegalView page={activeTab as 'privacy' | 'terms'} />
+              )}
+            </Suspense>
+          </main>
+        </div>
+      );
+    }
+    const user = sessionService.getUser();
+    return (
+      <PreRegistrationView
+        registeredEmail={user ? (user.email ?? sessionService.getDisplayName()) : null}
+        onRegister={() => {
+          setLoginIntent({ mode: 'signup', returnTab: 'feed' });
+          setActiveTab(LOGIN_TAB_ID);
+        }}
+        onSignIn={() => openLogin('feed')}
+        onSignOut={() => void sessionService.signOut()}
+        onOpenLegal={setActiveTab}
       />
     );
   }

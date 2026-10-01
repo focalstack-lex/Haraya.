@@ -1,22 +1,70 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-09-30 : commit 6949fbe : fingerprint 90a2bf4b3cc23cf0
+Generated 2026-10-01 : commit d7d18cf : fingerprint 651c2c26ddaa5760
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
 
 All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, and Cup Check posts.
 
+## promo-video/scripts/
+
+- `promo-video/scripts/capture-screens.mjs` (142 lines) : Captures the phone screens the video shows, from the running app, into public/screens/.
+- `promo-video/scripts/check-timeline.ts` (60 lines) : promo-video/scripts module: check-timeline
+- `promo-video/scripts/cue-sheet.ts` (93 lines) : Writes the SFX cue sheet for the editor: out/SFX_CUES.md (to read) and out/SFX_CUES.csv (to import or sort).
+- `promo-video/scripts/stills.mjs` (40 lines) : Renders review stills of HarayaPromo from one bundle: out/stills/<frame>.jpg for every frame given.
+
+## promo-video/src/
+
+- `promo-video/src/fonts.ts` (11 lines) : Plus Jakarta Sans, the face the app falls back to off Apple devices (`--font-ui` in the app's index.css).
+- `promo-video/src/index.ts` (5 lines) : promo-video/src entry point
+- `promo-video/src/Root.tsx` (9 lines) : promo-video/src module: Root
+- `promo-video/src/theme.ts` (49 lines) : Haraya's tokens, copied from the app's `src/index.css` @theme block, plus Aya's master palette
+- `promo-video/src/timeline.ts` (220 lines) : The one source of timing for the video. Scenes animate from these beats and the SFX cue sheet is generated from
+- `promo-video/src/Video.tsx` (58 lines) : The first frames come up out of black, like a cut from the edit before.
+
+## promo-video/src/components/
+
+- `promo-video/src/components/Aya.tsx` (48 lines) : Aya from the app's own component, so the video always shows the real character. The app animates her idle
+- `promo-video/src/components/Backdrop.tsx` (132 lines) : A fine static grain tile. It breaks up the banding a soft gradient gets in H.264.
+- `promo-video/src/components/CafeIllustration.tsx` (58 lines) : A flat drawing of a cafe corner for the owner demo's "Your Cafe" listing. It stands in for the photo an owner
+- `promo-video/src/components/Cursor.tsx` (117 lines) : Fingertip position at a frame: rests on a key, glides between consecutive keys.
+- `promo-video/src/components/Logo.tsx` (42 lines) : The brand logo image, never retyped, as `BrandLogo` in the app. A light band can sweep across it, masked to the
+- `promo-video/src/components/Phone.tsx` (81 lines) : Captures are 390 by 844 app pixels (public/screens, written by scripts/capture-screens.mjs).
+- `promo-video/src/components/Ripples.tsx` (49 lines) : Concentric rounded rings spreading from a pill, the reference's "10x better" backdrop, in the stage's own tones.
+- `promo-video/src/components/Typewriter.tsx` (67 lines) : Characters appear one by one with a caret. The untyped rest is laid out but transparent, so centered text
+- `promo-video/src/components/ui.tsx` (167 lines) : Puts children with their center at (x, y) in video pixels, scaled and rotated about that center. Recreated app
+- `promo-video/src/components/Words.tsx` (118 lines) : "*word*" gets the keyword fill, "~word~" is set light. Markers can span several words:
+
+## promo-video/src/lib/
+
+- `promo-video/src/lib/motion.ts` (24 lines) : The app's --ios-ease: sheets, bars and segmented thumbs.
+
+## promo-video/src/scenes/
+
+- `promo-video/src/scenes/Community.tsx` (106 lines) : Where the new spot lands on the map card, in card pixels.
+- `promo-video/src/scenes/EndCard.tsx` (80 lines) : Open Haraya and the web address share one centered row; the button is about 364 wide, the address 250.
+- `promo-video/src/scenes/Focus.tsx` (195 lines) : The check-in sheet is built at app pixels (390 wide) and scaled, anchored at its top left.
+- `promo-video/src/scenes/Hook.tsx` (59 lines) : What a visitor actually picks a cafe for, from the landing page: a free plug, a quiet table, a door still open.
+- `promo-video/src/scenes/Mood.tsx` (159 lines) : The mood finder's own lists (src/components/moodFinder/moods.ts).
+- `promo-video/src/scenes/Owners.tsx` (248 lines) : The owner editor, built at app pixels (390 wide) and scaled; anchored by its center.
+- `promo-video/src/scenes/Passport.tsx` (133 lines) : The ten listed Digos spots, stamped one first, as the Passport tab orders them (the capture shows this order).
+- `promo-video/src/scenes/PromiseScene.tsx` (184 lines) : The landing page's band: what Haraya filters for (LandingView BAND_ITEMS).
+- `promo-video/src/scenes/Reveal.tsx` (58 lines) : 0:07 A caret types "Introducing", the linen iris opens, the logo comes into focus and Aya waves.
+- `promo-video/src/scenes/Walk.tsx` (195 lines) : The map plane, in its own pixels. It is tilted back like a navigation view.
+
 ## root/
 
 - `index.html` (30 lines) : . module: index.html
+- `promo-video/remotion.config.ts` (8 lines) : promo-video module: remotion.config
+- `promo-video/webpack-override.ts` (28 lines) : Shared by remotion.config.ts (studio and render) and scripts/stills.mjs (review stills), so every bundle
 - `scripts/generate-cafes-seed.mjs` (60 lines) : Writes the SQL that stores the catalog spots in the database: Green Coffee and the Digos City shops, with their
 - `scripts/generate-code-map.mjs` (215 lines) : One-line purpose per file, inferred from its path and leading doc comment.
 - `scripts/make-email-logo.mjs` (30 lines) : Builds public/brand/haraya-email-logo.png: the wordmark on its own linen tile with rounded corners.
 - `scripts/verify-google-auth.mjs` (109 lines) : scripts module: verify-google-auth
-- `src/App.tsx` (893 lines) : Older links: the roaster portal is now the Place Portal. The Passport tab also answers to its own name.
-  - L81 : SharedList
-  - L107 : App
+- `src/App.tsx` (938 lines) : Older links: the roaster portal is now the Place Portal. The Passport tab also answers to its own name.
+  - L84 : SharedList
+  - L110 : App
 - `src/index.css` (747 lines) : src entry point
 - `src/main.tsx` (47 lines) : src entry point
 - `vite.config.ts` (43 lines) : . module: vite.config
@@ -192,6 +240,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 ## src/config/
 
 - `src/config/ecosystem.ts` (14 lines) : Sister ecosystem bridge between Haraya (coffee) and Habi (fashion).
+- `src/config/launch.ts` (10 lines) : Launch phase. During the soft launch the app is closed: visitors see the pre-registration page and can create an
 - `src/config/supabase.ts` (19 lines) : Haraya Supabase Client.
 
 ## src/data/
@@ -223,6 +272,8 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L86 : deriveStatus
   - L91 : catalogService
 - `src/services/communityService.ts` (154 lines) : Cup Check community layer: browser-created posts, likes, and comments. Likes are stored per browser (no accounts needed to
+- `src/services/earlyRegistrationService.test.ts` (21 lines) : src/services module: earlyRegistrationService.test
+- `src/services/earlyRegistrationService.ts` (36 lines) : The soft-launch promo count (20261001000000_early_registration_promo.sql): how many of the early slots are
 - `src/services/moderationService.ts` (280 lines) : Reports from visitors and the Control Room's moderation data: the report queue, recent check-ins,
 - `src/services/notificationService.ts` (99 lines) : In-app notifications (table notifications, 20260930020000): written by database triggers when a spot or
 - `src/services/placeImport.test.ts` (76 lines) : src/services module: placeImport.test
@@ -342,6 +393,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/views/ConfirmEmailView.tsx` (105 lines) : The only screen an unconfirmed sign-up sees: it replaces the whole app (every tab, the portal included) until
 - `src/views/LandingView.tsx` (339 lines) : Landing page shown at the bare URL (see `isLandingEntry` in utils/router.ts). It showcases the app with real
   - L14 : LandingViewProps
+  - L28 : Phone
   - L106 : LandingView
 - `src/views/LegalView.tsx` (234 lines) : Privacy Notice and Terms. Statements of fact describe what the code does today; anything that needs a
 - `src/views/LoginView.tsx` (359 lines) : What the page is doing: the two account modes, the two email-link flows, and the new-password form.
@@ -353,6 +405,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L488 : ListingEditorProps
   - L497 : ListingEditor
   - L729 : PlacePortalView
+- `src/views/PreRegistrationView.tsx` (165 lines) : The soft-launch page: while PRE_REGISTRATION is on it replaces the landing page and every tab for everyone but
 - `src/views/ProfileView.tsx` (755 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
   - L28 : ProfileSection
   - L30 : ProfileViewProps

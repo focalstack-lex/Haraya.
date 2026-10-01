@@ -90,6 +90,14 @@ migration is applied the app keeps working as before and these tools say they ar
 `.github/workflows/ci.yml` runs lint, the code map check, tests, the dependency audit and the build on every push
 and pull request.
 
+## Soft launch (pre-registration)
+
+Until launch the app is closed: every visitor except admins sees the pre-registration page
+(`src/views/PreRegistrationView.tsx`), can create an account, and sees the early coffee offer for the first 20
+confirmed accounts. The order comes from `early_registration_status()` in
+`supabase/migrations/20261001000000_early_registration_promo.sql`. To open the app, set `VITE_LAUNCH_MODE=open`
+in the Vercel environment and redeploy.
+
 ## Ecosystem bridge
 
 The header switcher links between Haraya (coffee) and Habi (fashion). The Habi target URL is
