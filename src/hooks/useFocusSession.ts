@@ -1,6 +1,7 @@
 import { useEffect, useRef, useSyncExternalStore } from 'react';
 import type { Cafe } from '../types/coffee';
 import { calculateDistanceMeters, SESSION_EXIT_RADIUS_M, type GeoPoint } from '../utils/geo';
+import { PRECISE_M } from '../utils/locationQuality';
 import { visitService } from '../services/visitService';
 import { formatDuration, VISIT_LIMITS } from '../services/visitMapping';
 
@@ -9,7 +10,8 @@ import { formatDuration, VISIT_LIMITS } from '../services/visitMapping';
  * closing the browser does not lose it, and a module store so the floating banner, the check-in sheet and the
  * end sheet all see the same session. useFocusBoundaryWatch follows the GPS while a session runs and saves it
  * by itself once the device has left the venue (two fixes in a row beyond 150 m, so one jittery fix is not
- * enough). Positions are compared in memory only; nothing but the check-in fix is ever stored.
+ * enough, and only fixes accurate to a street: indoors a phone falls back to Wi-Fi or a cell tower, and a fix
+ * hundreds of metres wide says nothing about whether the visitor left). Positions are compared in memory only; nothing but the check-in fix is ever stored.
  */
 
 const KEY = 'haraya_active_focus';
@@ -74,9 +76,13 @@ export function formatClock(totalSeconds: number): string {
   return [h, m, s].map((part) => String(part).padStart(2, '0')).join(':');
 }
 
-/** Fixes in a row beyond the exit radius; any fix back inside resets the count. */
-export function nextOutsideCount(previous: number, distanceMeters: number): number {
-  return distanceMeters > SESSION_EXIT_RADIUS_M ? previous + 1 : 0;
+/**
+ * Fixes in a row beyond the exit radius; any fix back inside resets the count. A fix outside but wider than
+ * PRECISE_M neither counts nor resets: it cannot tell a visitor who left from one sitting by a wall.
+ */
+export function nextOutsideCount(previous: number, distanceMeters: number, accuracyMeters = 0): number {
+  if (distanceMeters <= SESSION_EXIT_RADIUS_M) return 0;
+  return accuracyMeters <= PRECISE_M ? previous + 1 : previous;
 }
 
 // Store ----------------------------------------------------------------------------------------------------
@@ -218,7 +224,7 @@ export function useFocusBoundaryWatch(onOutcome: (outcome: AutoSaveOutcome) => v
       (position) => {
         if (finished) return;
         const distance = calculateDistanceMeters(position.coords.latitude, position.coords.longitude, cafeLat, cafeLng);
-        outside = nextOutsideCount(outside, distance);
+        outside = nextOutsideCount(outside, distance, position.coords.accuracy);
         if (outside >= EXIT_FIXES) void finish();
       },
       (error) => {

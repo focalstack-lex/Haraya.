@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-10-01 : commit a29b792 : fingerprint 28b5f8fdcb869ff6
+Generated 2026-10-01 : commit acbefa8 : fingerprint 2cefd18521444b8c
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -62,10 +62,10 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `scripts/generate-code-map.mjs` (215 lines) : One-line purpose per file, inferred from its path and leading doc comment.
 - `scripts/make-email-logo.mjs` (30 lines) : Builds public/brand/haraya-email-logo.png: the wordmark on its own linen tile with rounded corners.
 - `scripts/verify-google-auth.mjs` (109 lines) : scripts module: verify-google-auth
-- `src/App.tsx` (962 lines) : Older links: the roaster portal is now the Place Portal. The Passport tab also answers to its own name.
+- `src/App.tsx` (964 lines) : Older links: the roaster portal is now the Place Portal. The Passport tab also answers to its own name.
   - L84 : SharedList
   - L110 : App
-- `src/index.css` (747 lines) : src entry point
+- `src/index.css` (763 lines) : src entry point
 - `src/main.tsx` (47 lines) : src entry point
 - `vite.config.ts` (43 lines) : . module: vite.config
 
@@ -116,9 +116,9 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/components/common/FormControls.tsx` (272 lines) : Shared form primitives for Haraya: an iOS-style sheet (bottom sheet with a
 - `src/components/common/ImageUploadField.tsx` (83 lines) : File input that stores the image as a dataURL with type and size validation.
 - `src/components/common/LargeTitle.tsx` (46 lines) : iOS large title: the first thing on every primary page, left aligned.
-- `src/components/common/locationFix.test.ts` (37 lines) : src/components/common module: locationFix.test
-- `src/components/common/locationFix.ts` (46 lines) : Which set of steps fits the visitor's device.
-- `src/components/common/LocationHelp.tsx` (34 lines) : Why Haraya cannot see the visitor's location, with the steps for their device to turn it on.
+- `src/components/common/locationFix.test.ts` (51 lines) : src/components/common module: locationFix.test
+- `src/components/common/locationFix.ts` (73 lines) : Which set of steps fits the visitor's device.
+- `src/components/common/LocationHelp.tsx` (43 lines) : Why Haraya cannot see the visitor's location (or sees it only roughly), with the steps for their device to fix it.
 - `src/components/common/sheetStyles.ts` (8 lines) : Class strings shared by sheets, so every grouped list and section label inside a sheet matches.
 - `src/components/common/WelcomeModal.tsx` (160 lines) : What the app does, stated plainly: one row per real surface.
 
@@ -127,7 +127,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/components/community/CommentsSheet.tsx` (75 lines) : Comments for a cup post; seed posts are read-only, browser posts are live.
 - `src/components/community/CupCheckCard.tsx` (114 lines) : Community cup post: photo with floating tasting-tag pins, brew method, likes.
 - `src/components/community/FlavorPinPlacer.tsx` (132 lines) : Tap the uploaded photo to drop tasting-tag pins, then name each pin. Pins
-- `src/components/community/LocationPicker.tsx` (113 lines) : Pin placement for Add a Spot: tap the map, or use the device location. The location is read once on
+- `src/components/community/LocationPicker.tsx` (149 lines) : Pin placement for Add a Spot: tap the map, or use the device location. The location is read on tap and only
 - `src/components/community/NewPostSheet.tsx` (143 lines) : Compose a Cup Check: photo, caption, cafe tag, brew method, and flavor pins.
 
 ## src/components/drops/
@@ -172,10 +172,10 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/map/
 
-- `src/components/map/DavaoCoffeeMap.tsx` (989 lines) : Floating map control: a round bar-material button inside a 44px hit area.
-  - L58 : RowHandlers
-  - L131 : DavaoCoffeeMapProps
-  - L149 : DavaoCoffeeMap
+- `src/components/map/DavaoCoffeeMap.tsx` (1066 lines) : A fix that moved less than this since the view was last framed (GPS tightening in place) keeps the view.
+  - L62 : RowHandlers
+  - L138 : DavaoCoffeeMapProps
+  - L156 : DavaoCoffeeMap
 - `src/components/map/DirectionsActionSheet.tsx` (58 lines) : External map apps. Apple Maps uses its https form so the link also works outside Apple devices.
 - `src/components/map/liveNavMath.test.ts` (71 lines) : src/components/map module: liveNavMath.test
 - `src/components/map/liveNavMath.ts` (63 lines) : Pure math for in-app walking navigation. These straight-line figures are the fallback when no street route
@@ -184,16 +184,18 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/components/map/mapPins.test.ts` (72 lines) : src/components/map module: mapPins.test
 - `src/components/map/mapPins.ts` (95 lines) : Whether a spot is open right now, for the list and the preview card.
 - `src/components/map/MapPreviewCard.tsx` (123 lines) : Inside the last hour the card counts down, so a visitor does not walk to a door that is about to shut.
-- `src/components/map/nearby.test.ts` (31 lines) : src/components/map module: nearby.test
-- `src/components/map/nearby.ts` (21 lines) : Spots this close to the visitor show up on their own when the map opens.
+- `src/components/map/nearby.test.ts` (78 lines) : src/components/map module: nearby.test
+- `src/components/map/nearby.ts` (56 lines) : Spots this close to the visitor show up on their own when the map opens.
+- `src/components/map/roadDistance.test.ts` (81 lines) : src/components/map module: roadDistance.test
+- `src/components/map/roadDistance.ts` (183 lines) : Road distance from the visitor to each spot, from the OSRM table service (config/routing.ts: FOSSGIS unless
 - `src/components/map/RouteLoader.tsx` (177 lines) : Holds a loading phase on screen for at least MIN_LOADER_MS after it first appears, so a quick answer does not
 - `src/components/map/routeLoadPhase.test.ts` (34 lines) : src/components/map module: routeLoadPhase.test
 - `src/components/map/routeLoadPhase.ts` (22 lines) : What the walk is still waiting for before the first route can be drawn; null once there is nothing to wait for.
 - `src/components/map/routeMath.test.ts` (53 lines) : src/components/map module: routeMath.test
 - `src/components/map/routeMath.ts` (63 lines) : Pure math for following a street route: snap the visitor onto the nearest route segment, measure what is
 - `src/components/map/tiles.ts` (11 lines) : The one map tile layer, shared by the coffee map and the location picker.
-- `src/components/map/useLiveNavigation.ts` (129 lines) : Walking navigation driven by navigator.geolocation.watchPosition with high accuracy. Positions stay in
-- `src/components/map/walkingRoute.ts` (110 lines) : Street-following walking routes from the FOSSGIS OSRM server (OpenStreetMap data, foot profile, no key).
+- `src/components/map/useLiveNavigation.ts` (130 lines) : Walking navigation driven by navigator.geolocation.watchPosition with high accuracy. Positions stay in
+- `src/components/map/walkingRoute.ts` (111 lines) : Street-following walking routes from the OSRM foot server (config/routing.ts: FOSSGIS unless configured).
 
 ## src/components/moodFinder/
 
@@ -209,7 +211,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/components/moodFinder/parseQuery.ts` (85 lines) : Deterministic reading of a typed request ("quiet place to study, not too pricey, near Matina").
 - `src/components/moodFinder/scoreCafes.test.ts` (167 lines) : src/components/moodFinder module: scoreCafes.test
 - `src/components/moodFinder/scoreCafes.ts` (243 lines) : The mood finder's matcher. Pure: the same catalog, request and context always give the same
-- `src/components/moodFinder/useLocation.ts` (70 lines) : insecure: the page is not https (or localhost), so the browser refuses location before asking anyone.
+- `src/components/moodFinder/useLocation.ts` (101 lines) : insecure: the page is not https (or localhost), so the browser refuses location before asking anyone.
 - `src/components/moodFinder/weather.ts` (63 lines) : Current Davao weather from Open-Meteo (free, no key). Fixed city coordinates, never the
 
 ## src/components/passport/
@@ -228,7 +230,10 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/session/
 
-- `src/components/session/CheckInModal.tsx` (238 lines) : Check in at a spot. The device position is read once, in memory, and compared with the spot: within
+- `src/components/session/CheckInModal.tsx` (303 lines) : Check in at a spot. The device position is read in memory and compared with the spot: within 120 m the
+  - L17 : CheckInModalProps
+  - L28 : Phase
+  - L46 : CheckInModal
 - `src/components/session/EndSessionModal.tsx` (214 lines) : A small segmented control: one choice, or none until tapped.
 - `src/components/session/FloatingFocusBanner.tsx` (112 lines) : The running Deep Focus Session, floating just above the tab dock on phones (bottom of the screen on
 
@@ -242,6 +247,8 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 - `src/config/ecosystem.ts` (14 lines) : Sister ecosystem bridge between Haraya (coffee) and Habi (fashion).
 - `src/config/launch.ts` (13 lines) : Launch phase. During the soft launch the app is closed: visitors see the pre-registration page and can create an
+- `src/config/routing.test.ts` (45 lines) : src/config module: routing.test
+- `src/config/routing.ts` (43 lines) : Street routing servers (OSRM HTTP API). Haraya asks them for walking routes (live navigation, walkingRoute.ts)
 - `src/config/supabase.ts` (19 lines) : Haraya Supabase Client.
 
 ## src/data/
@@ -253,8 +260,8 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/hooks/
 
-- `src/hooks/useFocusSession.test.ts` (76 lines) : src/hooks module: useFocusSession.test
-- `src/hooks/useFocusSession.ts` (237 lines) : The running Deep Focus Session. It lives in localStorage (haraya_active_focus) so a refresh, a tab change or
+- `src/hooks/useFocusSession.test.ts` (89 lines) : src/hooks module: useFocusSession.test
+- `src/hooks/useFocusSession.ts` (243 lines) : The running Deep Focus Session. It lives in localStorage (haraya_active_focus) so a refresh, a tab change or
 - `src/hooks/useOnline.ts` (19 lines) : True while the browser reports a network connection; re-renders when it drops or comes back.
 - `src/hooks/useServiceVersions.ts` (63 lines) : Subscriber-version hooks: each service exposes a monotonically increasing
 
@@ -374,6 +381,8 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 - `src/utils/backgroundUpdate.test.ts` (68 lines) : src/utils module: backgroundUpdate.test
 - `src/utils/backgroundUpdate.ts` (30 lines) : Applies a waiting service worker update only after the page has been hidden for a while, so a quick
+- `src/utils/bestFix.test.ts` (127 lines) : A stand-in for navigator.geolocation: the test pushes fixes and errors into the one open watch.
+- `src/utils/bestFix.ts` (90 lines) : GeolocationPositionError.PERMISSION_DENIED
 - `src/utils/calendar.test.ts` (57 lines) : src/utils module: calendar.test
 - `src/utils/calendar.ts` (161 lines) : Calendar and clock helpers shared by roast drops, cafe hours, and the
 - `src/utils/emailTypos.test.ts` (39 lines) : src/utils module: emailTypos.test
@@ -384,6 +393,8 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/utils/gmailOnly.ts` (15 lines) : New accounts are Gmail only. The form checks it so the visitor hears it before anything is sent, and the database
 - `src/utils/inbox.test.ts` (21 lines) : src/utils module: inbox.test
 - `src/utils/inbox.ts` (25 lines) : Where a visitor reads their mail, from the address they signed up with. Only providers with a stable web
+- `src/utils/locationQuality.test.ts` (107 lines) : src/utils module: locationQuality.test
+- `src/utils/locationQuality.ts` (64 lines) : How far to trust a position fix. navigator.geolocation reports an accuracy radius in metres with every fix:
 - `src/utils/router.ts` (90 lines) : Hash routes so cafes, beans, roasteries, drops, and shared lists have shareable
 - `src/utils/weekdays.ts` (13 lines) : Canonical weekday iteration order for hours tables.
 
@@ -398,7 +409,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L18 : LandingViewProps
   - L34 : Phone
   - L112 : LandingView
-- `src/views/LegalView.tsx` (234 lines) : Privacy Notice and Terms. Statements of fact describe what the code does today; anything that needs a
+- `src/views/LegalView.tsx` (238 lines) : Privacy Notice and Terms. Statements of fact describe what the code does today; anything that needs a
 - `src/views/LoginView.tsx` (346 lines) : What the page is doing: the two account modes, the two email-link flows, and the new-password form.
   - L11 : LoginMode
   - L13 : LoginViewProps

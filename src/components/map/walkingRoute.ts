@@ -1,19 +1,20 @@
 import { useEffect, useRef, useState } from 'react';
 import { trailLengthKm, type GeoPoint } from '../../utils/geo';
 import { OFF_ROUTE_KM, progressAlongRoute } from './routeMath';
+import { FOOT_ROUTER, routerCredit } from '../../config/routing';
 
 /**
- * Street-following walking routes from the FOSSGIS OSRM server (OpenStreetMap data, foot profile, no key).
+ * Street-following walking routes from the OSRM foot server (config/routing.ts: FOSSGIS unless configured).
  * Only the start and end coordinates of a walk are sent, and only while live navigation is running; nothing
  * is stored. Any failure returns null and the map falls back to the straight-line guide.
  */
-const ROUTER = 'https://routing.openstreetmap.de/routed-foot/route/v1/foot';
+const ROUTER = `${FOOT_ROUTER}/route/v1/foot`;
 const TIMEOUT_MS = 8_000;
 const MAX_POINTS = 5_000;
 /** Minimum gap between two route requests, so a wandering walker cannot flood the free server. */
 const REFETCH_COOLDOWN_MS = 20_000;
 
-export const ROUTE_ATTRIBUTION = 'Walking route: OSRM by FOSSGIS';
+export const ROUTE_ATTRIBUTION = `Walking route: ${routerCredit(FOOT_ROUTER)}`;
 
 export interface WalkingRoute {
   points: GeoPoint[];

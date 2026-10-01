@@ -9,7 +9,8 @@ export type LegalPage = 'privacy' | 'terms';
  * with guesses, and update the fact sections whenever data handling changes (Supabase, Aya).
  */
 
-const LAST_UPDATED = '30 September 2026';
+const PRIVACY_UPDATED = '1 October 2026';
+const TERMS_UPDATED = '30 September 2026';
 
 const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
   <section className="space-y-2">
@@ -38,7 +39,7 @@ const List: React.FC<{ items: React.ReactNode[] }> = ({ items }) => (
 
 const Privacy: React.FC = () => (
   <>
-    <LargeTitle title="Privacy Notice" subtitle={`Last updated ${LAST_UPDATED}`} />
+    <LargeTitle title="Privacy Notice" subtitle={`Last updated ${PRIVACY_UPDATED}`} />
     <DraftNotice />
 
     <Section title="Who we are">
@@ -103,10 +104,12 @@ const Privacy: React.FC = () => (
             number are not.
           </>,
           <>
-            <strong>Location</strong>: read on your device when you tap Near me, Use my current location, or Navigate
-            in Haraya. During navigation it updates while the walk is running and stops when you end it or arrive. It
-            is not stored and not sent to us, except for the single position saved with a check-in (above). A spot's
-            map pin is the place's location, not yours.
+            <strong>Location</strong>: read on your device when you open Map &amp; Spots, or tap Near me, Use my
+            current location, Check in, or Navigate in Haraya. During navigation it updates while the walk is running
+            and stops when you end it or arrive. It is not stored and not sent to us, except for the single position
+            saved with a check-in (above). To show distances by road and walking routes, your position and the spots'
+            positions are sent to the routing service listed below. A spot's map pin is the place's location, not
+            yours.
           </>,
         ]}
       />
@@ -129,6 +132,7 @@ const Privacy: React.FC = () => (
           'Supabase, which runs our database and sign-in, stores your account, the spots you add and place listings, and sends sign-in, confirmation and password-reset emails.',
           'Google Fonts delivers the typeface and receives your IP address.',
           'OpenStreetMap map tiles are requested from your browser and include your IP address.',
+          'The OpenStreetMap routing service run by FOSSGIS (routing.openstreetmap.de) receives your position, the positions of nearby spots and your IP address when the map shows distances by road or a walking route. Haraya does not store them.',
           'Open-Meteo provides the weather hint. We send fixed city coordinates, not your location.',
           'Google Maps, Apple Maps, Waze and Google Calendar receive the destination only when you choose to open it there.',
         ]}
@@ -159,7 +163,7 @@ const Privacy: React.FC = () => (
 
 const Terms: React.FC = () => (
   <>
-    <LargeTitle title="Terms of Use" subtitle={`Last updated ${LAST_UPDATED}`} />
+    <LargeTitle title="Terms of Use" subtitle={`Last updated ${TERMS_UPDATED}`} />
     <DraftNotice />
 
     <Section title="What Haraya is">
