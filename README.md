@@ -100,6 +100,26 @@ confirmed accounts will have the opportunity of a coffee at a selected coffee sh
 from `early_registration_status()` in `supabase/migrations/20261001020000_early_registration_30_slots.sql`. To open the app, set `VITE_LAUNCH_MODE=open`
 in the Vercel environment and redeploy.
 
+## Location and routing
+
+Every location request goes through `watchBestFix` (`src/utils/bestFix.ts`): a phone's first answer is often a
+network fix kilometres wide, so the map, the check-in sheet and the Add a Spot pin keep listening for up to 15 seconds
+and keep the tightest fix. `src/utils/locationQuality.ts` grades the accuracy radius; the map draws it and says when a
+fix is only approximate, a check-in with a fix too wide to decide says so instead of "you are 2 km away", and a
+town-wide guess never moves a spot's pin.
+
+Walking routes and the map's road distances come from OSRM (`src/config/routing.ts`). The default is the free FOSSGIS
+server at routing.openstreetmap.de, which has a fair-use policy and no uptime promise. For real traffic, run an OSRM
+server (or a compatible host) and set `VITE_ROUTING_FOOT_URL` and `VITE_ROUTING_CAR_URL` to its base URLs, then add
+that host to `connect-src` in `vercel.json`. Road distances are cached for 10 minutes per place, and a failed request
+pauses the router for a minute; meanwhile the list shows straight-line distances, labelled as such.
+
+To check location on a real phone without deploying: run `VITE_LAUNCH_MODE=open npm run dev` (PowerShell:
+`$env:VITE_LAUNCH_MODE='open'; npm run dev`), plug the Android
+phone in by USB with USB debugging on, open `chrome://inspect/#devices` on the computer, add port forwarding
+`5174` to `localhost:5174`, and open `http://localhost:5174/#/tab/map` in Chrome on the phone. A browser only shares
+location with https pages or localhost, so a plain LAN address (`http://192.168.x.x:5174`) will not work.
+
 ## Ecosystem bridge
 
 The header switcher links between Haraya (coffee) and Habi (fashion). The Habi target URL is

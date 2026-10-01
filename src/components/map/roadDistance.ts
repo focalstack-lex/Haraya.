@@ -1,22 +1,30 @@
 import { useEffect, useRef, useState } from 'react';
 import { distanceKm, type GeoPoint } from '../../utils/geo';
+import { CAR_ROUTER, routerCredit } from '../../config/routing';
 
 /**
- * Road distance from the visitor to each spot, from the FOSSGIS OSRM table service (OpenStreetMap data, car
- * profile: the figure a maps app shows for directions). The straight line understates a drive by a quarter or
- * more, so the list says "by road" when this is in and "straight line" when it is not. One request per fix,
- * carrying the visitor's position and the spot coordinates; nothing is stored. Any failure returns null and
- * the list falls back to the straight line.
+ * Road distance from the visitor to each spot, from the OSRM table service (config/routing.ts: FOSSGIS unless
+ * configured; car profile, the figure a maps app shows for directions). The straight line understates a drive by
+ * a quarter or more, so the list says "by road" when this is in and "straight line" when it is not. One request
+ * per fix, carrying the visitor's position and the spot coordinates; nothing is stored beyond this page's memory.
+ * Answers are kept for CACHE_TTL_MS, so leaving the map tab and coming back does not ask again, and after a
+ * failure the router is left alone for FAILURE_PAUSE_MS. Any failure returns null and the list falls back to
+ * the straight line.
  */
-const ROUTER = 'https://routing.openstreetmap.de/routed-car/table/v1/driving';
+const ROUTER = `${CAR_ROUTER}/table/v1/driving`;
 const TIMEOUT_MS = 8_000;
 /** The public table service takes up to 100 coordinates, the visitor being one; the nearest spots go first. */
 export const MAX_SPOTS = 60;
 /** A move shorter than this keeps the distances already fetched. */
 export const REFETCH_AFTER_KM = 0.25;
+/** How long an answer stays good for the same spot and nearly the same place. */
+export const CACHE_TTL_MS = 10 * 60_000;
+const CACHE_MAX = 8;
+/** After a failed request (a busy server, a 429, no signal), how long to show straight lines without asking. */
+export const FAILURE_PAUSE_MS = 60_000;
 
 /** Short, so the map credits still fit one line on a phone. */
-export const ROAD_DISTANCE_ATTRIBUTION = 'Roads: OSRM/FOSSGIS';
+export const ROAD_DISTANCE_ATTRIBUTION = `Roads: ${routerCredit(CAR_ROUTER)}`;
 
 const coord = (p: GeoPoint) => `${p.lng.toFixed(5)},${p.lat.toFixed(5)}`;
 
@@ -68,51 +76,86 @@ export async function fetchRoadDistances(from: GeoPoint, to: GeoPoint[], signal:
   }
 }
 
+/** Road kilometres by spot id, for one origin and one catalog. */
+export interface RoadDistances {
+  origin: GeoPoint;
+  /** The catalog asked about, as its joined spot ids. */
+  ids: string;
+  byId: ReadonlyMap<string, number>;
+  /** When the router answered, in ms since the epoch. */
+  at: number;
+}
+
+/** True when an answer still fits: the same catalog, from within REFETCH_AFTER_KM of here. */
+export function fitsHere(result: RoadDistances | null, from: GeoPoint, ids: string): result is RoadDistances {
+  return result !== null && result.ids === ids && distanceKm(result.origin, from) < REFETCH_AFTER_KM;
+}
+
+// Answers kept for this page's lifetime, newest first; the map tab unmounts when the visitor leaves it
+let cache: RoadDistances[] = [];
+let pausedUntil = 0;
+
+export function readCache(from: GeoPoint, ids: string, now: number = Date.now()): RoadDistances | null {
+  return cache.find((entry) => now - entry.at < CACHE_TTL_MS && fitsHere(entry, from, ids)) ?? null;
+}
+
+export function writeCache(entry: RoadDistances): void {
+  cache = [entry, ...cache.filter((kept) => kept !== entry)].slice(0, CACHE_MAX);
+}
+
+/** Tests only: forget every answer and any pause. */
+export function resetRoadDistanceState(): void {
+  cache = [];
+  pausedUntil = 0;
+}
+
 /**
  * Kilometres by road from the visitor to each spot, by spot id, or null until the router answers (and when it
- * cannot). Fetched again only when the visitor moves more than REFETCH_AFTER_KM or the catalog changes; a
- * filter on the list does not refetch, so pass every spot, not the filtered ones.
+ * cannot). Asks again only when the visitor moves more than REFETCH_AFTER_KM or the catalog changes; a filter on
+ * the list does not ask again, so pass every spot, not the filtered ones. Distances measured from somewhere else
+ * are never shown: after a move the list reads "straight line" until the new answer is in.
  */
 export function useRoadDistances<T extends GeoPoint & { id: string }>(from: GeoPoint | null, spots: T[]): ReadonlyMap<string, number> | null {
-  const [byId, setById] = useState<ReadonlyMap<string, number> | null>(null);
-  const fetched = useRef<{ origin: GeoPoint; ids: string } | null>(null);
-  const inFlight = useRef<AbortController | null>(null);
+  const [result, setResult] = useState<RoadDistances | null>(null);
+  const inFlight = useRef<{ controller: AbortController; origin: GeoPoint; ids: string } | null>(null);
   const ids = spots.map((spot) => spot.id).join(',');
 
   useEffect(() => {
-    if (!from || spots.length === 0) return;
-    const last = fetched.current;
-    if (last && last.ids === ids && distanceKm(last.origin, from) < REFETCH_AFTER_KM) return;
+    if (!from || spots.length === 0 || fitsHere(result, from, ids) || readCache(from, ids)) return;
+    const pending = inFlight.current;
+    if (pending && pending.ids === ids && distanceKm(pending.origin, from) < REFETCH_AFTER_KM) return;
+    if (Date.now() < pausedUntil) return;
 
-    inFlight.current?.abort();
+    pending?.controller.abort();
     const controller = new AbortController();
-    inFlight.current = controller;
-    fetched.current = { origin: from, ids };
+    inFlight.current = { controller, origin: from, ids };
     const targets = pickNearest(spots, from);
     void fetchRoadDistances(from, targets, controller.signal).then((metres) => {
       if (controller.signal.aborted) return;
       inFlight.current = null;
       if (!metres) {
-        // Nothing to show for this position; the next fix or catalog change asks again
-        fetched.current = null;
-        setById(null);
+        pausedUntil = Date.now() + FAILURE_PAUSE_MS;
         return;
       }
-      const next = new Map<string, number>();
+      const byId = new Map<string, number>();
       metres.forEach((m, index) => {
-        if (m !== null) next.set(targets[index].id, m / 1000);
+        if (m !== null) byId.set(targets[index].id, m / 1000);
       });
-      setById(next);
+      const next: RoadDistances = { origin: from, ids, byId, at: Date.now() };
+      writeCache(next);
+      setResult(next);
     });
-  }, [from, spots, ids]);
+  }, [from, spots, ids, result]);
 
   useEffect(
     () => () => {
-      inFlight.current?.abort();
+      inFlight.current?.controller.abort();
       inFlight.current = null;
     },
     []
   );
 
-  return byId;
+  if (!from) return null;
+  if (fitsHere(result, from, ids)) return result.byId;
+  return readCache(from, ids)?.byId ?? null;
 }
