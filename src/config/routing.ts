@@ -11,10 +11,28 @@
 
 const FOSSGIS = 'https://routing.openstreetmap.de';
 
-/** A configured base URL, or the fallback when it is unset or not an http(s) URL. Trailing slashes dropped. */
+/**
+ * A configured base URL, or the fallback when it is unset or unusable: it must be https (http only for a server
+ * on this computer), with no user name, password, query or fragment, since route paths are appended to it.
+ * Trailing slashes are dropped.
+ */
 export function routerBase(configured: unknown, fallback: string): string {
-  if (typeof configured !== 'string' || !/^https?:\/\/[^\s/]+/i.test(configured.trim())) return fallback;
-  return configured.trim().replace(/\/+$/, '');
+  if (typeof configured !== 'string' || configured.trim() === '') return fallback;
+  let url: URL;
+  try {
+    url = new URL(configured.trim());
+  } catch {
+    console.warn('Haraya: ignoring a routing URL that is not a URL', configured);
+    return fallback;
+  }
+  const local = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
+  const safe =
+    (url.protocol === 'https:' || (url.protocol === 'http:' && local)) && !url.username && !url.password && !url.search && !url.hash;
+  if (!safe) {
+    console.warn('Haraya: ignoring a routing URL that is not plain https', configured);
+    return fallback;
+  }
+  return `${url.origin}${url.pathname}`.replace(/\/+$/, '');
 }
 
 /** Short credit for the map's attribution line: the FOSSGIS servers ask to be named. */
