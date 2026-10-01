@@ -1,0 +1,5 @@
+# Dependencies
+node_modules/
+
+# Renders and generated cue sheets (re-create with npm run render and npm run cues)
+out/

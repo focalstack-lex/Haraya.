@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "src/scenes/Walk.tsx"
+        ],
+        "createdAt": "2026-09-30T13:27:11.824Z",
+        "reason": "Claude: Walk.tsx L142 is a zero-size CSS border triangle drawing the map pin's pointer tail, not a card with a side accent"
+      }
+    ]
+  }
+}

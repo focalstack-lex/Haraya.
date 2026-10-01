@@ -1,0 +1,32 @@
+{
+  "name": "haraya-promo-video",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Haraya promo video, rendered with Remotion. See README.md.",
+  "type": "module",
+  "scripts": {
+    "studio": "remotion studio",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test scripts/check-timeline.ts",
+    "cues": "node scripts/cue-sheet.ts",
+    "capture": "node scripts/capture-screens.mjs",
+    "render": "remotion render HarayaPromo out/haraya-promo.mp4 --codec h264 --crf 12 --x264-preset slow --pixel-format yuv420p --color-space bt709",
+    "stills": "node scripts/stills.mjs"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.530",
+    "@remotion/google-fonts": "4.0.530",
+    "@remotion/paths": "4.0.530",
+    "lucide-react": "1.48.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "remotion": "4.0.530"
+  },
+  "devDependencies": {
+    "@remotion/bundler": "4.0.530",
+    "@remotion/renderer": "4.0.530",
+    "@types/node": "24.19.0",
+    "@types/react": "19.3.0",
+    "typescript": "6.0.3"
+  }
+}
