@@ -1,7 +1,8 @@
 import { supabase } from '../config/supabase';
+import { EARLY_COFFEE_SLOTS } from '../config/launch';
 
 /**
- * The soft-launch promo count (20261001000000_early_registration_promo.sql): how many of the early slots are
+ * The soft-launch promo count (20261001020000_early_registration_30_slots.sql): how many of the early slots are
  * taken and the caller's own place in the order. The database decides the order; this only reads it. Returns null
  * when the function is missing or unreachable, and the page then shows the offer without a count.
  */
@@ -15,11 +16,15 @@ export interface EarlyRegistrationStatus {
 
 const isCount = (value: unknown): value is number => typeof value === 'number' && Number.isInteger(value) && value >= 0;
 
-/** Validates the RPC reply, so a changed or broken function never puts a wrong number on the page. */
-export function parseEarlyRegistrationStatus(raw: unknown): EarlyRegistrationStatus | null {
+/**
+ * Validates the RPC reply, so a changed or broken function never puts a wrong number on the page. With
+ * expectedSlots, a reply for a different slot count (a database still on an older promo) is refused too.
+ */
+export function parseEarlyRegistrationStatus(raw: unknown, expectedSlots?: number): EarlyRegistrationStatus | null {
   if (!raw || typeof raw !== 'object') return null;
   const { slots, claimed, position } = raw as Record<string, unknown>;
   if (!isCount(slots) || slots === 0 || !isCount(claimed) || claimed > slots) return null;
+  if (expectedSlots !== undefined && slots !== expectedSlots) return null;
   if (position !== null && position !== undefined && (!isCount(position) || position === 0)) return null;
   return { slots, claimed, position: typeof position === 'number' ? position : null };
 }
@@ -31,5 +36,5 @@ export async function fetchEarlyRegistrationStatus(): Promise<EarlyRegistrationS
     console.warn('Haraya: could not read the early registration count', error.message);
     return null;
   }
-  return parseEarlyRegistrationStatus(data);
+  return parseEarlyRegistrationStatus(data, EARLY_COFFEE_SLOTS);
 }

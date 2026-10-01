@@ -4,7 +4,7 @@ import { ArrowRight, CircleCheck, Coffee, LogOut } from 'lucide-react';
 import { BrandLogo } from '../components/common/BrandLogo';
 import { AyaMascot } from '../components/common/AyaMascot';
 import { Phone } from './LandingView';
-import { EARLY_COFFEE_SLOTS } from '../config/launch';
+import { EARLY_COFFEE_SLOTS, EARLY_COFFEE_WINNERS } from '../config/launch';
 import { fetchEarlyRegistrationStatus, type EarlyRegistrationStatus } from '../services/earlyRegistrationService';
 
 /**
@@ -108,8 +108,10 @@ export const PreRegistrationView: React.FC<PreRegistrationViewProps> = ({ regist
               </span>
               <div>
                 <p className="text-[15px] sm:text-[16px] leading-[1.5]">
-                  <span className="font-semibold">The first {EARLY_COFFEE_SLOTS} registered accounts</span> will have the opportunity to
-                  get a coffee at a selected coffee shop.
+                  <span className="font-semibold">
+                    {EARLY_COFFEE_WINNERS} of the first {EARLY_COFFEE_SLOTS} registered accounts
+                  </span>{' '}
+                  will have the opportunity to get a coffee at a selected coffee shop, to be announced.
                 </p>
                 {statusLine && (
                   <p className="mt-1 text-[14px] font-semibold text-star" role="status">

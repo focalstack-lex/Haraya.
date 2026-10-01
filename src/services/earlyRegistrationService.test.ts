@@ -17,4 +17,9 @@ describe('parseEarlyRegistrationStatus', () => {
     expect(parseEarlyRegistrationStatus({ slots: 20, claimed: -1, position: null })).toBeNull();
     expect(parseEarlyRegistrationStatus({ slots: 20, claimed: 2, position: 0 })).toBeNull();
   });
+
+  it('refuses a reply for a different slot count than the page offers', () => {
+    expect(parseEarlyRegistrationStatus({ slots: 20, claimed: 18, position: null }, 30)).toBeNull();
+    expect(parseEarlyRegistrationStatus({ slots: 30, claimed: 18, position: 4 }, 30)).toEqual({ slots: 30, claimed: 18, position: 4 });
+  });
 });

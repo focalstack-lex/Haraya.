@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-10-01 : commit 35bd233 : fingerprint 27a5c64a49348c67
+Generated 2026-10-01 : commit f374c00 : fingerprint ba07c4975916e24c
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -240,7 +240,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 ## src/config/
 
 - `src/config/ecosystem.ts` (14 lines) : Sister ecosystem bridge between Haraya (coffee) and Habi (fashion).
-- `src/config/launch.ts` (10 lines) : Launch phase. During the soft launch the app is closed: visitors see the pre-registration page and can create an
+- `src/config/launch.ts` (13 lines) : Launch phase. During the soft launch the app is closed: visitors see the pre-registration page and can create an
 - `src/config/supabase.ts` (19 lines) : Haraya Supabase Client.
 
 ## src/data/
@@ -272,8 +272,8 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L86 : deriveStatus
   - L91 : catalogService
 - `src/services/communityService.ts` (154 lines) : Cup Check community layer: browser-created posts, likes, and comments. Likes are stored per browser (no accounts needed to
-- `src/services/earlyRegistrationService.test.ts` (21 lines) : src/services module: earlyRegistrationService.test
-- `src/services/earlyRegistrationService.ts` (36 lines) : The soft-launch promo count (20261001000000_early_registration_promo.sql): how many of the early slots are
+- `src/services/earlyRegistrationService.test.ts` (26 lines) : src/services module: earlyRegistrationService.test
+- `src/services/earlyRegistrationService.ts` (41 lines) : The soft-launch promo count (20261001020000_early_registration_30_slots.sql): how many of the early slots are
 - `src/services/moderationService.ts` (280 lines) : Reports from visitors and the Control Room's moderation data: the report queue, recent check-ins,
 - `src/services/notificationService.ts` (99 lines) : In-app notifications (table notifications, 20260930020000): written by database triggers when a spot or
 - `src/services/placeImport.test.ts` (76 lines) : src/services module: placeImport.test
@@ -407,7 +407,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
   - L488 : ListingEditorProps
   - L497 : ListingEditor
   - L729 : PlacePortalView
-- `src/views/PreRegistrationView.tsx` (160 lines) : The soft-launch page: while PRE_REGISTRATION is on it replaces the landing page and every tab for everyone but
+- `src/views/PreRegistrationView.tsx` (162 lines) : The soft-launch page: while PRE_REGISTRATION is on it replaces the landing page and every tab for everyone but
 - `src/views/ProfileView.tsx` (755 lines) : Leading icon of a grouped row: a 30px tinted rounded square.
   - L28 : ProfileSection
   - L30 : ProfileViewProps

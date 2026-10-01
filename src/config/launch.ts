@@ -5,5 +5,8 @@
  */
 export const PRE_REGISTRATION = import.meta.env.VITE_LAUNCH_MODE !== 'open';
 
-/** How many of the first registered accounts get the coffee offer. Must match the slots in 20261001000000_early_registration_promo.sql. */
-export const EARLY_COFFEE_SLOTS = 20;
+/** How many of the first registered accounts are in the coffee offer. Must match the slots in 20261001020000_early_registration_30_slots.sql. */
+export const EARLY_COFFEE_SLOTS = 30;
+
+/** How many of those accounts will have the opportunity of a coffee at the selected coffee shop. */
+export const EARLY_COFFEE_WINNERS = 3;

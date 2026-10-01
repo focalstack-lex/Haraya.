@@ -93,9 +93,9 @@ and pull request.
 ## Soft launch (pre-registration)
 
 Until launch the app is closed: every visitor except admins sees the pre-registration page
-(`src/views/PreRegistrationView.tsx`), can create an account, and sees the early coffee offer for the first 20
-confirmed accounts. The order comes from `early_registration_status()` in
-`supabase/migrations/20261001000000_early_registration_promo.sql`. To open the app, set `VITE_LAUNCH_MODE=open`
+(`src/views/PreRegistrationView.tsx`), can create an account, and sees the early coffee offer: 3 of the first 30
+confirmed accounts will have the opportunity of a coffee at a selected coffee shop, to be announced. The order comes
+from `early_registration_status()` in `supabase/migrations/20261001020000_early_registration_30_slots.sql`. To open the app, set `VITE_LAUNCH_MODE=open`
 in the Vercel environment and redeploy.
 
 ## Ecosystem bridge
