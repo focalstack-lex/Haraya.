@@ -1,6 +1,6 @@
 # CODE_MAP: Haraya Agent Navigation Map
 
-Generated 2026-10-01 : commit a29b792 : fingerprint 28b5f8fdcb869ff6
+Generated 2026-10-01 : commit 7a35f9b : fingerprint 98832de6ffbb1c47
 
 Regenerate with `npm run map:code`; verify staleness with `npm run map:code:check`.
 Never hand-edit: the generator owns this file.
@@ -65,7 +65,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/App.tsx` (962 lines) : Older links: the roaster portal is now the Place Portal. The Passport tab also answers to its own name.
   - L84 : SharedList
   - L110 : App
-- `src/index.css` (747 lines) : src entry point
+- `src/index.css` (763 lines) : src entry point
 - `src/main.tsx` (47 lines) : src entry point
 - `vite.config.ts` (43 lines) : . module: vite.config
 
@@ -116,9 +116,9 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/components/common/FormControls.tsx` (272 lines) : Shared form primitives for Haraya: an iOS-style sheet (bottom sheet with a
 - `src/components/common/ImageUploadField.tsx` (83 lines) : File input that stores the image as a dataURL with type and size validation.
 - `src/components/common/LargeTitle.tsx` (46 lines) : iOS large title: the first thing on every primary page, left aligned.
-- `src/components/common/locationFix.test.ts` (37 lines) : src/components/common module: locationFix.test
-- `src/components/common/locationFix.ts` (46 lines) : Which set of steps fits the visitor's device.
-- `src/components/common/LocationHelp.tsx` (34 lines) : Why Haraya cannot see the visitor's location, with the steps for their device to turn it on.
+- `src/components/common/locationFix.test.ts` (51 lines) : src/components/common module: locationFix.test
+- `src/components/common/locationFix.ts` (73 lines) : Which set of steps fits the visitor's device.
+- `src/components/common/LocationHelp.tsx` (43 lines) : Why Haraya cannot see the visitor's location (or sees it only roughly), with the steps for their device to fix it.
 - `src/components/common/sheetStyles.ts` (8 lines) : Class strings shared by sheets, so every grouped list and section label inside a sheet matches.
 - `src/components/common/WelcomeModal.tsx` (160 lines) : What the app does, stated plainly: one row per real surface.
 
@@ -172,20 +172,24 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 
 ## src/components/map/
 
-- `src/components/map/DavaoCoffeeMap.tsx` (989 lines) : Floating map control: a round bar-material button inside a 44px hit area.
-  - L58 : RowHandlers
-  - L131 : DavaoCoffeeMapProps
-  - L149 : DavaoCoffeeMap
+- `src/components/map/DavaoCoffeeMap.tsx` (1058 lines) : A fix that moved less than this since the view was last framed (GPS tightening in place) keeps the view.
+  - L62 : RowHandlers
+  - L138 : DavaoCoffeeMapProps
+  - L156 : DavaoCoffeeMap
 - `src/components/map/DirectionsActionSheet.tsx` (58 lines) : External map apps. Apple Maps uses its https form so the link also works outside Apple devices.
 - `src/components/map/liveNavMath.test.ts` (71 lines) : src/components/map module: liveNavMath.test
 - `src/components/map/liveNavMath.ts` (63 lines) : Pure math for in-app walking navigation. These straight-line figures are the fallback when no street route
+- `src/components/map/locationQuality.test.ts` (52 lines) : src/components/map module: locationQuality.test
+- `src/components/map/locationQuality.ts` (41 lines) : How far to trust a position fix. navigator.geolocation reports an accuracy radius in metres with every fix:
 - `src/components/map/mapFilters.test.ts` (70 lines) : src/components/map module: mapFilters.test
 - `src/components/map/mapFilters.ts` (33 lines) : True when the spot passes every active map filter; no filters means every spot.
 - `src/components/map/mapPins.test.ts` (72 lines) : src/components/map module: mapPins.test
 - `src/components/map/mapPins.ts` (95 lines) : Whether a spot is open right now, for the list and the preview card.
 - `src/components/map/MapPreviewCard.tsx` (123 lines) : Inside the last hour the card counts down, so a visitor does not walk to a door that is about to shut.
-- `src/components/map/nearby.test.ts` (31 lines) : src/components/map module: nearby.test
-- `src/components/map/nearby.ts` (21 lines) : Spots this close to the visitor show up on their own when the map opens.
+- `src/components/map/nearby.test.ts` (56 lines) : src/components/map module: nearby.test
+- `src/components/map/nearby.ts` (47 lines) : Spots this close to the visitor show up on their own when the map opens.
+- `src/components/map/roadDistance.test.ts` (42 lines) : src/components/map module: roadDistance.test
+- `src/components/map/roadDistance.ts` (119 lines) : Road distance from the visitor to each spot, from the FOSSGIS OSRM table service (OpenStreetMap data, car
 - `src/components/map/RouteLoader.tsx` (177 lines) : Holds a loading phase on screen for at least MIN_LOADER_MS after it first appears, so a quick answer does not
 - `src/components/map/routeLoadPhase.test.ts` (34 lines) : src/components/map module: routeLoadPhase.test
 - `src/components/map/routeLoadPhase.ts` (22 lines) : What the walk is still waiting for before the first route can be drawn; null once there is nothing to wait for.
@@ -209,7 +213,7 @@ All Davao Region content: cafes, roasteries, bean lots, drop batches, trails, an
 - `src/components/moodFinder/parseQuery.ts` (85 lines) : Deterministic reading of a typed request ("quiet place to study, not too pricey, near Matina").
 - `src/components/moodFinder/scoreCafes.test.ts` (167 lines) : src/components/moodFinder module: scoreCafes.test
 - `src/components/moodFinder/scoreCafes.ts` (243 lines) : The mood finder's matcher. Pure: the same catalog, request and context always give the same
-- `src/components/moodFinder/useLocation.ts` (70 lines) : insecure: the page is not https (or localhost), so the browser refuses location before asking anyone.
+- `src/components/moodFinder/useLocation.ts` (115 lines) : insecure: the page is not https (or localhost), so the browser refuses location before asking anyone.
 - `src/components/moodFinder/weather.ts` (63 lines) : Current Davao weather from Open-Meteo (free, no key). Fixed city coordinates, never the
 
 ## src/components/passport/

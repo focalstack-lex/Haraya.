@@ -1,13 +1,15 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { TILE_URL, TILE_OPTIONS } from './tiles';
 import L from 'leaflet';
-import { ChevronRight, Crosshair, Footprints, LocateFixed, Map as MapIcon, Minus, Navigation, Plus, WifiOff, X } from 'lucide-react';
+import { ChevronRight, Crosshair, Footprints, Loader2, LocateFixed, Map as MapIcon, Minus, Navigation, Plus, WifiOff, X } from 'lucide-react';
 import type { Cafe, Trail } from '../../types/coffee';
 import { curatedTrails } from '../../data/trails';
 import { distanceKm, directionsUrl, formatKm, trailLengthKm, walkMinutes, type GeoPoint } from '../../utils/geo';
 import { useOnline } from '../../hooks/useOnline';
 import { useLocation } from '../moodFinder/useLocation';
-import { NEARBY_RADIUS_KM, splitByDistance, type SpotDistance } from './nearby';
+import { NEARBY_RADIUS_KM, describeDistance, splitByDistance, walkMinutesFor, type SpotDistance } from './nearby';
+import { ROAD_DISTANCE_ATTRIBUTION, useRoadDistances } from './roadDistance';
+import { fixQuality, formatAccuracy } from './locationQuality';
 import {
   CLUSTER_RADIUS_PX,
   PHOTO_PIN_PX,
@@ -39,6 +41,8 @@ import { LargeTitle } from '../common/LargeTitle';
 const DAVAO_CENTER: [number, number] = [7.19, 125.55];
 const REGION_ZOOM = 9;
 const CITY_ZOOM = 12;
+/** A fix that moved less than this since the view was last framed (GPS tightening in place) keeps the view. */
+const REFRAME_AFTER_KM = 0.3;
 
 /** Floating map control: a round bar-material button inside a 44px hit area. */
 const MapControl: React.FC<{ label: string; onClick: () => void; children: React.ReactNode }> = ({ label, onClick, children }) => (
@@ -64,7 +68,7 @@ interface RowHandlers {
 }
 
 /** One venue in the side list: photo, name, area, open status and, once the visitor is located, how far it is. */
-const VenueRow: React.FC<RowHandlers & { cafe: Cafe; km?: number }> = ({ cafe, km, onPick, onHover, activeId }) => {
+const VenueRow: React.FC<RowHandlers & { cafe: Cafe; distance?: SpotDistance<Cafe> }> = ({ cafe, distance, onPick, onHover, activeId }) => {
   const status = pinStatus(cafe.hours);
   const active = activeId === cafe.id;
   return (
@@ -86,14 +90,17 @@ const VenueRow: React.FC<RowHandlers & { cafe: Cafe; km?: number }> = ({ cafe, k
             <span className={`ml-1.5 font-medium ${STATUS_TEXT_COLORS[status]}`}>{PIN_STATUS_LABELS[status]}</span>
           </span>
         </span>
-        {km !== undefined && (
+        {distance && (
           <span className="shrink-0 text-right ios-footnote text-ink-2">
-            <span className="block font-mono">{formatKm(km)}</span>
-            {km <= NEARBY_RADIUS_KM && (
-              <span className="flex items-center justify-end gap-0.5" aria-label={`${walkMinutes(km)} minute walk`}>
+            <span className="block font-mono">{describeDistance(distance).value}</span>
+            {distance.km <= NEARBY_RADIUS_KM ? (
+              <span className="flex items-center justify-end gap-0.5" aria-label={`${walkMinutesFor(distance)} minute walk`}>
                 <Footprints className="w-3 h-3" aria-hidden="true" />
-                <span className="font-mono">{walkMinutes(km)}</span> min
+                <span className="font-mono">{walkMinutesFor(distance)}</span> min
               </span>
+            ) : (
+              // Farther spots say which distance this is: along the roads, or the straight line when the router is out
+              <span className="block">{describeDistance(distance).note}</span>
             )}
           </span>
         )}
@@ -105,8 +112,8 @@ const VenueRow: React.FC<RowHandlers & { cafe: Cafe; km?: number }> = ({ cafe, k
 
 const VenueList: React.FC<RowHandlers & { entries: SpotDistance<Cafe>[] }> = ({ entries, ...handlers }) => (
   <ul className="ios-group ios-card-shadow">
-    {entries.map(({ spot, km }) => (
-      <VenueRow key={spot.id} cafe={spot} km={km} {...handlers} />
+    {entries.map((entry) => (
+      <VenueRow key={entry.spot.id} cafe={entry.spot} distance={entry} {...handlers} />
     ))}
   </ul>
 );
@@ -178,7 +185,11 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({
   const online = useOnline();
   // A fresh GPS fix every time: the nearby list is only as good as the position, and after a walk or a tap on
   // "near me" the visitor may have moved
-  const { position: myPosition, status: locationStatus, request: requestLocation } = useLocation({ maximumAgeMs: 0, highAccuracy: true });
+  const { position: myPosition, status: locationStatus, refining, request: requestLocation } = useLocation({ maximumAgeMs: 0, highAccuracy: true });
+  // How wide the fix is: the ring under the dot, and a note when it is only a neighbourhood or a guess
+  const fixGrade = myPosition ? fixQuality(myPosition.accuracy) : null;
+  // Road distances for every listed spot, so a filter never asks the router again
+  const roadKm = useRoadDistances(myPosition, cafes);
   const framedNearbyFix = useRef<GeoPoint | null>(null);
   // Aya covers the map for either wait: the walk's first fix and route, or the fix for the nearby view
   const overlayPhase = loadPhase ?? (!navTarget && locationStatus === 'locating' ? 'locating' : null);
@@ -190,7 +201,10 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({
     () => (filters.size === 0 ? cafes : cafes.filter((cafe) => matchesMapFilters(cafe, filters))),
     [cafes, filters]
   );
-  const ranked = useMemo(() => (myPosition ? splitByDistance(visibleCafes, myPosition) : null), [visibleCafes, myPosition]);
+  const ranked = useMemo(
+    () => (myPosition ? splitByDistance(visibleCafes, myPosition, NEARBY_RADIUS_KM, roadKm) : null),
+    [visibleCafes, myPosition, roadKm]
+  );
   // Live navigation owns the map while walking; the nearby view comes back once the walk ends
   const showNearby = ranked !== null && !navTarget;
   const [zoom, setZoom] = useState(REGION_ZOOM);
@@ -238,6 +252,9 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({
       attributionControl: true,
     });
     new SeamlessTileLayer(TILE_URL, TILE_OPTIONS).addTo(map);
+    // A metric scale bar, so the nearby ring and the distances can be checked against the map. Top left: the
+    // bottom edge belongs to the credits, which wrap on a phone once the router is credited too.
+    L.control.scale({ metric: true, imperial: false, maxWidth: 120, position: 'topleft' }).addTo(map);
     // Clusters depend on the zoom; a tap on bare map closes the preview card
     map.on('zoomend', () => setZoom(map.getZoom()));
     map.on('click', () => setPreviewId(null));
@@ -407,6 +424,8 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !navTarget) return;
+    // The navigation banner takes the top left corner, where the scale bar sits
+    map.getContainer().classList.add('haraya-map-walking');
     const layer = L.layerGroup().addTo(map);
     const target: [number, number] = [navTarget.lat, navTarget.lng];
     // The destination's own photo pin, shown large; the pins layer leaves this spot out while walking
@@ -432,6 +451,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({
     map.on('dragstart', pauseFollow);
     return () => {
       map.off('dragstart', pauseFollow);
+      map.getContainer().classList.remove('haraya-map-walking');
       layer.remove();
       navLayers.current?.you.remove();
       navLayers.current?.accuracy.remove();
@@ -505,6 +525,17 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({
     };
   }, [routeShown]);
 
+  // And while its road distances are in the list
+  const roadShown = roadKm !== null && showNearby;
+  useEffect(() => {
+    const control = mapRef.current?.attributionControl;
+    if (!control || !roadShown) return;
+    control.addAttribution(ROAD_DISTANCE_ATTRIBUTION);
+    return () => {
+      control.removeAttribution(ROAD_DISTANCE_ATTRIBUTION);
+    };
+  }, [roadShown]);
+
   // Find the visitor as soon as the map opens, and again when the connection comes back or a walk ends,
   // so the spots around them show up without a search. Live navigation runs its own GPS watch.
   useEffect(() => {
@@ -517,6 +548,18 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({
     if (!map || !myPosition || navTarget) return;
     const center: [number, number] = [myPosition.lat, myPosition.lng];
     const layer = L.layerGroup().addTo(map);
+    // How far the fix can be off: a faint ring under the dot that grows to a whole town for a network guess
+    if (Number.isFinite(myPosition.accuracy) && myPosition.accuracy > 0) {
+      L.circle(center, {
+        radius: myPosition.accuracy,
+        color: '#2F6FDB',
+        weight: 1,
+        opacity: 0.35,
+        fillColor: '#2F6FDB',
+        fillOpacity: fixGrade === 'rough' ? 0.03 : 0.08,
+        interactive: false,
+      }).addTo(layer);
+    }
     L.circle(center, {
       radius: NEARBY_RADIUS_KM * 1000,
       color: '#906D4B',
@@ -542,19 +585,26 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({
     return () => {
       layer.remove();
     };
-  }, [myPosition, navTarget]);
+  }, [myPosition, fixGrade, navTarget]);
 
-  // Frame each new fix once: the visitor and every spot within the radius, or the whole radius when none are.
+  // Frame each new fix once: the visitor and every spot within the radius, or the whole radius when none are, or
+  // the whole uncertainty ring when the fix is wider than the radius. A fix tightening in place (GPS locking on
+  // after the network's first answer) keeps the view; only a real move frames again.
   // A catalog refresh keeps the view; a trail or a walk keeps its own framing until it ends.
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !myPosition || !ranked || navTarget || activeTrail || framedNearbyFix.current === myPosition) return;
+    if (!map || !myPosition || !ranked || navTarget || activeTrail) return;
+    const framed = framedNearbyFix.current;
+    if (framed && distanceKm(framed, myPosition) < REFRAME_AFTER_KM) return;
     framedNearbyFix.current = myPosition;
     const here = L.latLng(myPosition.lat, myPosition.lng);
+    const spreadM = Number.isFinite(myPosition.accuracy) ? myPosition.accuracy : 0;
     const area =
-      ranked.nearby.length > 0
-        ? L.latLngBounds([here, ...ranked.nearby.map(({ spot }) => L.latLng(spot.lat, spot.lng))]).pad(0.2)
-        : here.toBounds(NEARBY_RADIUS_KM * 2000);
+      spreadM > NEARBY_RADIUS_KM * 1000
+        ? here.toBounds(spreadM * 2)
+        : ranked.nearby.length > 0
+          ? L.latLngBounds([here, ...ranked.nearby.map(({ spot }) => L.latLng(spot.lat, spot.lng))]).pad(0.2)
+          : here.toBounds(NEARBY_RADIUS_KM * 2000);
     map.fitBounds(area, { maxZoom: 16 });
   }, [myPosition, ranked, navTarget, activeTrail]);
 
@@ -588,6 +638,19 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({
   };
 
   const rowHandlers: RowHandlers = { onPick: focusSpot, onHover: setHoverId, activeId: previewCafe?.id ?? null };
+
+  // What to say under the map about the visitor's location: nothing while it is precise or still being found
+  const locationNote: 'offline' | 'refining' | 'approximate' | 'rough' | 'denied' | 'unavailable' | 'insecure' | null = navTarget
+    ? null
+    : !online
+      ? 'offline'
+      : locationStatus === 'denied' || locationStatus === 'unavailable' || locationStatus === 'insecure'
+        ? locationStatus
+        : refining
+          ? 'refining'
+          : locationStatus === 'granted' && fixGrade && fixGrade !== 'precise'
+            ? fixGrade
+            : null;
 
   const recenterOnMe = () => {
     const map = mapRef.current;
@@ -668,7 +731,7 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({
             {previewCafe && (
               <MapPreviewCard
                 cafe={previewCafe}
-                km={myPosition ? distanceKm(myPosition, previewCafe) : null}
+                distance={myPosition ? { km: distanceKm(myPosition, previewCafe), roadKm: roadKm?.get(previewCafe.id) ?? null } : null}
                 onView={onSelectCafe}
                 onDirections={onDirections}
                 onClose={() => setPreviewId(null)}
@@ -711,18 +774,23 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({
             </div>
           </div>
 
-          {/* Why the nearby spots are not showing yet, kept small under the map */}
-          {!navTarget && (!online || (locationStatus !== 'idle' && locationStatus !== 'granted' && locationStatus !== 'locating')) && (
+          {/* The visitor's location, kept small under the map: offline, still tightening, only a wide fix, or off */}
+          {locationNote && (
             <div role="status" className="ios-group flex items-center gap-2.5 px-4 py-2.5 text-[14px] leading-snug text-ink-2">
-              {!online ? (
+              {locationNote === 'offline' ? (
                 <>
                   <WifiOff className="w-4 h-4 shrink-0 text-tint-ink" strokeWidth={2} />
                   <span>You're offline. Connect to the internet and the cafes near you will show up on the map automatically.</span>
                 </>
+              ) : locationNote === 'refining' ? (
+                <>
+                  <Loader2 className="w-4 h-4 shrink-0 text-tint-ink animate-spin" strokeWidth={2} aria-hidden="true" />
+                  <span>Getting a precise fix{myPosition && `, ${formatAccuracy(myPosition.accuracy)} so far`}.</span>
+                </>
+              ) : locationNote === 'approximate' || locationNote === 'rough' ? (
+                <LocationHelp problem={locationNote} accuracyM={myPosition?.accuracy} onRetry={showNearMe} />
               ) : (
-                (locationStatus === 'denied' || locationStatus === 'unavailable' || locationStatus === 'insecure') && (
-                  <LocationHelp problem={locationStatus} onRetry={showNearMe} />
-                )
+                <LocationHelp problem={locationNote} onRetry={showNearMe} />
               )}
             </div>
           )}
@@ -950,7 +1018,8 @@ export const DavaoCoffeeMap: React.FC<DavaoCoffeeMapProps> = ({
                 {ranked.nearby.length === 0 ? (
                   <p className="ios-group px-4 py-3 text-[14px] text-ink-2">
                     No spots within {NEARBY_RADIUS_KM} km of you yet.
-                    {ranked.farther.length > 0 && ` The closest is ${ranked.farther[0].spot.name}, ${formatKm(ranked.farther[0].km)} away.`}
+                    {ranked.farther.length > 0 &&
+                      ` The closest is ${ranked.farther[0].spot.name}, ${describeDistance(ranked.farther[0]).value} ${describeDistance(ranked.farther[0]).note}.`}
                   </p>
                 ) : (
                   <VenueList entries={ranked.nearby} {...rowHandlers} />
