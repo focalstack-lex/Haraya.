@@ -341,6 +341,22 @@ html {
 .leaflet-container .leaflet-tile-container img.leaflet-tile {
   mix-blend-mode: normal;
 }
+
+/* Map scale bar (DavaoCoffeeMap.tsx): lets the nearby ring and the distances be checked against the tiles.
+   It steps aside while the navigation banner has its corner. */
+.leaflet-container .leaflet-control-scale-line {
+  border: 1.5px solid var(--color-ink-2);
+  border-top: none;
+  background: rgba(255, 253, 249, 0.8);
+  color: var(--color-ink);
+  font: 500 11px/1.4 var(--font-ui);
+  padding: 1px 6px 0;
+}
+
+.haraya-map-walking .leaflet-control-scale {
+  display: none;
+}
+
 /* Cup Check flavor pins float over post photos */
 .flavor-pin {
   filter: drop-shadow(0 2px 8px rgba(19, 25, 31, 0.4));

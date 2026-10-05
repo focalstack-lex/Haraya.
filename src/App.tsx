@@ -875,6 +875,8 @@ export const App: React.FC = () => {
       />
 
       <CheckInModal
+        // A fresh sheet per spot and per opening, so the last result never shows while the new fix is found
+        key={checkInCafe?.id ?? 'closed'}
         cafe={checkInCafe}
         onClose={() => setCheckInCafe(null)}
         onDirections={(cafe) => {

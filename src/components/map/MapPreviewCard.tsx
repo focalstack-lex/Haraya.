@@ -1,10 +1,9 @@
 import React from 'react';
 import { Navigation, X } from 'lucide-react';
 import type { Cafe, Weekday } from '../../types/coffee';
-import { formatKm, walkMinutes } from '../../utils/geo';
 import { minutesUntilClose } from '../../utils/calendar';
 import { pinStatus } from './mapPins';
-import { NEARBY_RADIUS_KM } from './nearby';
+import { NEARBY_RADIUS_KM, describeDistance, walkMinutesFor, type Distance } from './nearby';
 
 /** Inside the last hour the card counts down, so a visitor does not walk to a door that is about to shut. */
 const CLOSING_SOON_MIN = 60;
@@ -19,8 +18,8 @@ const clockAfter = (now: Date, minutes: number): string => {
 
 interface MapPreviewCardProps {
   cafe: Cafe;
-  /** Distance from the visitor, or null before they are located. */
-  km: number | null;
+  /** Distance from the visitor (straight line, and by road once known), or null before they are located. */
+  distance: Distance | null;
   onView: (cafeId: string) => void;
   /** Opens the directions picker: walk there on Haraya's map, or open the spot in a maps app. */
   onDirections?: (cafe: Cafe) => void;
@@ -28,11 +27,12 @@ interface MapPreviewCardProps {
 }
 
 /** The spot behind a tapped pin: where it is, whether it is open and until when, and directions one tap away. */
-export const MapPreviewCard: React.FC<MapPreviewCardProps> = ({ cafe, km, onView, onDirections, onClose }) => {
+export const MapPreviewCard: React.FC<MapPreviewCardProps> = ({ cafe, distance, onView, onDirections, onClose }) => {
   const now = new Date();
   const status = pinStatus(cafe.hours, now);
   const minutesLeft = status === 'open' ? minutesUntilClose(cafe.hours, now) : 0;
   const today = cafe.hours[WEEKDAYS[now.getDay()]];
+  const away = distance && describeDistance(distance);
 
   return (
     // Sits above the map credits so the OpenStreetMap attribution stays readable
@@ -76,12 +76,12 @@ export const MapPreviewCard: React.FC<MapPreviewCardProps> = ({ cafe, km, onView
               <span className="font-medium text-ink-2">Hours not listed</span>
             )}
           </p>
-          {km !== null && (
+          {distance && away && (
             <p className="ios-footnote text-ink-2">
-              <span className="font-mono">{formatKm(km)}</span> away
-              {km <= NEARBY_RADIUS_KM && (
+              <span className="font-mono">{away.value}</span> {away.note}
+              {distance.km <= NEARBY_RADIUS_KM && (
                 <>
-                  , about <span className="font-mono">{walkMinutes(km)}</span> min walk
+                  , about <span className="font-mono">{walkMinutesFor(distance)}</span> min walk
                 </>
               )}
             </p>
